@@ -1,0 +1,61 @@
+// MAKEHELP.BAT generated Help Map file.  Used by BASEBALL.HPJ. 
+ 
+// Commands (ID_* and IDM_*) 
+HID_FORMS_SCORESHEETFORM                0x18003
+HID_FORMS_STATISTCSFORM                 0x18004
+HID_FORMS_SCORESHEETFORMXTRA            0x18005
+HID_VIEW_NORMAL                         0x18006
+HID_LEAGUES_ADDLEAGUE                   0x18007
+HID_LEAGUES_EDITLEAGUE                  0x18008
+HID_TEAMS_ADDTEAMS                      0x18009
+HID_TEAMS_EDITTEAMS                     0x1800A
+HID_PLAYERS_ADDPLAYERS                  0x1800B
+HID_STATISTICS_CREATESTATS              0x1800D
+HID_STATISTICS_UPDATESTATS              0x1800E
+HID_LEAGUES_ADDLEAGUES                  0x1800F
+HID_LEAGUES_EDITLEAGUES                 0x18010
+HID_PLAYERS_ADDPITCHERS                 0x18017
+HID_PLAYERS_DELPLAYERS                  0x18018
+HID_PLAYERS_DELPITCHERS                 0x18019
+HID_PLAYERS_EDITLEAGUEBAT               0x1801A
+HID_PLAYERS_EDITLEAGUEPIT               0x1801B
+HID_FILE_EXPORTBASETEAMS                0x1801C
+HID_FILE_EXPORTLEAGUETEAMS              0x1801D
+HID_FILE_EXPORTHTMLBASETEAMS            0x1801E
+HID_FILE_EXPORTHTMLLEAGUETEAMS          0x1801F
+HID_TEAMS_EDITLEAGUETEAMS               0x18020
+HID_STATISTICS_HTMLLEAGUESTATS          0x18021
+HID_FILE_EXPORTHTMLLEAGUETEAMSALL       0x18023
+HID_FILE_EXPORTLEAGUETEAMSALL           0x18024
+HID_PLAYERS_ADDEDITBATTERS              0x18025
+HID_PLAYERS_ADDEDITPITCHERS             0x18026
+HID_LEAGUES_LEAGUEOPTIONSHTML           0x18027
+ 
+// Prompts (IDP_*) 
+ 
+// Resources (IDR_*) 
+HIDR_MAINFRAME                          0x20080
+HIDR_BASEBATYPE                         0x20081
+ 
+// Dialogs (IDD_*) 
+HIDD_ABOUTBOX                           0x20064
+HIDD_LEAGUE1                            0x20097
+HIDD_DIVISION1                          0x20098
+HIDD_ADDTEAMS1                          0x2009B
+HIDD_PLAYERS1                           0x2009C
+HIDD_TEAM1                              0x2009D
+HIDD_SELTEAM1                           0x2009E
+HIDD_PITCHERS1                          0x2009F
+HIDD_SELLEAGUE1                         0x200A0
+HIDD_SPLASH                             0x200A2
+HIDD_BATTERS                            0x200A3
+HIDD_TEAMHTMLOPTIONS                    0x200A5
+HIDD_BATTERSCHANCE                      0x200A6
+HIDD_BATTERSSTATS                       0x200A7
+HIDD_BATTERSINFO                        0x200A8
+HIDD_PITCHERSINFO                       0x200AA
+HIDD_PITCHERSSTATS                      0x200AB
+HIDD_PITCHERSCHANCE                     0x200AC
+HIDD_LEAGUEHTMLOPTIONS                  0x200AD
+ 
+// Frame Controls (IDW_*) 

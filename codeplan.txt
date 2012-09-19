@@ -1,0 +1,639 @@
+Strat program enhancments.
+ 1. Create the Help files
+ 2. Create access league information class
+ 3. Dialog to add short team names
+ 4. Code to create HTML for top players in various categories
+ 5. Seems Games behind is being calculated incorrectly. For every game not
+    played I should add .5 instead of subtracting .5.
+ 6. Add dialog to enter game results (score and per inning breakdowns).
+
+
+===============================================================================
+Sample Statistics from the Strat program I think.
+
+                           Super 1973 Stats & Standings 
+  
+East                        WON LOST  PCT   GB  MAGIC#   ACTWON ACTLOST ACTPCT 
+1973 Pittsburgh PIN          44  33  .571 ----    89         80      82   .494 
+1973 New York NYN            40  30  .571   .5               82      79   .509 
+1973 Chicago CHN             35  38  .479  7.0               77      84   .478 
+1973 Philadelphia PHN        36  41  .468  8.0               71      91   .438 
+1973 Montreal MON            34  40  .459  8.5               79      83   .488 
+1973 Saint Louis SLN         33  42  .440 10.0               81      81   .500 
+
+West                        WON LOST  PCT   GB  MAGIC#   ACTWON ACTLOST ACTPCT 
+1973 Cincinnati CIN          40  33  .548 ----    89         99      63   .611 
+1973 San Francisco SFN       38  34  .528  1.5               88      74   .543 
+1973 Los Angeles LAN         37  36  .507  3.0               95      66   .590 
+1973 Houston HON             38  38  .500  3.5               82      80   .506 
+1973 San Diego SDN           36  39  .480  5.0               60     102   .370 
+1973 Atlanta ATN             34  41  .453  7.0               76      85   .472 
+  
+
+ ----BATTING AVERAGE----   ------RUNS SCORED------   --------DOUBLES-------- 
+ R.Garr        ATN  .386   B.Williams    CHN    57   H.Aaron       ATN    22 
+ M.Sanguillen  PIN  .344   W.McCovey     SFN    57   G.Maddox      SFN    20 
+ W.Mays        NYN  .331   J.Morgan      CIN    55   G.Luzinski    PHN    17 
+ C.Geronimo    CIN  .322   B.Robertson   PIN    55   A.Oliver      PIN    17 
+ K.Griffey     CIN  .321   G.Foster      CIN    53   B.Robertson   PIN    16 
+ W.McCovey     SFN  .315   W.Mays        NYN    51   D.Cash        PIN    16 
+ B.McBride     SLN  .313   H.Aaron       ATN    50   D.Rader       SFN    16 
+ B.Williams    CHN  .312   D.Evans       ATN    49   J.Hickman     CHN    15 
+ H.Aaron       ATN  .310   M.Schmidt     PHN    47   D.Rader       HON    15 
+ G.Foster      CIN  .307   C.Jones       NYN    44   R.Cey         LAN    15 
+ A.Oliver      PIN  .300   W.Stargell    PIN    44   W.Mays        NYN    15 
+ L.Brock       SLN  .298   C.Tovar       PHN    43   C.Tovar       PHN    15 
+
+ --------TRIPLES--------   --------HOMERUNS-------   -----RUNS BATTED IN---- 
+ R.Garr        ATN    12   B.Robertson   PIN    27   W.Mays        NYN    68 
+ J.Morgan      CIN     7   B.Williams    CHN    21   W.McCovey     SFN    57 
+ R.Metzger     HON     7   G.Foster      CIN    21   D.Evans       ATN    56 
+ H.Aaron       ATN     6   W.Mays        NYN    21   G.Foster      CIN    56 
+ C.Geronimo    CIN     5   W.McCovey     SFN    21   B.Robertson   PIN    54 
+ W.Davis       LAN     5   W.Stargell    PIN    20   H.Aaron       ATN    52 
+ K.Boswell     NYN     5   R.Santo       CHN    18   N.Colbert     SDN    47 
+ C.Tovar       PHN     5   A.Oliver      PIN    18   B.Williams    CHN    46 
+ B.McBride     SLN     5   T.Perez       CIN    17   J.Hickman     CHN    45 
+ D.Thomas      SDN     5   J.Wynn        HON    17   M.Schmidt     PHN    45 
+ OTHERS TIED WITH      4   M.Schmidt     PHN    17   W.Stargell    PIN    45 
+                           D.Winfield    SDN    17   T.Perez       CIN    43 
+
+ ---------WALKS---------   ------STRIKE OUTS------   ------HIT BY PITCH----- 
+ J.Morgan      CIN    56   J.Wynn        HON    95   J.Essian      PHN    15 
+ D.Dietz       ATN    52   G.Luzinski    PHN    76   R.Hunt        MON    14 
+ J.Wynn        HON    51   R.Cey         LAN    75   G.Foster      CIN     7 
+ B.Carbo       SLN    48   W.Stargell    PIN    75   C.Jones       NYN     7 
+ K.Singleton   MON    46   N.Colbert     SDN    74   B.Stinson     MON     7 
+ G.Matthews    SFN    46   T.Perez       CIN    67   C.Johnson     HON     6 
+ R.Santo       CHN    41   D.Rader       HON    66   C.Tovar       PHN     6 
+ R.Fairly      MON    41   K.Singleton   MON    66   T.Foli        MON     5 
+ W.Garrett     NYN    41   M.Schmidt     PHN    64   R.Staub       NYN     5 
+ D.Evans       ATN    40   P.Corrales    SDN    64   B.McBride     SLN     5 
+ W.McCovey     SFN    38   B.Bonds       SFN    62   OTHERS TIED WITH      4 
+ OTHERS TIED WITH     37   B.Robertson   PIN    60 
+
+ -----SACRIFICE HITS----   ------STOLEN BASES-----   ----STOLEN BASE PCT---- 
+ R.Hundley     CHN     8   L.Brock       SLN    39   C.Jones       NYN  .818 
+ T.Scott       MON     8   J.Morgan      CIN    27   B.McBride     SLN  .808 
+ J.Niekro      ATN     7   C.Tovar       PHN    27   J.Bench       CIN  .800 
+ G.Beckert     CHN     6   C.Cedeno      HON    21   C.Cedeno      HON  .778 
+ D.Sutton      LAN     6   W.Mays        NYN    21   W.Mays        NYN  .778 
+ C.Kirby       SDN     6   B.McBride     SLN    21   K.Griffey     CIN  .765 
+ C.Morton      ATN     5   B.Bonds       SFN    17   L.Lintz       MON  .765 
+ R.Hebner      PIN     5   D.Lopes       LAN    16   C.Tovar       PHN  .730 
+ M.Kelleher    SLN     5   K.Griffey     CIN    13   B.Bonds       SFN  .708 
+ T.Murphy      SLN     5   W.Davis       LAN    13   T.Fuentes     SFN  .700 
+ OTHERS TIED WITH      4   L.Lintz       MON    13   L.Brock       SLN  .696 
+                           J.Cardenal    CHN    11   J.Morgan      CIN  .692 
+  
+
+ -----HITTING STREAK----   ---PINCH HIT BAT AVG---   ------SLUGGING PCT----- 
+ M.Sanguillen  PIN    17   S.Garvey      LAN  .500   B.Robertson   PIN  .700 
+ W.McCovey     SFN    17   C.Goggin      ATN  .455   W.Mays        NYN  .658 
+ J.Cardenal    CHN    16   G.Hiser       CHN  .417   G.Foster      CIN  .607 
+ B.Bailey      MON    15   C.Johnson     HON  .400   B.Williams    CHN  .599 
+ G.Luzinski    PHN    14   A.Thorton     CHN  .368   W.McCovey     SFN  .588 
+ R.Garr        ATN    13   M.Easler      HON  .361   R.Garr        ATN  .581 
+ C.Geronimo    CIN    13   T.Agee        HON  .357   H.Aaron       ATN  .559 
+ D.Rader       HON    13   G.Theodore    NYN  .357   A.Oliver      PIN  .556 
+ W.Davis       LAN    13   J.Cruz        SLN  .350   D.Parker      PIN  .525 
+ W.Garrett     NYN    13   L.May         HON  .333   D.Winfield    SDN  .521 
+ B.McBride     SLN    13   W.Montanez    PHN  .333   J.Bench       CIN  .518 
+ OTHERS TIED WITH     12   T.Martinez    NYN  .308   M.Schmidt     PHN  .514 
+
+ ------ON BASE PCT------   ----BAT AVG VS. LEFT---   ------HR VS. LEFT------ 
+ R.Garr        ATN  .421   J.Cardenal    CHN  .471   D.Winfield    SDN     9 
+ W.McCovey     SFN  .402   S.Garvey      LAN  .396   D.Evans       ATN     7 
+ W.Garrett     NYN  .396   D.Rader       HON  .382   D.Roberts     SDN     7 
+ C.Geronimo    CIN  .395   C.Tovar       PHN  .379   J.Wynn        HON     6 
+ W.Mays        NYN  .391   D.Baker       ATN  .366   M.Schmidt     PHN     6 
+ D.Dietz       ATN  .390   M.Schmidt     PHN  .360   A.Thorton     CHN     5 
+ R.Staub       NYN  .385   O.Brown       ATN  .359   C.Cedeno      HON     5 
+ R.Fairly      MON  .385   D.Johnson     ATN  .348   C.Johnson     HON     5 
+ K.Singleton   MON  .384   J.Royster     LAN  .340   R.Zisk        PIN     5 
+ K.Griffey     CIN  .380   T.Scott       MON  .340   N.Colbert     SDN     5 
+ J.Morgan      CIN  .380   J.Torre       SLN  .333   J.Bench       CIN     5 
+ C.Jones       NYN  .378   B.Williams    CHN  .328   OTHERS TIED WITH      4 
+
+ ---BAT AVG VS. RIGHT---   ------HR VS. RIGHT-----   ----------WINS--------- 
+ J.Torre       SLN  .385   B.Robertson   PIN    24   D.Sutton      LAN    10 
+ R.Garr        ATN  .376   W.McCovey     SFN    19   B.Moose       PIN     9 
+ F.Tepedino    ATN  .342   A.Oliver      PIN    18   S.Blass       PIN     9 
+ M.Sanguillen  PIN  .341   B.Williams    CHN    17   T.Hall        CIN     8 
+ K.Griffey     CIN  .335   G.Foster      CIN    17   S.Renko       MON     8 
+ W.McCovey     SFN  .335   W.Mays        NYN    17   J.Koosman     NYN     8 
+ C.Geronimo    CIN  .335   W.Stargell    PIN    16   D.Ellis       PIN     8 
+ D.Rader       SFN  .329   R.Monday      CHN    14   J.Marichal    SFN     8 
+ W.Mays        NYN  .327   R.Santo       CHN    14   OTHERS TIED WITH      7 
+ H.Aaron       ATN  .327   D.Parker      PIN    14 
+ B.Stinson     MON  .322   T.Perez       CIN    13 
+ R.Monday      CHN  .322   H.Aaron       ATN    12 
+
+ ---------LOSSES--------   ------WINNING PCT------   ----------ERA---------- 
+ P.Niekro      ATN    10   J.D'Acquisto  SFN 1.000   J.Marichal    SFN  1.69 
+ S.Carlton     PHN     9   B.Moose       PIN  .900   D.Sutton      LAN  2.17 
+ N.Briles      PIN     9   H.Parker      NYN  .875   B.Moose       PIN  2.44 
+ B.Gibson      SLN     9   C.Carroll     CIN  .857   D.Ellis       PIN  2.76 
+ L.Gura        CHN     8   D.Sutton      LAN  .833   B.Capra       NYN  2.91 
+ T.John        LAN     8   S.Blass       PIN  .818   J.Richard     HON  3.02 
+ T.Seaver      NYN     8   R.Reuschel    CHN  .778   B.Gibson      SLN  3.05 
+ L.Christenson PHN     8   J.Koosman     NYN  .727   T.Seaver      NYN  3.12 
+ B.Greif       SDN     8   D.Ellis       PIN  .727   L.Dierker     HON  3.12 
+ S.Rogers      MON     8   G.Gentry      ATN  .714   J.Matlack     NYN  3.18 
+ OTHERS TIED WITH      7   OTHERS TIED WITH   .700   G.Zahn        LAN  3.19 
+                                                     C.Osteen      LAN  3.30 
+
+ -----GAMES PITCHED-----   -----COMPLETE GAMES----   ---------SAVES--------- 
+ B.Miller      SDN    31   S.Carlton     PHN     7   T.McGraw      NYN    17 
+ V.Romo        SDN    30   J.Marichal    SFN     7   J.Brewer      LAN    10 
+ L.Walker      PIN    28   J.Richard     HON     6   M.Marshall    MON     9 
+ T.McGraw      NYN    27   D.Sutton      LAN     6   W.Granger     SLN     9 
+ R.Troedson    SDN    27   B.Gibson      SLN     6   V.Romo        SDN     9 
+ J.Willoughby  SFN    27   P.Niekro      ATN     5   C.Upshaw      HON     8 
+ B.Bonham      CHN    26   F.Jenkins     CHN     5   J.Billingham  CIN     7 
+ C.Zachary     PIN    26   S.Renko       MON     5   K.Brett       PHN     7 
+ B.Locker      CHN    25   A.Messersmith LAN     4   W.Twitchell   PHN     7 
+ C.Hough       LAN    25   N.Briles      PIN     4   D.Giusti      PIN     7 
+ J.D'Acquisto  SFN    25   OTHERS TIED WITH      3   OTHERS TIED WITH      6 
+ OTHERS TIED WITH     23 
+
+ --------SAVE PCT-------   ------HITS ALLOWED-----   ---HOME RUNS ALLOWED--- 
+ J.Brewer      LAN  .909   P.Niekro      ATN   133   K.Forsch      HON    19 
+ T.House       ATN  .857   S.Blass       PIN   128   C.Morton      ATN    18 
+ B.Miller      SDN  .857   N.Briles      PIN   128   J.Koosman     NYN    18 
+ T.McGraw      NYN  .810   C.Morton      ATN   125   S.Carlton     PHN    17 
+ J.Billingham  CIN  .778   S.Carlton     PHN   122   D.Segui       SLN    17 
+ M.Marshall    MON  .750   D.Ruthven     PHN   115   A.Messersmith LAN    16 
+ V.Romo        SDN  .750   J.Niekro      ATN   111   J.Lonborg     PHN    15 
+ C.Upshaw      HON  .727   K.Forsch      HON   110   D.Wilson      HON    15 
+ W.Twitchell   PHN  .700   R.Jones       SDN   109   T.Seaver      NYN    14 
+ D.Giusti      PIN  .700   C.Taylor      MON   106   B.Greif       SDN    14 
+ W.Granger     SLN  .692   B.Gibson      SLN   106   M.Corkins     SDN    14 
+ R.Hernandez   PIN  .667   OTHERS TIED WITH    105   OTHERS TIED WITH     13 
+
+ ---------WALKS---------   -------STRIKEOUTS------   ---PITCHER'S BAT AVG--- 
+ R.Bryant      SFN    53   J.Richard     HON   136   E.Sosa        SFN  .444 
+ S.Rogers      MON    52   T.Hall        CIN   132   J.Rooker      PIN  .400 
+ T.Hall        CIN    50   B.Gibson      SLN   114   S.Blass       PIN  .361 
+ A.Messersmith LAN    49   S.Carlton     PHN   112   R.Wise        SLN  .310 
+ B.Capra       NYN    49   C.Kirby       SDN   105   G.Zahn        LAN  .304 
+ J.Richard     HON    46   R.Nelson      CIN   104   J.Niekro      ATN  .294 
+ T.John        LAN    46   D.Sutton      LAN   101   C.Osteen      LAN  .294 
+ S.Renko       MON    45   T.Seaver      NYN    98   B.Hooton      CHN  .280 
+ D.Ellis       PIN    45   J.Lonborg     PHN    97   D.Carrithers  SFN  .278 
+ T.Murphy      SLN    45   F.Jenkins     CHN    93   M.Corkins     SDN  .267 
+ S.Arlin       SDN    44   J.Matlack     NYN    89   F.Jenkins     CHN  .265 
+ B.Stoneman    MON    43   B.Moose       PIN    87   G.Nolan       CIN  .243 
+
+ -----PITCHER'S HRs-----   ----HITS / 9 INNINGS---   -----BB / 9 INNINGS---- 
+ M.Corkins     SDN     3   D.Sutton      LAN  5.68   J.Marichal    SFN  1.38 
+ S.Carlton     PHN     2   T.Hall        CIN  5.90   J.Barr        SFN  1.90 
+ B.Moose       PIN     2   D.Segui       SLN  6.08   M.Pappas      CHN  1.91 
+ OTHERS TIED WITH      1   T.Seaver      NYN  6.40   R.Reuschel    CHN  1.94 
+                           B.Capra       NYN  6.64   B.Gibson      SLN  2.06 
+                           J.Richard     HON  7.17   G.Zahn        LAN  2.13 
+                           J.Marichal    SFN  7.31   J.Pizarro     HON  2.21 
+                           B.Moose       PIN  7.31   T.Seaver      NYN  2.25 
+                           D.Wilson      HON  7.43   R.Wise        SLN  2.30 
+                           C.Osteen      LAN  7.49   G.Nolan       CIN  2.30 
+                           J.Matlack     NYN  7.57   R.Jones       SDN  2.31 
+                           S.Renko       MON  7.62   K.Forsch      HON  2.34 
+
+ -----Ks / 9 INNINGS----   ----HRs / 9 INNINGS----   ----OPPONENT BAT AVG--- 
+ T.Hall        CIN 11.46   D.Ellis       PIN  0.32   D.Sutton      LAN  .179 
+ J.Richard     HON  9.56   J.Niekro      ATN  0.40   T.Hall        CIN  .185 
+ C.Kirby       SDN  9.39   J.Marichal    SFN  0.54   D.Segui       SLN  .191 
+ R.Nelson      CIN  9.30   B.Capra       NYN  0.55   T.Seaver      NYN  .201 
+ B.Gibson      SLN  8.69   F.Jenkins     CHN  0.59   B.Capra       NYN  .209 
+ T.Seaver      NYN  8.48   J.Matlack     NYN  0.60   J.Marichal    SFN  .218 
+ S.Carlton     PHN  8.33   B.Moose       PIN  0.63   J.Richard     HON  .221 
+ J.Lonborg     PHN  8.21   R.Reuschel    CHN  0.68   B.Moose       PIN  .223 
+ B.Moose       PIN  7.86   G.Zahn        LAN  0.68   C.Osteen      LAN  .225 
+ F.Jenkins     CHN  7.85   S.Rogers      MON  0.68   D.Wilson      HON  .230 
+ J.Matlack     NYN  7.65   J.Richard     HON  0.70   J.Matlack     NYN  .230 
+ M.Corkins     SDN  7.62   L.Christenson PHN  0.71   R.Nelson      CIN  .232 
+
+ ----LEFT OPP BAT AVG---   ---RIGHT OPP BAT AVG---   ------RUN SUPPORT------ 
+ T.Hall        CIN  .110   B.Capra       NYN  .162   G.Gentry      ATN  6.14 
+ R.Jones       SDN  .172   D.Sutton      LAN  .166   C.Morton      ATN  5.94 
+ D.Segui       SLN  .187   D.Ellis       PIN  .172   R.Nelson      CIN  5.50 
+ D.Sutton      LAN  .198   B.Greif       SDN  .181   B.Hooton      CHN  5.38 
+ S.Carlton     PHN  .200   B.Moose       PIN  .189   J.Matlack     NYN  5.29 
+ G.Zahn        LAN  .200   D.Segui       SLN  .194   N.Briles      PIN  5.25 
+ C.Osteen      LAN  .200   C.Kirby       SDN  .194   J.McGlothlin  CIN  5.21 
+ T.Seaver      NYN  .208   T.Seaver      NYN  .195   S.Renko       MON  5.07 
+ T.John        LAN  .217   F.Jenkins     CHN  .196   P.Niekro      ATN  4.94 
+ M.Pappas      CHN  .222   S.Renko       MON  .199   B.Moose       PIN  4.93 
+ J.Koosman     NYN  .228   T.Bradley     SFN  .201   J.Barr        SFN  4.92 
+ L.Christenson PHN  .231   T.Hall        CIN  .204   S.Blass       PIN  4.82 
+
+ ---INHERITED SCORE %---   ----STRIKEOUTS/WALKS--- 
+ P.Borbon      CIN  .133   J.Marichal    SFN  4.33 
+ T.McGraw      NYN  .154   B.Gibson      SLN  4.22 
+ R.Hernandez   PIN  .250   T.Seaver      NYN  3.77 
+ B.Locker      CHN  .286   J.Lonborg     PHN  3.46 
+ D.Laroche     CHN  .350   J.Barr        SFN  3.29 
+ C.Zachary     PIN  .357   M.Pappas      CHN  3.19 
+ R.Folkers     SLN  .375   D.Sutton      LAN  3.16 
+ K.Brett       PHN  .400   F.Jenkins     CHN  3.10 
+ T.House       ATN  .438   J.Richard     HON  2.96 
+ V.Romo        SDN  .462   S.Carlton     PHN  2.80 
+ T.Walker      MON  .500   C.Kirby       SDN  2.76 
+ R.Harrison    ATN  .600   R.Reuschel    CHN  2.74 
+  
+
+TEAM                   AVG    AB    R     H   2B  3B   HR  RBI   SB   CS    E 
+1973 Atlanta          .278  2630  368   731  106  31   75  361   18   15   39 
+1973 Pittsburgh       .273  2667  367   728  123  16  111  355   18   15   32 
+1973 Saint Louis      .272  2584  287   704   88  18   35  277   70   27   23 
+1973 Cincinnati       .267  2494  361   665  103  20   81  355   69   33   26 
+1973 New York         .253  2357  297   597   85  20   52  291   42   19   17 
+1973 Houston          .252  2610  302   657   93  21   70  294   34   14   43 
+1973 San Francisco    .251  2477  300   622   94  17   79  290   39   21   40 
+1973 Chicago          .249  2472  302   616   83  13   86  296   24   19   19 
+1973 Montreal         .245  2453  304   600   93  10   69  294   20   15   22 
+1973 Los Angeles      .243  2404  284   585   86  11   63  282   45   30   27 
+1973 Philadelphia     .243  2589  292   629  107  16   71  283   38   14   24 
+1973 San Diego        .240  2561  289   614   86  20   81  286   23    9   38 
+--------------------  ---- ----- ---- ----- ---- --- ---- ---- ---- ---- ---- 
+LEAGUE TOTALS         .256 30298 3753  7748 1147 213  873 3664  440  231  350 
+  
+
+TEAM                   ERA   W   L      IP     H    R   ER   HR   BB    SO OAVG 
+1973 Los Angeles      3.23  37  36   654.1   566  259  235   74  231   406 .234 
+1973 New York         3.34  40  30   627.1   545  240  233   78  220   472 .235 
+1973 Houston          3.53  38  38   695.2   628  297  273   85  241   446 .244 
+1973 San Francisco    3.75  38  34   664.2   620  303  277   71  237   441 .248 
+1973 San Diego        3.94  36  39   680.2   636  315  298   73  268   455 .248 
+1973 Chicago          4.00  35  38   656.1   648  304  292   63  196   391 .259 
+1973 Philadelphia     4.18  36  41   680.1   676  335  316   74  248   495 .260 
+1973 Saint Louis      4.21  33  42   673.2   668  327  315   83  236   465 .262 
+1973 Cincinnati       4.25  40  33   657.0   639  328  310   64  237   492 .255 
+1973 Pittsburgh       4.27  44  33   687.2   720  340  326   74  250   456 .271 
+1973 Montreal         4.42  34  40   660.1   688  335  324   66  275   349 .272 
+1973 Atlanta          4.53  34  41   669.1   715  365  337   68  242   406 .277 
+-------------------- ----- --- --- ------- ----- ---- ---- ---- ---- ----- ---- 
+LEAGUE TOTALS         3.97 445 445  8007.1  7749 3748 3536  873 2881  5274 .256 
+
+TEAM      OB% SLUG  PROD GAM   BB IBB    SO HBP   SH  SF GIDP    TB HRHM HRRD 
+1973 ATN .345 .427  .773  75  266  23   441  16   31  20   64  1124   36   39 
+1973 CHN .320 .398  .717  73  252  23   427  13   27  19   70   983   37   49 
+1973 CIN .343 .421  .765  73  285  19   419  18   37  22   55  1051   37   44 
+1973 HON .318 .384  .701  76  241  18   509  19   25  18   52  1002   42   28 
+1973 LAN .311 .367  .678  73  231  15   427  13   34  17   57   882   35   28 
+1973 MON .332 .375  .707  74  287   8   470  41   35  16   68   920   36   33 
+1973 NYN .330 .373  .703  70  257  20   373  26   27  26   58   878   23   29 
+1973 PHN .299 .379  .678  77  186  21   407  30   24  19   59   981   39   32 
+1973 PIN .321 .456  .777  77  184   9   468  12   16  17   68  1216   54   57 
+1973 SDN .302 .384  .685  75  214  16   500  19   37  14   56   983   32   49 
+1973 SFN .319 .398  .718  72  242  14   467  12   24  12   52   987   51   28 
+1973 SLN .335 .361  .696  75  236  22   365  17   25  18   72   933   23   12 
+-------- ---- ---- ----- --- ---- --- ----- --- ---- --- ---- -----  ---  --- 
+TOTALS   .323 .394  .717 445 2881 208  5273 236  342 218  731 11940  445  428 
+  
+
+TEAM                  CG SHO SAV    BFP IBB  BK  WP  PB IRSC% X-TOT X-OUT X-PCT 
+1973 Atlanta           6   3  18   2899   8   0   1  10  .420   422   301  .713 
+1973 Chicago          14   5  15   2769  16   0   4   1  .321   390   324  .831 
+1973 Cincinnati        8   6  15   2806  19   0   6   2  .314   379   299  .789 
+1973 Houston          13   6  17   2877  19   0   5   5  .395   402   322  .801 
+1973 Los Angeles      14   7  13   2718  23   0   3   5  .270   364   297  .816 
+1973 Montreal         11   3  14   2862  17   0   3   3  .468   348   284  .816 
+1973 New York         10   6  23   2585  16   0   2   2  .229   339   284  .838 
+1973 Philadelphia     11   4  18   2908  19   0   3   1  .426   417   349  .837 
+1973 Pittsburgh       16  10  22   2977  20   0   4   2  .333   410   313  .763 
+1973 Saint Louis      13   8  14   2867  14   0   6   4  .371   356   274  .770 
+1973 San Diego         7   3  16   2900  12   0   2   7  .491   353   269  .762 
+1973 San Francisco    11   6  16   2809  25   0   6   9  .444   382   291  .762 
+-------------------- --- --- --- ------ --- --- --- --- ----- ----- ----- ----- 
+LEAGUE TOTALS        134  67 201  33977 208   0  45  51  .380  4562  3607  .791 
+  
+
+TEAM     WON LOST   BATTING AVERAGE     HOME RUNS           RUNS BATTED IN 
+1973 PIN  44  33    R.Garr    ATN .386  B.Roberts PIN   27  W.Mays    NYN   68 
+1973 NYN  40  30    M.Sanguil PIN .344  B.William CHN   21  W.McCovey SFN   57 
+1973 CHN  35  38    W.Mays    NYN .331  G.Foster  CIN   21  D.Evans   ATN   56 
+1973 PHN  36  41    C.Geronim CIN .322  W.Mays    NYN   21  G.Foster  CIN   56 
+1973 MON  34  40    K.Griffey CIN .321  W.McCovey SFN   21  B.Roberts PIN   54 
+1973 SLN  33  42 
+                    WINS                SAVES               ERA 
+1973 CIN  40  33    D.Sutton  LAN   10  T.McGraw  NYN   17  J.Maricha SFN 1.69 
+1973 SFN  38  34    B.Moose   PIN    9  J.Brewer  LAN   10  D.Sutton  LAN 2.17 
+1973 LAN  37  36    S.Blass   PIN    9  M.Marshal MON    9  B.Moose   PIN 2.44 
+1973 HON  38  38    OTHERS TIED W    8  W.Granger SLN    9  D.Ellis   PIN 2.76 
+1973 SDN  36  39                        V.Romo    SDN    9  B.Capra   NYN 2.91 
+1973 ATN  34  41 
+                    CUR HIT STREAK      MVP POINT           CY YOUNG POINT 
+                    J.Hickman CHN   11  W.Mays    NYN  261  D.Sutton  LAN  398 
+                    J.Grubb   SDN    9  W.McCovey SFN  252  B.Moose   PIN  313 
+                    J.Cardena CHN    8  B.Roberts PIN  239  T.Hall    CIN  309 
+                    K.Singlet MON    7  H.Aaron   ATN  238  T.McGraw  NYN  274 
+                    B.Boone   PHN    6  B.William CHN  235  D.Ellis   PIN  254 
+
+YESTERDAY'S GAMES   TODAY'S SCHEDULE AND PROBABLE STARTERS 
+MON  5  at  ATN  3  PIN-Briles(5-9, 5.97) at NYN-Parker(7-1, 1.46) 
+CIN     at  NYN     CHN-Jenkins(4-6, 4.30) at CIN-Billing(2-2, 2.82) 
+PHN  3  at  HON  7  PHN-Christe(3-8, 4.25) at SLN-Wise(5-7, 4.32) 
+CHN     at  SFN     SDN-Corkins(5-4, 3.81) at ATN-Gentry(5-2, 4.06) 
+SDN     at  LAN     MON-Renko(8-6, 3.97) at HON-Pizarro(4-4, 3.48) 
+SLN  0  at  PIN  3  SFN-Bradley(4-4, 4.04) at LAN-Messers(5-7, 3.96) 
+
+YESTERDAY'S BEST PERFORMANCES 
+BATTER         TM OPP AB  R  H RB BB Ks HR SB 
+G.Gross       HON PHN  3  1  2  2  2  0  1  0 
+G.McNertney   PIN SLN  3  2  2  1  0  0  1  0 
+M.Schmidt     PHN HON  4  1  2  2  0  2  1  0 
+K.Singleton   MON ATN  5  2  2  1  0  1  1  0 
+D.Rader       HON PHN  2  1  1  1  2  0  0  0 
+
+PITCHER        TM OPP  INN  H  R ER BB Ks HR WLS 
+D.Ellis       PIN SLN  9.0  4  0  0  4  7  0 W 
+B.Stoneman    MON ATN  6.0  2  0  0  1  3  0 W 
+J.Crawford    HON PHN  1.0  0  0  0  0  1  0 W 
+C.Upshaw      HON PHN  2.0  1  0  0  0  2  0 
+M.Marshall    MON ATN  1.0  0  0  0  1  0  0   S 
+
+ALL-STAR SELECTIONS BY POSITION 
+C  J.Bench(CIN) 4,924,952               M.Sanguillen(PIN) 4,207,221 
+1B W.McCovey(SFN) 10,920,721            B.Robertson(PIN) 9,498,908 
+2B J.Morgan(CIN) 7,577,002              D.Lopes(LAN) 4,623,523 
+3B M.Schmidt(PHN) 6,926,382             D.Evans(ATN) 6,620,896 
+SS C.Speier(SFN) 4,194,105              L.Bowa(PHN) 3,854,877 
+LF B.Williams(CHN) 9,164,652            G.Foster(CIN) 7,867,226 
+CF W.Mays(NYN) 12,186,110               D.Winfield(SDN) 7,291,974 
+RF H.Aaron(ATN) 9,471,987               D.Parker(PIN) 5,842,000 
+Pi D.Sutton(LAN) 11,698,666             B.Moose(PIN) 7,572,685 
+   T.Hall(CIN) 7,400,179                T.McGraw(NYN) 6,138,075 
+   D.Ellis(PIN) 5,494,692               J.Richard(HON) 5,337,794 
+   J.Marichal(SFN) 5,070,005            J.Matlack(NYN) 4,877,691 
+   R.Nelson(CIN) 4,500,138              J.Koosman(NYN) 4,447,600 
+   R.Reuschel(CHN) 4,206,869            J.D'Acquisto(SFN) 4,206,869 
+  
+
+Longest games 
+ 5/25  15         CHN  4  8  0  SLN  2 11  0 (15 inning game) 
+ 4/22  13         ATN 12 22  3  SLN 13 16  0 (13 inning game) 
+ 4/28  13         SDN  3 12  0  NYN  5 13  0 (13 inning game) 
+ 5/ 6  13         CIN  4  6  1  HON  5 10  2 (13 inning game) 
+ 5/21  13         SFN  8 16  0  HON  9 16  0 (13 inning game) 
+ 6/21  13         MON  2  9  0  PHN  3 17  0 (13 inning game) 
+
+Most Runs - 1 Team 
+ 4/25  16 NYN     NYN 16 12  2  PIN  5 11  0 
+ 4/11  15 MON     PIN  5  7  2  MON 15 15  0 
+ 6/ 5  15 PHN     PHN 15 16  1  CHN  3  6  1 
+ 4/16  14 PIN     PIN 14 14  0  SDN  0  8  1 
+ 4/27  14 LAN     HON  3  6  0  LAN 14 14  0 
+ 5/31  14 ATN     CIN  1  6  0  ATN 14 21  0 
+ 6/ 6  14 ATN     PIN  4  9  1  ATN 14 19  0 
+ 6/19  14 MON     MON 14 20  0  SLN  8 20  1 
+
+Most Hits - 1 Team 
+ 4/22  22 ATN     ATN 12 22  3  SLN 13 16  0 (13 inning game) 
+ 5/31  21 ATN     CIN  1  6  0  ATN 14 21  0 
+ 5/ 9  20 CIN     CIN 13 20  0  SFN  9 10  2 (11 inning game) 
+ 6/15  20 SFN     ATN  7  9  0  SFN 11 20  0 
+ 6/19  20 SLN     MON 14 20  0  SLN  8 20  1 
+ 6/19  20 MON     MON 14 20  0  SLN  8 20  1 
+ 4/27  19 SLN     PIN  8 14  1  SLN 11 19  0 
+ 5/ 5  19 MON     MON 10 19  0  CHN  9 11  0 
+ 5/13  19 PHN     PHN 10 19  0  MON  1  7  0 
+ 6/ 6  19 ATN     PIN  4  9  1  ATN 14 19  0 
+
+Most Runs - Both Teams 
+ 4/22  25         ATN 12 22  3  SLN 13 16  0 (13 inning game) 
+ 5/ 9  22         CIN 13 20  0  SFN  9 10  2 (11 inning game) 
+ 6/19  22         MON 14 20  0  SLN  8 20  1 
+ 4/25  21         NYN 16 12  2  PIN  5 11  0 
+ 4/11  20         PIN  5  7  2  MON 15 15  0 
+ 4/18  20         HON  7 10  1  NYN 13 13  0 
+
+Most Hits - Both Teams 
+ 6/19  40         MON 14 20  0  SLN  8 20  1 
+ 4/22  38         ATN 12 22  3  SLN 13 16  0 (13 inning game) 
+ 4/27  33         PIN  8 14  1  SLN 11 19  0 
+ 4/11  32         NYN  9 15  0  ATN 10 17  1 
+ 5/21  32         SFN  8 16  0  HON  9 16  0 (13 inning game) 
+ 5/ 7  30         CIN 10 16  0  HON  8 14  0 (10 inning game) 
+ 5/ 5  30         MON 10 19  0  CHN  9 11  0 
+ 5/ 9  30         CIN 13 20  0  SFN  9 10  2 (11 inning game) 
+ 5/16  30         SLN 10 18  1  CIN  7 12  3 (10 inning game) 
+ 6/23  30         MON 11 16  1  ATN  5 14  0 
+
+At Bats 
+ 4/22  8 R Garr of ATN vs. SLN (13 inning game) 
+ 4/22  8 B McBride of SLN vs. ATN (13 inning game) 
+ 4/22  7 S Jackson of ATN vs. SLN (13 inning game) 
+ 4/22  7 F Tepedino of ATN vs. SLN (13 inning game) 
+ 4/22  7 M Lum of ATN vs. SLN (13 inning game) 
+ 4/28  7 C Jones of NYN vs. SDN (13 inning game) 
+ 4/28  7 B Harrelson of NYN vs. SDN (13 inning game) 
+ 5/ 9  7 J Morgan of CIN vs. SFN (11 inning game) 
+ 5/ 9  7 G Foster of CIN vs. SFN (11 inning game) 
+ 5/21  7 G Maddox of SFN vs. HON (13 inning game) 
+ 5/21  7 G Gross of HON vs. SFN (13 inning game) 
+ 5/25  7 B McBride of SLN vs. CHN (15 inning game) 
+ 6/21  7 L Bowa of PHN vs. MON (13 inning game) 
+ 6/21  7 M Schmidt of PHN vs. MON (13 inning game) 
+       6 by many players 
+
+Hits 
+ 4/22  6 R Garr of ATN vs. SLN in 8 at-bats (13 inning game) 
+ 4/10  5 G Beckert of CHN vs. PHN in 5 at-bats 
+ 4/11  5 M Jorgensen of MON vs. PIN in 5 at-bats 
+ 4/12  5 R Hebner of PIN vs. MON in 5 at-bats 
+ 4/18  5 N Colbert of SDN vs. PIN in 5 at-bats 
+ 4/22  5 J Oates of ATN vs. SLN in 6 at-bats (13 inning game) 
+ 5/ 1  5 M Easler of HON vs. PIN in 6 at-bats (12 inning game) 
+ 5/ 5  5 K Singleton of MON vs. CHN in 6 at-bats 
+ 5/ 6  5 R Garr of ATN vs. PIN in 5 at-bats 
+ 5/17  5 T Martinez of NYN vs. SDN in 5 at-bats 
+ 6/ 1  5 W McCovey of SFN vs. PIN in 5 at-bats 
+ 6/16  5 G Thomasson of SFN vs. ATN in 5 at-bats (12 inning game) 
+       4 by many players 
+
+Walks 
+ 4/10  4 J Morgan of CIN vs. LAN 
+ 4/20  4 D Dietz of ATN vs. SLN 
+ 4/21  4 G Matthews of SFN vs. HON 
+ 4/23  4 B Russell of LAN vs. SFN (12 inning game) 
+       3 by many players 
+
+Strikeouts 
+ 4/11  4 G Matthews of SFN vs. SDN in 4 at-bats 
+ 4/22  4 R Cey of LAN vs. PHN in 4 at-bats 
+ 4/23  4 J Wynn of HON vs. CIN in 4 at-bats 
+ 4/26  4 A Kosco of CIN vs. SFN in 5 at-bats 
+ 4/30  4 B Harrelson of NYN vs. SFN in 4 at-bats 
+ 5/11  4 B Bonds of SFN vs. NYN in 5 at-bats (11 inning game) 
+ 5/18  4 M Perez of ATN vs. CIN in 4 at-bats 
+ 5/21  4 T Perez of CIN vs. CHN in 5 at-bats 
+ 5/26  4 B Robertson of PIN vs. SDN in 4 at-bats (10 inning game) 
+ 5/30  4 J Wynn of HON vs. SDN in 4 at-bats 
+ 6/ 6  4 C Gaston of SDN vs. CIN in 4 at-bats 
+       3 by many players 
+
+Home Runs 
+ 4/24  3 G Foster of CIN vs. HON in 5 at-bats 
+       2 by many players 
+
+Runs Scored 
+ 4/11  4 M Jorgensen of MON vs. PIN 
+ 4/16  4 D Parker of PIN vs. SDN 
+ 4/18  4 N Colbert of SDN vs. PIN 
+ 4/25  4 J Beauchamp of NYN vs. PIN 
+ 4/27  4 L Brock of SLN vs. PIN 
+ 5/25  4 O Brown of ATN vs. CIN 
+ 6/ 1  4 W McCovey of SFN vs. PIN 
+ 6/17  4 B Williams of CHN vs. PHN 
+       3 by many players 
+
+RBIs 
+ 6/ 8  7 H Breeden of MON vs. LAN in 4 at-bats 
+ 4/11  6 J Bench of CIN vs. LAN in 4 at-bats 
+ 4/18  6 N Colbert of SDN vs. PIN in 5 at-bats 
+ 4/26  6 O Brown of ATN vs. CHN in 4 at-bats 
+ 4/27  6 K Reitz of SLN vs. PIN in 5 at-bats 
+ 5/28  6 R Morales of SDN vs. MON in 5 at-bats 
+ 4/24  5 D Mason of SDN vs. ATN in 5 at-bats 
+ 5/ 4  5 S Garvey of LAN vs. SFN in 5 at-bats 
+ 5/ 9  5 J Morgan of CIN vs. SFN in 7 at-bats (11 inning game) 
+ 5/18  5 B McBride of SLN vs. PHN in 5 at-bats 
+ 5/19  5 R Fairly of MON vs. SFN in 4 at-bats 
+ 5/21  5 B Watson of HON vs. SFN in 6 at-bats (13 inning game) 
+ 5/26  5 R Cey of LAN vs. CHN in 5 at-bats 
+ 6/ 5  5 G Luzinski of PHN vs. CHN in 5 at-bats 
+ 6/ 6  5 W Mays of NYN vs. SFN in 5 at-bats 
+ 6/12  5 D Rader of SFN vs. MON in 5 at-bats 
+ 6/15  5 W McCovey of SFN vs. ATN in 5 at-bats 
+ 6/19  5 B Bailey of MON vs. SLN in 6 at-bats 
+       4 by many players 
+
+Stolen Bases 
+ 4/18  3 J Morgan of CIN vs. MON 
+ 4/21  3 L Brock of SLN vs. ATN 
+ 4/25  3 L Brock of SLN vs. PHN (11 inning game) 
+ 5/ 2  3 C Tovar of PHN vs. ATN 
+ 5/11  3 C Jones of NYN vs. SFN (11 inning game) 
+ 5/28  3 B McBride of SLN vs. SFN 
+ 6/21  3 C Tovar of PHN vs. MON (13 inning game) 
+ 6/21  3 J Morgan of CIN vs. PIN 
+       2 by many players 
+
+Outs Recorded 
+ 4/14 33 J Richard of HON vs. SFN 
+ 4/14 32 P Niekro of ATN vs. LAN 
+ 4/15 31 D Ellis of PIN vs. SDN 
+ 4/14 30 D Sutton of LAN vs. ATN 
+ 4/29 30 T Seaver of NYN vs. SDN 
+ 5/26 30 B Moose of PIN vs. SDN 
+ 5/26 29 C Kirby of SDN vs. PIN 
+      27 by many pitchers 
+
+Runs Allowed 
+ 6/10 11 S Carlton of PHN vs. ATN in 4 2/3 innings 
+ 4/22 10 S Arlin of SDN vs. CIN in 4 2/3 innings 
+ 4/26 10 L Gura of CHN vs. ATN in 5 innings 
+ 6/ 5 10 R Reuschel of CHN vs. PHN in 6 innings 
+ 4/25  9 J Rooker of PIN vs. NYN in 3 2/3 innings 
+ 6/ 8  9 A Messersmith of LAN vs. MON in 8 innings 
+ 6/19  9 S Carlton of PHN vs. CHN in 6 1/3 innings 
+ 4/18  8 J Reuss of HON vs. NYN in 4 innings 
+ 4/24  8 R Reed of ATN vs. SDN in 2 1/3 innings 
+ 5/ 4  8 S Carlton of PHN vs. SDN in 5 innings 
+ 5/13  8 T Hall of CIN vs. ATN in 5 2/3 innings 
+ 5/15  8 C Morton of ATN vs. CIN in 2 2/3 innings 
+ 6/ 3  8 P Niekro of ATN vs. PIN in 7 1/3 innings 
+ 6/ 3  8 G Nolan of CIN vs. SDN in 7 innings 
+ 6/ 8  8 J Lonborg of PHN vs. ATN in 8 innings 
+ 6/10  8 C Morton of ATN vs. PHN in 8 innings 
+ 6/22  8 G Zahn of LAN vs. SDN in 4 2/3 innings 
+       7 by many pitchers 
+
+Least Hits Allowed - 9+ IP 
+ 4/19  0 J Marichal of SFN vs. HON in 9 innings 
+ 5/ 2  1 J Rooker of PIN vs. HON in 9 innings 
+ 4/12  2 S Arlin of SDN vs. SFN in 9 innings 
+ 4/16  2 S Renko of MON vs. CHN in 9 innings 
+ 4/19  2 B Gibson of SLN vs. ATN in 9 innings 
+ 5/ 7  2 F Jenkins of CHN vs. MON in 9 innings 
+ 5/13  2 C Osteen of LAN vs. SDN in 9 innings 
+ 5/18  2 D Segui of SLN vs. PHN in 9 innings 
+ 5/22  2 T Hall of CIN vs. ATN in 9 innings 
+ 5/25  2 J Barr of SFN vs. SDN in 9 innings 
+ 5/25  2 T Seaver of NYN vs. HON in 9 innings 
+ 5/26  2 D Wilson of HON vs. ATN in 9 innings 
+ 6/ 4  2 J Richard of HON vs. LAN in 9 innings 
+       3 by many pitchers 
+
+Most Hits Allowed 
+ 6/19 16 S Renko of MON vs. SLN in 7 1/3 innings 
+ 6/ 8 15 J Lonborg of PHN vs. ATN in 8 innings 
+ 5/10 14 C Morton of ATN vs. HON in 8 2/3 innings 
+ 6/ 4 14 M Torrez of MON vs. SLN in 7 innings 
+ 6/ 8 14 J Marichal of SFN vs. SDN in 8 innings 
+ 4/11 13 C Morton of ATN vs. NYN in 6 innings 
+ 4/22 13 N Briles of PIN vs. CHN in 6 1/3 innings 
+ 4/26 13 L Gura of CHN vs. ATN in 5 innings 
+ 4/29 13 B Gibson of SLN vs. PIN in 9 innings 
+ 6/ 3 13 P Niekro of ATN vs. PIN in 7 1/3 innings 
+ 6/10 13 C Morton of ATN vs. PHN in 8 innings 
+ 4/29 12 S Blass of PIN vs. SLN in 5 innings 
+ 5/ 7 12 K Forsch of HON vs. CIN in 6 2/3 innings (10 inning game) 
+ 5/27 12 R Jones of SDN vs. PIN in 8 innings 
+ 6/ 1 12 N Briles of PIN vs. SFN in 6 innings 
+ 6/ 6 12 C Taylor of MON vs. SLN in 7 1/3 innings 
+ 6/13 12 C Taylor of MON vs. SDN in 6 innings 
+ 6/17 12 B Lersch of PHN vs. CHN in 5 innings 
+ 6/22 12 B Moose of PIN vs. SLN in 9 innings 
+
+Walks Allowed 
+ 5/18 10 R Bryant of SFN vs. MON in 6 2/3 innings 
+ 4/10  8 T John of LAN vs. CIN in 7 innings 
+ 5/ 6  8 B Hooton of CHN vs. MON in 7 1/3 innings 
+ 5/31  8 G Gentry of ATN vs. CIN in 7 innings 
+ 6/ 8  8 A Messersmith of LAN vs. MON in 8 innings 
+ 6/17  8 T John of LAN vs. ATN in 5 2/3 innings 
+ 4/19  7 S Rogers of MON vs. NYN in 8 innings 
+ 4/21  7 C Kirby of SDN vs. CIN in 5 innings 
+ 4/26  7 J Niekro of ATN vs. CHN in 8 innings 
+ 4/27  7 B Stoneman of MON vs. PHN in 5 innings 
+ 5/ 1  7 S Renko of MON vs. LAN in 8 innings (12 inning game) 
+ 5/ 6  7 L Dierker of HON vs. CIN in 9 innings (13 inning game) 
+ 5/ 8  7 S Carlton of PHN vs. MON in 8 innings 
+ 5/19  7 T Bradley of SFN vs. MON in 5 1/3 innings 
+ 5/27  7 J Koosman of NYN vs. MON in 8 innings 
+ 6/ 3  7 S Arlin of SDN vs. CIN in 6 innings 
+ 6/ 8  7 N Briles of PIN vs. CIN in 8 innings 
+ 6/ 9  7 R Bryant of SFN vs. SDN in 5 innings 
+ 6/20  7 A Messersmith of LAN vs. HON in 8 innings 
+
+Strikeouts 
+ 5/26 17 C Kirby of SDN vs. PIN in 9 2/3 innings (10 inning game) 
+ 4/29 14 T Hall of CIN vs. SFN in 8 1/3 innings 
+ 6/20 14 J Richard of HON vs. LAN in 9 innings 
+ 4/15 13 T Hall of CIN vs. PHN in 8 innings 
+ 5/ 7 13 F Jenkins of CHN vs. MON in 9 innings 
+ 4/25 12 D Sutton of LAN vs. SFN in 9 innings 
+ 5/ 8 12 T Hall of CIN vs. SFN in 8 1/3 innings 
+ 6/ 6 12 T Hall of CIN vs. SDN in 8 innings 
+ 6/14 12 R Nelson of CIN vs. SLN in 9 innings (12 inning game) 
+ 6/14 12 J Richard of HON vs. CHN in 9 innings (10 inning game) 
+ 4/18 11 M Corkins of SDN vs. PIN in 6 1/3 innings 
+ 4/24 11 B Gibson of SLN vs. PHN in 9 innings 
+ 5/ 1 11 J Koosman of NYN vs. SFN in 7 innings 
+ 5/27 11 T Hall of CIN vs. SFN in 7 2/3 innings 
+ 5/29 11 J Richard of HON vs. NYN in 9 innings 
+ 6/ 4 11 J Richard of HON vs. LAN in 9 innings 
+ 6/ 6 11 J Matlack of NYN vs. SFN in 9 innings 
+ 6/12 11 C Kirby of SDN vs. HON in 8 innings 
+      10 by many pitchers 
+
+Home Runs Allowed 
+ 5/17  5 J Koosman of NYN vs. SDN in 7 innings 
+ 5/14  4 C Swan of NYN vs. PIN in 6 2/3 innings 
+ 5/24  4 J McGlothlin of CIN vs. ATN in 8 1/3 innings 
+ 6/ 8  4 J Marichal of SFN vs. SDN in 8 innings 
+       3 by many pitchers 
+  
+

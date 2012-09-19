@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <SccProjectName />
+    <SccLocalPath />
+    <Keyword>MFCProj</Keyword>
+    <ProjectGuid>{C14B680B-9DE8-D875-6925-0439E6351BDC}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Static</UseOfMfc>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Debug\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>MaxSpeed</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>.\Release\Baseball.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ObjectFileName>.\Release\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\Release\Baseball.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <RedirectOutputAndErrors>NUL</RedirectOutputAndErrors>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release\Baseball.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>.\Release\Baseball.exe</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <Optimization>Disabled</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level3</WarningLevel>
+      <MinimalRebuild>true</MinimalRebuild>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>.\Debug\Baseball.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ObjectFileName>.\Debug\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\Debug\Baseball.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <RedirectOutputAndErrors>NUL</RedirectOutputAndErrors>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug\Baseball.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>.\Debug\Baseball.exe</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AddLeague.cpp" />
+    <ClCompile Include="AddTeam.cpp" />
+    <ClCompile Include="Baseball.cpp" />
+    <ClCompile Include="BaseballDoc.cpp" />
+    <ClCompile Include="BaseballView.cpp" />
+    <ClCompile Include="ChildFrm.cpp" />
+    <ClCompile Include="dialogs.cpp" />
+    <ClCompile Include="DlgAddDivision.cpp" />
+    <ClCompile Include="DlgAddTeams.cpp" />
+    <ClCompile Include="FileStruct.cpp" />
+    <ClCompile Include="FormA.cpp" />
+    <ClCompile Include="FormB.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="Registry.cpp" />
+    <ClCompile Include="Splash.cpp" />
+    <ClCompile Include="StdAfx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="res\Baseball.ico" />
+    <CustomBuild Include="res\Baseball.rc2">
+      <FileType>RC</FileType>
+    </CustomBuild>
+    <CustomBuild Include="res\BaseballDoc.ico" />
+    <CustomBuild Include="res\Baseballs.bmp" />
+    <CustomBuild Include="res\bitmap1.bmp" />
+    <CustomBuild Include="res\bmp00001.bmp" />
+    <CustomBuild Include="res\bmp00002.bmp" />
+    <CustomBuild Include="res\DownArrow.bmp" />
+    <CustomBuild Include="res\DownArrowP.bmp" />
+    <CustomBuild Include="res\Field.bmp" />
+    <CustomBuild Include="res\field1.bmp" />
+    <CustomBuild Include="res\FieldGray.bmp" />
+    <CustomBuild Include="res\FieldGrayComplete.bmp" />
+    <CustomBuild Include="res\FieldGreen.bmp" />
+    <CustomBuild Include="res\Fieldstrikenadballs.bmp" />
+    <CustomBuild Include="res\ScoreBoard.bmp" />
+    <CustomBuild Include="res\Splash.bmp" />
+    <CustomBuild Include="res\StopGame.bmp" />
+    <CustomBuild Include="res\StopGameRed.bmp" />
+    <CustomBuild Include="res\StopGameYellow.bmp" />
+    <CustomBuild Include="res\Toolbar.bmp" />
+    <CustomBuild Include="res\UpArrow.bmp" />
+    <CustomBuild Include="res\UpArrowP.bmp" />
+    <CustomBuild Include="hlp\AfxCore.rtf">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="hlp\AfxPrint.rtf">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="hlp\AppExit.bmp" />
+    <CustomBuild Include="hlp\Baseball.cnt">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="hlp\Bullet.bmp" />
+    <CustomBuild Include="hlp\CurArw2.bmp" />
+    <CustomBuild Include="hlp\CurArw4.bmp" />
+    <CustomBuild Include="hlp\CurHelp.bmp" />
+    <CustomBuild Include="hlp\EditCopy.bmp" />
+    <CustomBuild Include="hlp\EditCut.bmp" />
+    <CustomBuild Include="hlp\EditPast.bmp" />
+    <CustomBuild Include="hlp\EditUndo.bmp" />
+    <CustomBuild Include="hlp\FileNew.bmp" />
+    <CustomBuild Include="hlp\FileOpen.bmp" />
+    <CustomBuild Include="hlp\FilePrnt.bmp" />
+    <CustomBuild Include="hlp\FileSave.bmp" />
+    <CustomBuild Include="hlp\HlpSBar.bmp" />
+    <CustomBuild Include="hlp\HlpTBar.bmp" />
+    <CustomBuild Include="MakeHelp.bat">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="hlp\RecFirst.bmp" />
+    <CustomBuild Include="hlp\RecLast.bmp" />
+    <CustomBuild Include="hlp\RecNext.bmp" />
+    <CustomBuild Include="hlp\RecPrev.bmp" />
+    <CustomBuild Include="hlp\Scmax.bmp" />
+    <CustomBuild Include="hlp\ScMenu.bmp" />
+    <CustomBuild Include="hlp\Scmin.bmp" />
+    <CustomBuild Include="Baseball.reg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Baseball.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AddLeague.h" />
+    <ClInclude Include="AddTeam.h" />
+    <ClInclude Include="Baseball.h" />
+    <ClInclude Include="BaseballDoc.h" />
+    <ClInclude Include="BaseballView.h" />
+    <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="dialogs.h" />
+    <ClInclude Include="DlgAddDivision.h" />
+    <ClInclude Include="DlgAddTeams.h" />
+    <ClInclude Include="FileStruct.h" />
+    <ClInclude Include="FormA.h" />
+    <ClInclude Include="FormB.h" />
+    <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="Registry.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Splash.h" />
+    <ClInclude Include="StdAfx.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="Baseball.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

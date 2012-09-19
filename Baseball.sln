@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Baseball", "Baseball.vcxproj", "{C14B680B-9DE8-D875-6925-0439E6351BDC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{750001E9-9E38-424D-876C-5DDDEF4ECBB2}"
+	ProjectSection(SolutionItems) = preProject
+		Baseball.vsd = Baseball.vsd
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C14B680B-9DE8-D875-6925-0439E6351BDC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C14B680B-9DE8-D875-6925-0439E6351BDC}.Debug|Win32.Build.0 = Debug|Win32
+		{C14B680B-9DE8-D875-6925-0439E6351BDC}.Release|Win32.ActiveCfg = Release|Win32
+		{C14B680B-9DE8-D875-6925-0439E6351BDC}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

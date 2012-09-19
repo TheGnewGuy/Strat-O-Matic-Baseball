@@ -1,0 +1,48 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: Baseball - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\WIN98\TEMP\RSP2062.TMP" with contents
+[
+/nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"Release/Baseball.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\SOURCE\C\Baseball\BaseballDoc.cpp"
+]
+Creating command line "cl.exe @C:\WIN98\TEMP\RSP2062.TMP" 
+Creating temporary file "C:\WIN98\TEMP\RSP2063.TMP" with contents
+[
+/nologo /subsystem:windows /incremental:no /pdb:"Release/Baseball.pdb" /machine:I386 /out:"Release/Baseball.exe" 
+.\Release\AddLeague.obj
+.\Release\AddTeam.obj
+.\Release\Baseball.obj
+.\Release\BaseballDoc.obj
+.\Release\BaseballView.obj
+.\Release\ChildFrm.obj
+.\Release\dialogs.obj
+.\Release\DlgAddDivision.obj
+.\Release\DlgAddTeams.obj
+.\Release\FileStruct.obj
+.\Release\FormA.obj
+.\Release\FormB.obj
+.\Release\MainFrm.obj
+.\Release\Registry.obj
+.\Release\Splash.obj
+.\Release\StdAfx.obj
+.\Release\Baseball.res
+]
+Creating command line "link.exe @C:\WIN98\TEMP\RSP2063.TMP"
+<h3>Output Window</h3>
+Compiling...
+BaseballDoc.cpp
+Linking...
+
+
+
+<h3>Results</h3>
+Baseball.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
