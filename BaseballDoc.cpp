@@ -31,6 +31,7 @@
 //		and the export routine.
 //      Version 1.0.0.10
 //	01/18/14 Changed in ExportHTMLFile OB% to OB%%
+//      Version 1.0.0.11 and Copyright to 2014
 //
 //	New Features to add:
 //		1.	Deletion of players and pitchers
