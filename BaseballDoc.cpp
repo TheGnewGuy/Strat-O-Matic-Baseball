@@ -30,6 +30,7 @@
 //		This included updating Dialogs for Batter and Pitcher chance,
 //		and the export routine.
 //      Version 1.0.0.10
+//	01/18/14 Changed in ExportHTMLFile OB% to OB%%
 //
 //	New Features to add:
 //		1.	Deletion of players and pitchers
@@ -1416,7 +1417,7 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	sprintf_s(HTMLData,"<TD ALIGN = CENTER><B>SLG</B></TD>");
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<TD ALIGN = CENTER><B>OB%</B></TD>");
+	sprintf_s(HTMLData,"<TD ALIGN = CENTER><B>OB%%</B></TD>");
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 	sprintf_s(HTMLData,"</TR>\n");
