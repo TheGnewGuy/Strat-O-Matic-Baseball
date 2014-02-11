@@ -212,7 +212,7 @@ public:
 // Attributes
 public:
 	// We will always have 1 Conference and one Division. If these
-	// are not specified, then they will be assigne NULL
+	// are not specified, then they will be assigned NULL
 	//
 	// Record Layout varies, each indentation will duplicat number:
 	//	BYTE Number of Conferences
@@ -223,8 +223,12 @@ public:
 	//			30 char Division Name (Always 1, Name may be NULL)
 	//				40 char Team Name
 	//				8 char Team File Name no extension
-	//              short Wins
-	//              short Loss
+	//				Short team 3 char
+	//				Ballpark 20 char
+	//              home short Wins
+	//              home short Loss
+	//              away short Wins
+	//              away short Loss
 	BYTE	m_Conferencenumber;
 	BYTE	m_Divisionnumber;
 	BYTE	m_Teamsnumber;

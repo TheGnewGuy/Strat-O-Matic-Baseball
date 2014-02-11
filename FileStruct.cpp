@@ -16,7 +16,15 @@ static char THIS_FILE[] = __FILE__;
 
 BatterStruct::BatterStruct()
 {
-	m_RecordSize = 30+
+	// This file has a 74 byte header as follows
+	//
+	// Read Count byte (number of players)
+	// Read team name 40 char
+	// Read short team name 3 char
+	// Read Ballpark 30 char
+	//
+	// Player layout repeats
+		m_RecordSize = 30 +
 		sizeof(m_AB)+
 		sizeof(m_Runs)+
 		sizeof(m_Hits)+
@@ -455,7 +463,12 @@ int BatterStruct::CopyBatterFile(CString inFileName, CString outFileName)
 
 PitcherStruct::PitcherStruct()
 {
-	m_RecordSize = 30+
+	// This file has a 1 byte header as follows
+	//
+	// Read Count byte (number of players)
+	//
+	// Player layout repeats
+		m_RecordSize = 30 +
 		sizeof(m_Wins)+
 		sizeof(m_Loss)+
 		sizeof(m_Saves)+
@@ -801,6 +814,38 @@ int PitcherStruct::CopyPitcherFile(CString inFileName, CString outFileName)
 
 LeagueStruct::LeagueStruct()
 {
+	// We will always have 1 Conference and one Division. If these
+	// are not specified, then they will be assigned NULL
+	//
+	// Record Layout varies, each indentation will duplicat number:
+	//	BYTE Number of Conferences
+	//	30 char League Name
+	//		BYTE Number of Divisions
+	//		30 char Conference Name (Always 1, Name may be NULL)
+	//			BYTE Number of teams
+	//			30 char Division Name (Always 1, Name may be NULL)
+	//				40 char Team Name
+	//				8 char Team File Name no extension
+	//              home short Wins
+	//              home short Loss
+	//              away short Wins
+	//              away short Loss
+	//
+	// Version byte
+	// Number of Conferences byte
+	// LeagueName 30 char
+	// Number of Divisions in Conference byte
+	// Conference Name 30 char
+	// Number of Teams in Division byte
+	// Division Name 30 char
+	// Team Name 40 char
+	// Team file 8 char
+	// Short team 3 char
+	// Ballpark 20 char
+	// Home game wins short
+	// Home game losses short
+	// Away game wins short
+	// Away game losses short
 }
 
 LeagueStruct::~LeagueStruct()

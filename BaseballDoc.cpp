@@ -32,6 +32,8 @@
 //      Version 1.0.0.10
 //	01/18/14 Changed in ExportHTMLFile OB% to OB%%
 //      Version 1.0.0.11 and Copyright to 2014
+//  01/22/14 Changed the XBteam.txt and XPteam.txt to trim trailing spaces from team name
+//      resulting in "XP1997 Baltland       .txt" being changed to "XP1997 Baltland.txt"
 //
 //	New Features to add:
 //		1.	Deletion of players and pitchers
