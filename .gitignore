@@ -21,3 +21,4 @@ obj/
 _ReSharper*/
 Baseball.opensdf
 Baseball.sdf
+*.ipch
