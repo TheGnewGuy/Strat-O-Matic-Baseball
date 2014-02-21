@@ -241,27 +241,25 @@ void CBaseballView::OnPrepareDC(CDC* pDC, CPrintInfo* pInfo)
 			DWORD dwReturned=0, dwNeeded=0;
 			char* PrinterName = NULL;
 
-			rc = EnumPrinters( PRINTER_ENUM_DEFAULT
-//							|PRINTER_ENUM_REMOTE
-							|PRINTER_ENUM_CONNECTIONS, 
-						  NULL, 
-						  1, 
-						  (LPBYTE)lpPrinterInfo2,
-						  dwNeeded, 
-						  &dwNeeded, 
-						  &dwReturned );
+			rc = EnumPrinters(PRINTER_ENUM_LOCAL
+						|PRINTER_ENUM_CONNECTIONS, 
+						NULL, 
+						1, 
+						(LPBYTE)lpPrinterInfo2,
+						dwNeeded, 
+						&dwNeeded, 
+						&dwReturned );
         
 			lpPrinterInfo2 = (LPPRINTER_INFO_1)MyAllocMem(dwNeeded);
 
-			EnumPrinters( PRINTER_ENUM_DEFAULT
-//							|PRINTER_ENUM_REMOTE
-							|PRINTER_ENUM_CONNECTIONS,  
-						  NULL, 
-						  1, 
-						  (LPBYTE)lpPrinterInfo2,
-						  dwNeeded, 
-						  &dwNeeded, 
-						  &dwReturned );
+			EnumPrinters(PRINTER_ENUM_LOCAL
+						|PRINTER_ENUM_CONNECTIONS,  
+						NULL,
+						1, 
+						(LPBYTE)lpPrinterInfo2,
+						dwNeeded, 
+						&dwNeeded, 
+						&dwReturned );
 			
 	    PrinterName = (char*)lpPrinterInfo2->pName;
         lpDevMode = ChangeDevMode(m_hWnd,PrinterName);

@@ -189,8 +189,8 @@ void FormA::OnDraw(CDC * pDC, CBaseballDoc* pDoc)
 	pDC->TextOut(xStart+88+(13*xIncInning)+(7*xIncStats),-(yStartForm+45),"W",1);
 	pDC->TextOut(xStart+88+(13*xIncInning)+(8*xIncStats),-(yStartForm+45),"K",1);
 	pDC->TextOut(xStart+33+(13*xIncInning)+(9*xIncStats),-(yStartForm+45),"RE",2);
-	pDC->TextOut(xStart+25+(13*xIncInning)+(10*xIncStats),-(yStartForm+45-40),"SB",2);
-	pDC->TextOut(xStart+120+(13*xIncInning)+(10*xIncStats),-(yStartForm+45+80),"CS",2);
+	pDC->TextOut(xStart+25+(13*xIncInning)+(10*xIncStats),-(yStartForm+45-30),"SB",2);
+	pDC->TextOut(xStart+75+(13*xIncInning)+(10*xIncStats),-(yStartForm+45+70),"CS",2);
 
 	// Boxes for Inning Scores
 	pDC->MoveTo(437,-7000);
