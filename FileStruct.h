@@ -215,6 +215,7 @@ public:
 	// are not specified, then they will be assigned NULL
 	//
 	// Record Layout varies, each indentation will duplicat number:
+	//  Version byte
 	//	BYTE Number of Conferences
 	//	30 char League Name
 	//		BYTE Number of Divisions

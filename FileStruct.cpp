@@ -818,6 +818,7 @@ LeagueStruct::LeagueStruct()
 	// are not specified, then they will be assigned NULL
 	//
 	// Record Layout varies, each indentation will duplicat number:
+	//  Version byte
 	//	BYTE Number of Conferences
 	//	30 char League Name
 	//		BYTE Number of Divisions
@@ -826,6 +827,8 @@ LeagueStruct::LeagueStruct()
 	//			30 char Division Name (Always 1, Name may be NULL)
 	//				40 char Team Name
 	//				8 char Team File Name no extension
+	//				Short team 3 char
+	//				Ballpark 20 char
 	//              home short Wins
 	//              home short Loss
 	//              away short Wins
