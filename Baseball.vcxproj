@@ -86,6 +86,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Release\Baseball.exe</OutputFile>
+      <AdditionalDependencies>odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -127,6 +128,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Debug\Baseball.exe</OutputFile>
+      <AdditionalDependencies>odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -135,14 +137,22 @@
     <ClCompile Include="Baseball.cpp" />
     <ClCompile Include="BaseballDoc.cpp" />
     <ClCompile Include="BaseballView.cpp" />
+    <ClCompile Include="Batter.cpp" />
+    <ClCompile Include="BatterStats.cpp" />
     <ClCompile Include="ChildFrm.cpp" />
+    <ClCompile Include="Conferences.cpp" />
+    <ClCompile Include="Database.cpp" />
     <ClCompile Include="dialogs.cpp" />
+    <ClCompile Include="Divisions.cpp" />
     <ClCompile Include="DlgAddDivision.cpp" />
     <ClCompile Include="DlgAddTeams.cpp" />
     <ClCompile Include="FileStruct.cpp" />
     <ClCompile Include="FormA.cpp" />
     <ClCompile Include="FormB.cpp" />
+    <ClCompile Include="Leagues.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="Pitcher.cpp" />
+    <ClCompile Include="PitcherStats.cpp" />
     <ClCompile Include="Registry.cpp" />
     <ClCompile Include="Splash.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -151,6 +161,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Teams.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\Baseball.ico" />
@@ -226,18 +237,30 @@
     <ClInclude Include="Baseball.h" />
     <ClInclude Include="BaseballDoc.h" />
     <ClInclude Include="BaseballView.h" />
+    <ClInclude Include="Batter.h" />
+    <ClInclude Include="BatterStats.h" />
     <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="Conferences.h" />
+    <ClInclude Include="Database.h" />
     <ClInclude Include="dialogs.h" />
+    <ClInclude Include="Divisions.h" />
     <ClInclude Include="DlgAddDivision.h" />
     <ClInclude Include="DlgAddTeams.h" />
     <ClInclude Include="FileStruct.h" />
     <ClInclude Include="FormA.h" />
     <ClInclude Include="FormB.h" />
+    <ClInclude Include="Leagues.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="Pitcher.h" />
+    <ClInclude Include="PitcherStats.h" />
     <ClInclude Include="Registry.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Splash.h" />
     <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="Teams.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Baseball.accdb" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

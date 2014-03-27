@@ -1,12 +1,16 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Baseball", "Baseball.vcxproj", "{C14B680B-9DE8-D875-6925-0439E6351BDC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{750001E9-9E38-424D-876C-5DDDEF4ECBB2}"
 	ProjectSection(SolutionItems) = preProject
 		Baseball.vsd = Baseball.vsd
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Strat-O-Matic-DB", "..\Strat-O-Matic-DB\Strat-O-Matic-DB.vcxproj", "{7744B22C-C12D-4562-A260-DA875B70D59F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +22,10 @@ Global
 		{C14B680B-9DE8-D875-6925-0439E6351BDC}.Debug|Win32.Build.0 = Debug|Win32
 		{C14B680B-9DE8-D875-6925-0439E6351BDC}.Release|Win32.ActiveCfg = Release|Win32
 		{C14B680B-9DE8-D875-6925-0439E6351BDC}.Release|Win32.Build.0 = Release|Win32
+		{7744B22C-C12D-4562-A260-DA875B70D59F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7744B22C-C12D-4562-A260-DA875B70D59F}.Debug|Win32.Build.0 = Debug|Win32
+		{7744B22C-C12D-4562-A260-DA875B70D59F}.Release|Win32.ActiveCfg = Release|Win32
+		{7744B22C-C12D-4562-A260-DA875B70D59F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -24,3 +24,4 @@
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_STDAFX_H__20B48469_70F7_11D2_B0EE_444553540000__INCLUDED_)
+#include <afxdb.h>

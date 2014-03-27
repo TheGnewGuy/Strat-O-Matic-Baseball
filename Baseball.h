@@ -45,6 +45,9 @@ public:
 private:
 	CSplashWnd m_splash;
 	DWORD m_dwSplashTime;
+public:
+//	afx_msg void OnFileOpen();
+	afx_msg void OnFileOpen();
 };
 
 

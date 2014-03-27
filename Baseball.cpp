@@ -9,6 +9,7 @@
 #include "dialogs.h"
 #include "BaseballDoc.h"
 #include "BaseballView.h"
+#include "Batter.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,9 +28,10 @@ BEGIN_MESSAGE_MAP(CBaseballApp, CWinApp)
 	//}}AFX_MSG_MAP
 	// Standard file based document commands
 	ON_COMMAND(ID_FILE_NEW, CWinApp::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, CWinApp::OnFileOpen)
+//	ON_COMMAND(ID_FILE_OPEN, CWinApp::OnFileOpen)
 	// Standard print setup command
 	ON_COMMAND(ID_FILE_PRINT_SETUP, CWinApp::OnFilePrintSetup)
+	ON_COMMAND(ID_FILE_OPEN, &CBaseballApp::OnFileOpen)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -220,4 +222,80 @@ void CBaseballApp::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
+}
+
+
+void CBaseballApp::OnFileOpen()
+{
+	CDatabase database;
+	CString SqlString;
+	CString sCatID, sCategory;
+	CString sDriver = "MICROSOFT ACCESS DRIVER (*.mdb, *.accdb)";
+//	CString sDriver = "MS Access Database";  // This does not work
+	CString sDsn;
+	CString sFile = "C:\\Users\\gnew\\Documents\\Baseball.accdb";
+	// You must change above path if it's different
+	int iRec = 0;
+
+	// Build ODBC connection string
+	sDsn.Format("ODBC;DRIVER={%s};DSN='';DBQ=%s", sDriver, sFile);
+	TRY
+	{
+		// Open the database
+		if (database.Open(NULL, false, false, sDsn))
+		{
+
+			// Allocate the recordset
+			CBatter rs(&database);
+
+			// Build the SQL statement
+			SqlString = "SELECT FirstName, LastName "
+				"FROM Batter";
+
+			// Execute the query
+			//rs.Open(CRecordset::snapshot, NULL, CRecordset::none);
+			//rs.AddNew();
+			//rs.m_FirstName = "John";
+			//rs.m_LastName = "Gnew";
+			//rs.Update();
+			//rs.AddNew();
+			//rs.m_FirstName = "Johnny";
+			//rs.m_LastName = "New";
+			//rs.Update();
+			//rs.Close();
+			//// Reset List control if there is any data
+			//ResetListControl();
+			//// populate Grids
+			//ListView_SetExtendedListViewStyle(m_ListControl, LVS_EX_GRIDLINES);
+
+			//// Column width and heading
+			//m_ListControl.InsertColumn(0, "Emp Id", LVCFMT_LEFT, -1, 0);
+			//m_ListControl.InsertColumn(1, "Emp Name", LVCFMT_LEFT, -1, 1);
+			//m_ListControl.SetColumnWidth(0, 120);
+			//m_ListControl.SetColumnWidth(1, 200);
+
+			//// Loop through each record
+			//while (!recset.IsEOF())
+			//{
+			//	// Copy each column into a variable
+			//	recset.GetFieldValue("EmpID", sCatID);
+			//	recset.GetFieldValue("EmpName", sCategory);
+
+			//	// Insert values into the list control
+			//	iRec = m_ListControl.InsertItem(0, sCatID, 0);
+			//	m_ListControl.SetItemText(0, 1, sCategory);
+
+			//	// goto next record
+			//	recset.MoveNext();
+			//}
+			// Close the database
+			database.Close();
+		}
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database error: " + e->m_strError);
+	}
+	END_CATCH;
 }
