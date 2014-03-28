@@ -107,12 +107,48 @@ END_MESSAGE_MAP()
 
 CBaseballDoc::CBaseballDoc()
 {
-	// TODO: add one-time construction code here
+	CString sDriver = _T("MICROSOFT ACCESS DRIVER (*.mdb, *.accdb)");
+	CString sDsn;
+	CString sFile = _T("C:\\Family\\SOURCE\\C\\Strat-O-Matic-DB\\Baseball.accdb");
+	CString SqlString;
+
 	SetAllFormsFalse();
+
+	// Build ODBC connection string
+	sDsn.Format(_T("ODBC;DRIVER={%s};DSN='';DBQ=%s"), sDriver, sFile);
+
+	TRY
+	{
+		// Open the database
+		m_pDatabase.Open(NULL, false, false, sDsn);
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Open error: " + e->m_strError);
+	}
+	END_CATCH;
 }
 
 CBaseballDoc::~CBaseballDoc()
 {
+	TRY
+	{
+		if (m_pDatabase.IsOpen())
+		m_pDatabase.Close();
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Close error: " + e->m_strError);
+	}
+	END_CATCH;
+}
+
+CBaseballDoc * CBaseballDoc::GetDoc()
+{
+	CFrameWnd * pFrame = (CFrameWnd *)(AfxGetApp()->m_pMainWnd);
+	return (CBaseballDoc *)pFrame->GetActiveDocument();
 }
 
 BOOL CBaseballDoc::OnNewDocument()

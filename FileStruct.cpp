@@ -3,7 +3,9 @@
 
 #include "stdafx.h"
 #include "Baseball.h"
+#include "BaseballDoc.h"
 #include "FileStruct.h"
+#include "Teams.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -867,3 +869,26 @@ TeamStruct::~TeamStruct()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+
+// Return an array of team names
+CStringArray TeamStruct::GetTeams(CString strLeague)
+{
+	CBaseballDoc* pDoc = CBaseballDoc::GetDoc();
+	ASSERT_VALID(pDoc);
+
+	// Allocate the Teams recordset
+	CTeams rsTeam(&pDoc->m_pDatabase);
+	TRY
+	{
+		// Execute the query
+		rsTeam.Open(CRecordset::snapshot, NULL, CRecordset::none);
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Teams RS error: " + e->m_strError);
+	}
+	END_CATCH;
+
+	return CStringArray();
+}

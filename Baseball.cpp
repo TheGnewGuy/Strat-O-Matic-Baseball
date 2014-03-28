@@ -232,8 +232,9 @@ void CBaseballApp::OnFileOpen()
 	CString sCatID, sCategory;
 	CString sDriver = "MICROSOFT ACCESS DRIVER (*.mdb, *.accdb)";
 //	CString sDriver = "MS Access Database";  // This does not work
-	CString sDsn;
-	CString sFile = "C:\\Users\\gnew\\Documents\\Baseball.accdb";
+	CString sDsn; 
+//	CString sFile = "C:\\Users\\gnew\\Documents\\Baseball.accdb";
+	CString sFile = "C:\\Family\\SOURCE\\C\\Strat - O - Matic - Baseball\\Baseball.accdb";
 	// You must change above path if it's different
 	int iRec = 0;
 

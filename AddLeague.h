@@ -44,6 +44,9 @@ protected:
 	virtual void OnOK();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	// Return an array of team names
+//	CStringArray GetTeams(CString strLeague);
 };
 
 //{{AFX_INSERT_LOCATION}}

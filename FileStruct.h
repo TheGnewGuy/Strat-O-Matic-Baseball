@@ -4,6 +4,7 @@
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
+
 // FileStruct.h : header file
 //
 
@@ -298,6 +299,9 @@ public:
 
 protected:
 	// Generated message map functions
+public:
+	// Return an array of team names
+	CStringArray GetTeams(CString strLeague);
 };
 
 /////////////////////////////////////////////////////////////////////////////

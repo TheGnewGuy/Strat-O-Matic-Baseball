@@ -19,6 +19,7 @@ protected: // create from serialization only
 
 // Attributes
 public:
+	static CBaseballDoc * GetDoc();
 
 // Operations
 public:
@@ -92,6 +93,8 @@ private:
 	CString m_Conference2;
 	CString m_Conference1;
 	CString m_NewLeagueName;
+public:
+	CDatabase m_pDatabase;
 };
 
 /////////////////////////////////////////////////////////////////////////////
