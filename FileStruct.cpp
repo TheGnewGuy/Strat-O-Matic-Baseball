@@ -4,8 +4,9 @@
 #include "stdafx.h"
 #include "Baseball.h"
 #include "BaseballDoc.h"
-#include "FileStruct.h"
+#include "Leagues.h"
 #include "Teams.h"
+#include "FileStruct.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -816,45 +817,58 @@ int PitcherStruct::CopyPitcherFile(CString inFileName, CString outFileName)
 
 LeagueStruct::LeagueStruct()
 {
-	// We will always have 1 Conference and one Division. If these
-	// are not specified, then they will be assigned NULL
-	//
-	// Record Layout varies, each indentation will duplicat number:
-	//  Version byte
-	//	BYTE Number of Conferences
-	//	30 char League Name
-	//		BYTE Number of Divisions
-	//		30 char Conference Name (Always 1, Name may be NULL)
-	//			BYTE Number of teams
-	//			30 char Division Name (Always 1, Name may be NULL)
-	//				40 char Team Name
-	//				8 char Team File Name no extension
-	//				Short team 3 char
-	//				Ballpark 20 char
-	//              home short Wins
-	//              home short Loss
-	//              away short Wins
-	//              away short Loss
-	//
-	// Version byte
-	// Number of Conferences byte
-	// LeagueName 30 char
-	// Number of Divisions in Conference byte
-	// Conference Name 30 char
-	// Number of Teams in Division byte
-	// Division Name 30 char
-	// Team Name 40 char
-	// Team file 8 char
-	// Short team 3 char
-	// Ballpark 20 char
-	// Home game wins short
-	// Home game losses short
-	// Away game wins short
-	// Away game losses short
+	CBaseballDoc* pDoc = CBaseballDoc::GetDoc();
+	ASSERT_VALID(pDoc);
+
+	// Allocate the recordset
+	m_pLeagues_set = new CLeagues(&pDoc->m_pDatabase);
+
+	// Allocate the Teams recordset
+	CTeams rsTeam(&pDoc->m_pDatabase);
+	TRY
+	{
+		// Execute the query
+		m_pLeagues_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Leagues RS error: " + e->m_strError);
+	}
+	END_CATCH;
 }
 
 LeagueStruct::~LeagueStruct()
 {
+	TRY
+	{
+		if (m_pLeagues_set->IsOpen())
+		m_pLeagues_set->Close();
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Close error LeagueStruct: " + e->m_strError);
+	}
+	END_CATCH;
+}
+
+long LeagueStruct::GetLeagueID(CString strLeagueName)
+{
+	long retLeagueID = 0;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	m_pLeagues_set->m_strFilter = "[LeagueName] = " + strLeagueName;
+	// Execute the query
+	m_pLeagues_set->Requery();
+
+	if (!m_pLeagues_set->IsEOF())
+	{
+		retLeagueID = m_pLeagues_set->m_LeagueID;
+	}
+
+	return retLeagueID;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -862,26 +876,18 @@ LeagueStruct::~LeagueStruct()
 
 TeamStruct::TeamStruct()
 {
-}
-
-TeamStruct::~TeamStruct()
-{
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
-// Return an array of team names
-CStringArray TeamStruct::GetTeams(CString strLeague)
-{
 	CBaseballDoc* pDoc = CBaseballDoc::GetDoc();
 	ASSERT_VALID(pDoc);
+
+	// Allocate the recordset
+	m_pTeams_set = new CTeams(&pDoc->m_pDatabase);
 
 	// Allocate the Teams recordset
 	CTeams rsTeam(&pDoc->m_pDatabase);
 	TRY
 	{
 		// Execute the query
-		rsTeam.Open(CRecordset::snapshot, NULL, CRecordset::none);
+		m_pTeams_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
 	}
 		CATCH(CDBException, e)
 	{
@@ -889,6 +895,45 @@ CStringArray TeamStruct::GetTeams(CString strLeague)
 			AfxMessageBox("Database Teams RS error: " + e->m_strError);
 	}
 	END_CATCH;
+	m_arrayTeamNames = new CStringArray();
+}
 
-	return CStringArray();
+TeamStruct::~TeamStruct()
+{
+	TRY
+	{
+		if (m_pTeams_set->IsOpen())
+		m_pTeams_set->Close();
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Close error TeamStruct: " + e->m_strError);
+	}
+	END_CATCH;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+// Return an array of team names
+CStringArray* TeamStruct::GetTeams(long LeagueID)
+{
+	CString tmpLaegueID;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpLaegueID.Format("%d", LeagueID);
+	m_pTeams_set->m_strFilter = "[LeagueID] = " + tmpLaegueID;
+	// Execute the query
+	m_pTeams_set->Requery();
+
+	m_arrayTeamNames->RemoveAll();
+
+	while (!m_pTeams_set->IsEOF())
+	{
+		m_arrayTeamNames->Add(m_pTeams_set->m_TeamName);
+		m_pTeams_set->MoveNext();
+	}
+
+	return m_arrayTeamNames;
 }
