@@ -6,6 +6,8 @@
 #endif // _MSC_VER >= 1000
 #include "Leagues.h"
 #include "Teams.h"
+#include "Batter.h"
+#include "BatterStats.h"
 
 // FileStruct.h : header file
 //
@@ -117,6 +119,12 @@ private:
 	int BatterWrite(CFile* myFile);
 protected:
 	// Generated message map functions
+public:
+	// Get Batter Stats and then Batter for Name
+	CStringArray* GetBatterNameArray(long TeamID);
+	CBatterStats* m_pBatterStats_set;
+	CBatter* m_pBatter_set;
+	CStringArray* m_arrayBatterNames;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -268,6 +276,8 @@ protected:
 public:
 	CLeagues* m_pLeagues_set;
 	long GetLeagueID(CString strLeagueName);
+	CStringArray* GetAllLeagues();
+	CStringArray* m_arrayLeagueNames;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -309,6 +319,8 @@ public:
 	CStringArray* GetTeams(long LeagueID);
 	CTeams* m_pTeams_set;
 	CStringArray* m_arrayTeamNames;
+	long GetTeamID(CString strTeamName, long LeagueID);
+	CString GetTeamName(long TeamID);
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -147,8 +147,29 @@ CBaseballDoc::~CBaseballDoc()
 
 CBaseballDoc * CBaseballDoc::GetDoc()
 {
-	CFrameWnd * pFrame = (CFrameWnd *)(AfxGetApp()->m_pMainWnd);
-	return (CBaseballDoc *)pFrame->GetActiveDocument();
+	//For a single document interface (SDI) application, add the following code to 
+	//  your SDI document's implementation file for CBaseballDoc::GetDoc(): 
+	//CFrameWnd * pFrame = (CFrameWnd *)(AfxGetApp()->m_pMainWnd);
+	//return (CBaseballDoc *)pFrame->GetActiveDocument();
+
+	//For a multiple document interface (MDI) application, the CBaseballDoc::GetDoc() 
+	//  code should be the following: 
+	CMDIChildWnd * pChild =
+		((CMDIFrameWnd*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
+
+	if (!pChild)
+		return NULL;
+
+	CDocument * pDoc = pChild->GetActiveDocument();
+
+	if (!pDoc)
+		return NULL;
+
+	// Fail if doc is of wrong kind
+	if (!pDoc->IsKindOf(RUNTIME_CLASS(CBaseballDoc)))
+		return NULL;
+
+	return (CBaseballDoc *)pDoc;
 }
 
 BOOL CBaseballDoc::OnNewDocument()
@@ -3715,13 +3736,13 @@ void CBaseballDoc::BuildPlayerArray(CStringArray* arrayFileNames, CString strLea
 
 void CBaseballDoc::OnPlayersAddEditBatters() 
 {
-	CString strLeagueName;
-	CString strLeagueFile;
-	CString strLeagueDir;
+	//CString strLeagueName;
+	//CString strLeagueFile;
+	//CString strLeagueDir;
 	CString strLeague;
 	CString strTeam;
-	CString strTeamFile;
-	CString strTeamName;
+	//CString strTeamFile;
+	//CString strTeamName;
 	PropertyPageBatters myBatters1;
 	PropertyPageBattersChance myBatters2;
 	PropertyPageBattersStats myBatters3;
@@ -3743,21 +3764,29 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 	// For testing force to a team name
 	strLeague = GetLeagues(TRUE);
 
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-	}
-	else
-	{
-		strLeagueDir = "data";
-	}
-	strTeam = GetTeams(strLeagueDir);
-	strTeamFile = strTeam.Right(12);
-	strTeamName = strTeam.Left(30);
-	myBattersSheet.m_FileName = strLeagueDir+"\\"+strTeamFile;
-	myBattersSheet.m_TeamName = strTeamName;
+	LeagueStruct* myLeague = new LeagueStruct();
+	myBattersSheet.m_LeagueID = myLeague->GetLeagueID(strLeague);
+
+	//strLeagueName = strLeague.Left(30);
+	//if (strncmp(strLeagueName,"All",3))
+	//{
+	//	strLeagueFile = strLeague.Right(12);
+	//	strLeagueDir = strLeagueFile.Left(8);
+	//}
+	//else
+	//{
+	//	strLeagueDir = "data";
+	//}
+//	strTeam = GetTeams(strLeagueDir);
+	strTeam = GetTeams(strLeague);
+	TeamStruct* myTeam = new TeamStruct();
+	myBattersSheet.m_TeamID = myTeam->GetTeamID(strTeam, myBattersSheet.m_LeagueID);
+
+	//strTeamFile = strTeam.Right(12);
+	//strTeamName = strTeam.Left(30);
+	//myBattersSheet.m_FileName = strLeagueDir+"\\"+strTeamFile;
+	//myBattersSheet.m_TeamName = strTeamName;
+	myBattersSheet.m_TeamName = strTeam;
 
 	// Remove the APPLY button from the display
 	myBattersSheet.m_psh.dwFlags |= PSH_NOAPPLYNOW;
@@ -3787,83 +3816,108 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 //
 CString CBaseballDoc::GetLeagues(BOOL baseFlag)
 {
-	CFileFind myFileFind;
-	CFile myInFile;
-	BOOL bWorking;
-	CStringArray arrayFileNames;
-	int sortflag;
-	int i;
 	DlgSelLeague dlgSelLeague;
 	CString strLeagueName;
-	CString strTemp;
-	BYTE version;
-	BYTE count;
-	char temp[41];
+	CStringArray* LeagueArray = new CStringArray();
+	
+	LeagueArray->RemoveAll();
 
-	bWorking = myFileFind.FindFile("data\\L*.dat",0);
-	if (bWorking)
+	LeagueStruct* myLeagues = new LeagueStruct();
+
+	LeagueArray = myLeagues->GetAllLeagues();
+
+	for (int i = 0; i < LeagueArray->GetSize(); i++)
 	{
-		while (bWorking)
-		{
-			bWorking = myFileFind.FindNextFile();
-			arrayFileNames.Add(myFileFind.GetFileName());
-		}
-		myFileFind.Close();
-
-		// Since the FindNextFile does not return the files in any order
-		// we must sort the file names
-		sortflag = 1;
-		while (sortflag)
-		{
-			sortflag = 0;
-			for (i=0; i<(arrayFileNames.GetSize()-1);i++)
-			{
-				if (arrayFileNames[i].Compare(arrayFileNames[i+1]) == 1)
-				{
-					strTemp = arrayFileNames[i];
-					arrayFileNames[i] = arrayFileNames[i+1];
-					arrayFileNames[i+1] = strTemp;
-					sortflag = 1;
-				}
-			}
-		}
-
-		for (i=0; i<arrayFileNames.GetSize(); i++)
-		{
-			myInFile.Open("data\\"+arrayFileNames[i],CFile::modeRead);
-			myInFile.Read(&version,sizeof(version));
-			myInFile.Read(&count,sizeof(count));
-			myInFile.Read(temp,30);
-			myInFile.Close();
-			temp[30] = NULL;
-			strLeagueName = temp;
-			strLeagueName = strLeagueName+"\t"+arrayFileNames[i];
-			dlgSelLeague.m_arrayLeagues.Add(strLeagueName);
-		}
-		// If TRUE add in Base directory
-		if (baseFlag == TRUE)
-		{
-			//           123456789012345678901234567890
-			strcpy_s(temp,"All Base Teams                ");
-			temp[30] = NULL;
-			strLeagueName = temp;
-			strLeagueName = strLeagueName+"\t"+"data";
-			dlgSelLeague.m_arrayLeagues.Add(strLeagueName);
-		}
-
-		if (dlgSelLeague.DoModal() == IDOK)
-		{
-			strLeagueName = dlgSelLeague.m_arrayLeagues[0];
-		}
+		dlgSelLeague.m_arrayLeagues.Add(LeagueArray->ElementAt(i));
 	}
-	else
+
+	if (dlgSelLeague.DoModal() == IDOK)
 	{
-		// No Leagues found so display message
-		AfxMessageBox("Could not find any Leagues files. Please create a League");
-		return "";
+		strLeagueName = dlgSelLeague.m_arrayLeagues[0];
 	}
+
 	return strLeagueName;
 }
+
+//CString CBaseballDoc::GetLeagues(BOOL baseFlag)
+//{
+//	CFileFind myFileFind;
+//	CFile myInFile;
+//	BOOL bWorking;
+//	CStringArray arrayFileNames;
+//	int sortflag;
+//	int i;
+//	DlgSelLeague dlgSelLeague;
+//	CString strLeagueName;
+//	CString strTemp;
+//	BYTE version;
+//	BYTE count;
+//	char temp[41];
+//
+//	bWorking = myFileFind.FindFile("data\\L*.dat", 0);
+//	if (bWorking)
+//	{
+//		while (bWorking)
+//		{
+//			bWorking = myFileFind.FindNextFile();
+//			arrayFileNames.Add(myFileFind.GetFileName());
+//		}
+//		myFileFind.Close();
+//
+//		// Since the FindNextFile does not return the files in any order
+//		// we must sort the file names
+//		sortflag = 1;
+//		while (sortflag)
+//		{
+//			sortflag = 0;
+//			for (i = 0; i<(arrayFileNames.GetSize() - 1); i++)
+//			{
+//				if (arrayFileNames[i].Compare(arrayFileNames[i + 1]) == 1)
+//				{
+//					strTemp = arrayFileNames[i];
+//					arrayFileNames[i] = arrayFileNames[i + 1];
+//					arrayFileNames[i + 1] = strTemp;
+//					sortflag = 1;
+//				}
+//			}
+//		}
+//
+//		for (i = 0; i<arrayFileNames.GetSize(); i++)
+//		{
+//			myInFile.Open("data\\" + arrayFileNames[i], CFile::modeRead);
+//			myInFile.Read(&version, sizeof(version));
+//			myInFile.Read(&count, sizeof(count));
+//			myInFile.Read(temp, 30);
+//			myInFile.Close();
+//			temp[30] = NULL;
+//			strLeagueName = temp;
+//			strLeagueName = strLeagueName + "\t" + arrayFileNames[i];
+//			dlgSelLeague.m_arrayLeagues.Add(strLeagueName);
+//		}
+//		// If TRUE add in Base directory
+//		if (baseFlag == TRUE)
+//		{
+//			//           123456789012345678901234567890
+//			strcpy_s(temp, "All Base Teams                ");
+//			temp[30] = NULL;
+//			strLeagueName = temp;
+//			strLeagueName = strLeagueName + "\t" + "data";
+//			dlgSelLeague.m_arrayLeagues.Add(strLeagueName);
+//		}
+//
+//		if (dlgSelLeague.DoModal() == IDOK)
+//		{
+//			strLeagueName = dlgSelLeague.m_arrayLeagues[0];
+//		}
+//	}
+//	else
+//	{
+//		// No Leagues found so display message
+//		AfxMessageBox("Could not find any Leagues files. Please create a League");
+//		return "";
+//	}
+//	return strLeagueName;
+//}
 
 //	Parse the team names as follows:
 //
@@ -3875,77 +3929,108 @@ CString CBaseballDoc::GetLeagues(BOOL baseFlag)
 //	strTeamFile = strTeam.Right(12);
 //	strTeamName = strTeam.Left(30);
 //
-CString CBaseballDoc::GetTeams(CString strDir)
+CString CBaseballDoc::GetTeams(CString strLeagueName)
 {
 	dlgSelTeam dlgSelTeam;
-	BOOL bWorking;
-	BYTE count;
-	CFile myInFile;
-	CStringArray arrayFileNames;
-	int sortflag;
-	int i;
-	CString strTemp;
-	char temp[41];
 	CString strTeamName;
-	CFileFind myFileFind;
+	long myLeagueID;
 
-	count = 0;
+	TeamStruct* myTeams = new TeamStruct();
 
-	bWorking = myFileFind.FindFile(strDir+"\\TB*.dat",0);
-	if (bWorking)
+	CStringArray* TeamArray = new CStringArray();
+
+	LeagueStruct* myLeagues = new LeagueStruct();
+
+	TeamArray->RemoveAll();
+
+	myLeagueID = myLeagues->GetLeagueID(strLeagueName);
+
+	TeamArray = myTeams->GetTeams(myLeagueID);
+
+	for (int i = 0; i<TeamArray->GetSize(); i++)
 	{
-		while (bWorking)
-		{
-			bWorking = myFileFind.FindNextFile();
-			arrayFileNames.Add(myFileFind.GetFileName());
-		}
-		myFileFind.Close();
-
-		// Since the FindNextFile does not return the files in any order
-		// we must sort the file names
-		sortflag = 1;
-		while (sortflag)
-		{
-			sortflag = 0;
-			for (i=0; i<(arrayFileNames.GetSize()-1);i++)
-			{
-				if (arrayFileNames[i].Compare(arrayFileNames[i+1]) == 1)
-				{
-					strTemp = arrayFileNames[i];
-					arrayFileNames[i] = arrayFileNames[i+1];
-					arrayFileNames[i+1] = strTemp;
-					sortflag = 1;
-				}
-			}
-		}
-
-		for (i=0; i<arrayFileNames.GetSize(); i++)
-		{
-			myInFile.Open(strDir+"\\"+arrayFileNames[i],CFile::modeRead);
-			myInFile.Read(&count,sizeof(count));
-			myInFile.Read(temp,40);
-			myInFile.Close();
-			temp[40] = NULL;
-			strTeamName = temp;
-			strTeamName = strTeamName+"\t"+arrayFileNames[i];
-			dlgSelTeam.m_arrayTeams.Add(strTeamName);
-		}
-
-		if (dlgSelTeam.DoModal() == IDOK)
-		{
-			strTeamName = dlgSelTeam.m_arrayTeams[0];
-		}
+		dlgSelTeam.m_arrayTeams.Add(TeamArray->ElementAt(i));
 	}
-	else
+
+	if (dlgSelTeam.DoModal() == IDOK)
 	{
-		// No teams found so display message
-		AfxMessageBox("Could not find any Team files. Please create a team");
-		return "";
+		strTeamName = dlgSelTeam.m_arrayTeams[0];
 	}
+
 	return strTeamName;
 }
 
-void CBaseballDoc::OnPlayersAddEditPitchers() 
+//CString CBaseballDoc::GetTeams(CString strDir)
+//{
+//	dlgSelTeam dlgSelTeam;
+//	BOOL bWorking;
+//	BYTE count;
+//	CFile myInFile;
+//	CStringArray arrayFileNames;
+//	int sortflag;
+//	int i;
+//	CString strTemp;
+//	char temp[41];
+//	CString strTeamName;
+//	CFileFind myFileFind;
+//
+//	count = 0;
+//
+//	bWorking = myFileFind.FindFile(strDir + "\\TB*.dat", 0);
+//	if (bWorking)
+//	{
+//		while (bWorking)
+//		{
+//			bWorking = myFileFind.FindNextFile();
+//			arrayFileNames.Add(myFileFind.GetFileName());
+//		}
+//		myFileFind.Close();
+//
+//		// Since the FindNextFile does not return the files in any order
+//		// we must sort the file names
+//		sortflag = 1;
+//		while (sortflag)
+//		{
+//			sortflag = 0;
+//			for (i = 0; i<(arrayFileNames.GetSize() - 1); i++)
+//			{
+//				if (arrayFileNames[i].Compare(arrayFileNames[i + 1]) == 1)
+//				{
+//					strTemp = arrayFileNames[i];
+//					arrayFileNames[i] = arrayFileNames[i + 1];
+//					arrayFileNames[i + 1] = strTemp;
+//					sortflag = 1;
+//				}
+//			}
+//		}
+//
+//		for (i = 0; i<arrayFileNames.GetSize(); i++)
+//		{
+//			myInFile.Open(strDir + "\\" + arrayFileNames[i], CFile::modeRead);
+//			myInFile.Read(&count, sizeof(count));
+//			myInFile.Read(temp, 40);
+//			myInFile.Close();
+//			temp[40] = NULL;
+//			strTeamName = temp;
+//			strTeamName = strTeamName + "\t" + arrayFileNames[i];
+//			dlgSelTeam.m_arrayTeams.Add(strTeamName);
+//		}
+//
+//		if (dlgSelTeam.DoModal() == IDOK)
+//		{
+//			strTeamName = dlgSelTeam.m_arrayTeams[0];
+//		}
+//	}
+//	else
+//	{
+//		// No teams found so display message
+//		AfxMessageBox("Could not find any Team files. Please create a team");
+//		return "";
+//	}
+//	return strTeamName;
+//}
+
+void CBaseballDoc::OnPlayersAddEditPitchers()
 {
 	CString strLeagueName;
 	CString strLeagueFile;

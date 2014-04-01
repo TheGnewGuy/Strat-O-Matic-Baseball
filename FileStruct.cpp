@@ -117,10 +117,66 @@ BatterStruct::BatterStruct()
 	m_OBChanceBasic.Empty();
 	m_OBChanceLeft.Empty();
 	m_OBChanceRight.Empty();
+
+	CBaseballDoc* pDoc = CBaseballDoc::GetDoc();
+	ASSERT_VALID(pDoc);
+
+	// Allocate the recordset
+	m_pBatter_set = new CBatter(&pDoc->m_pDatabase);
+
+	TRY
+	{
+		// Execute the query
+		m_pBatter_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Batter RS error: " + e->m_strError);
+	}
+	END_CATCH;
+
+	// Allocate the recordset
+	m_pBatterStats_set = new CBatterStats(&pDoc->m_pDatabase);
+
+	TRY
+	{
+		// Execute the query
+		m_pBatterStats_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database BatterStats RS error: " + e->m_strError);
+	}
+	END_CATCH;
+	m_arrayBatterNames = new CStringArray();
 }
 
 BatterStruct::~BatterStruct()
 {
+	TRY
+	{
+		if (m_pBatterStats_set->IsOpen())
+		m_pBatterStats_set->Close();
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Close error BatterStruct: " + e->m_strError);
+	}
+	END_CATCH;
+	TRY
+	{
+		if (m_pBatter_set->IsOpen())
+		m_pBatter_set->Close();
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Close error BatterStruct: " + e->m_strError);
+	}
+	END_CATCH;
 }
 
 int BatterStruct::UpdateBatter(CString BatterFileName, LONG SeekPosition)
@@ -459,6 +515,39 @@ int BatterStruct::CopyBatterFile(CString inFileName, CString outFileName)
 	inFile.Close();
 	outFile.Close();
 	return 1;
+}
+
+// Get Batter Stats and then Batter for Name
+CStringArray* BatterStruct::GetBatterNameArray(long TeamID)
+{
+	CString tmpTeamID;
+	CString tmpBatterID;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpTeamID.Format("%d", TeamID);
+	m_pBatterStats_set->m_strFilter = "[TeamID] = " + tmpTeamID;
+	// Execute the query
+	m_pBatterStats_set->Requery();
+
+	m_arrayBatterNames->RemoveAll();
+
+	while (!m_pBatterStats_set->IsEOF())
+	{
+		tmpBatterID.Format("%d", m_pBatterStats_set->m_BatterID);
+		m_pBatter_set->m_strFilter = "[BatterID] = " + tmpBatterID;
+		m_pBatter_set->Requery();
+
+		while (!m_pBatter_set->IsEOF())
+		{
+			m_arrayBatterNames->Add(m_pBatter_set->m_LastName);
+			m_pBatter_set->MoveNext();
+		}
+
+		m_pBatterStats_set->MoveNext();
+	}
+
+	return m_arrayBatterNames;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -836,6 +925,7 @@ LeagueStruct::LeagueStruct()
 			AfxMessageBox("Database Leagues RS error: " + e->m_strError);
 	}
 	END_CATCH;
+	m_arrayLeagueNames = new CStringArray();
 }
 
 LeagueStruct::~LeagueStruct()
@@ -859,7 +949,7 @@ long LeagueStruct::GetLeagueID(CString strLeagueName)
 
 	// Update the filter which is the WHERE portion to find the teams
 	// based on a given league.
-	m_pLeagues_set->m_strFilter = "[LeagueName] = " + strLeagueName;
+	m_pLeagues_set->m_strFilter = "[LeagueName] = '" + strLeagueName + "'";
 	// Execute the query
 	m_pLeagues_set->Requery();
 
@@ -869,6 +959,24 @@ long LeagueStruct::GetLeagueID(CString strLeagueName)
 	}
 
 	return retLeagueID;
+}
+
+CStringArray* LeagueStruct::GetAllLeagues()
+{
+	CString tmpLaegueID;
+
+	// Execute the query
+	m_pLeagues_set->Requery();
+
+	m_arrayLeagueNames->RemoveAll();
+
+	while (!m_pLeagues_set->IsEOF())
+	{
+		m_arrayLeagueNames->Add(m_pLeagues_set->m_LeagueName);
+		m_pLeagues_set->MoveNext();
+	}
+
+	return m_arrayLeagueNames;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -936,4 +1044,34 @@ CStringArray* TeamStruct::GetTeams(long LeagueID)
 	}
 
 	return m_arrayTeamNames;
+}
+
+
+long TeamStruct::GetTeamID(CString strTeamName, long LeagueID)
+{
+	CString tmpLaegueID;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpLaegueID.Format("%d", LeagueID);
+	m_pTeams_set->m_strFilter = "[TeamName] = '" + strTeamName + "' AND " + "[LeagueID] = " + tmpLaegueID;
+	// Execute the query
+	m_pTeams_set->Requery();
+
+	return m_pTeams_set->m_TeamID;
+}
+
+
+CString TeamStruct::GetTeamName(long TeamID)
+{
+	CString tmpTeamID;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpTeamID.Format("%d", TeamID);
+	m_pTeams_set->m_strFilter = "[TeamID] = " + tmpTeamID;
+	// Execute the query
+	m_pTeams_set->Requery();
+
+	return m_pTeams_set->m_TeamName;
 }

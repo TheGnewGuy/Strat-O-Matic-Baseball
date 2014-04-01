@@ -1207,6 +1207,8 @@ PropertySheetBatters::PropertySheetBatters(UINT nIDCaption, CWnd* pParentWnd, UI
 {
 	m_rgetcursel = -1;
 	m_newFlag = FALSE;
+	m_LeagueID = 0;
+	m_TeamID = 0;
 }
 
 PropertySheetBatters::PropertySheetBatters(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
@@ -1214,6 +1216,10 @@ PropertySheetBatters::PropertySheetBatters(LPCTSTR pszCaption, CWnd* pParentWnd,
 {
 	m_rgetcursel = -1;
 	m_newFlag = FALSE;
+	m_LeagueID = 0;
+
+	m_TeamID = 0;
+
 }
 
 PropertySheetBatters::~PropertySheetBatters()
@@ -1588,18 +1594,20 @@ LRESULT PropertySheetBatters::OnCancel(WPARAM wParam,LPARAM lParam)
 
 void PropertySheetBatters::BuildPlayerNameComboBox(int iPage)
 {
-	BYTE count;
-	int i;
-	LONG lTeamSection = 74;
-	LONG lPlayerSection = m_structBatter.m_RecordSize;
+	//BYTE count;
+	//int i;
+	//LONG lTeamSection = 74;
+	//LONG lPlayerSection = m_structBatter.m_RecordSize;
 	CString	strPlayerName;	// Length of 30
-
-
-	// If needed save Player Name
+	CStringArray* arrayBatterNames;
+	
+	//// If needed save Player Name
 	if (m_flagNew == TRUE)
 		strPlayerName = m_structBatter.m_PlayerName;
-	// Get count of players in file
-	count = m_structBatter.GetCountBatter(m_FileName);
+	//// Get count of players in file
+	//count = m_structBatter.GetCountBatter(m_FileName);
+	arrayBatterNames = m_structBatter.GetBatterNameArray(m_TeamID);
+
 	// Open file and build player ComboBox
 	switch (iPage)
 	{
@@ -1616,23 +1624,24 @@ void PropertySheetBatters::BuildPlayerNameComboBox(int iPage)
 		m_pPage4->m_comboPlayerName.ResetContent();
 		break;
 	}
-	for (i=0; i<count; i++)
+	for (int i = 0; i<arrayBatterNames->GetCount(); i++)
 	{
-		m_lSeekPlayerFile = lTeamSection+(i*lPlayerSection);
-		m_structBatter.GetBatter(m_FileName ,m_lSeekPlayerFile);
+		//m_lSeekPlayerFile = lTeamSection+(i*lPlayerSection);
+		//m_structBatter.GetBatter(m_FileName ,m_lSeekPlayerFile);
 		switch (iPage)
 		{
 		case 1:
-			m_pPage1->m_comboPlayerName.AddString(m_structBatter.m_PlayerName);
+			// m_pPage1->m_comboPlayerName.AddString(m_structBatter.m_PlayerName);
+			m_pPage1->m_comboPlayerName.AddString(arrayBatterNames->ElementAt(i));
 			break;
 		case 2:
-			m_pPage2->m_comboPlayerName.AddString(m_structBatter.m_PlayerName);
+			m_pPage2->m_comboPlayerName.AddString(arrayBatterNames->ElementAt(i));
 			break;
 		case 3:
-			m_pPage3->m_comboPlayerName.AddString(m_structBatter.m_PlayerName);
+			m_pPage3->m_comboPlayerName.AddString(arrayBatterNames->ElementAt(i));
 			break;
 		case 4:
-			m_pPage4->m_comboPlayerName.AddString(m_structBatter.m_PlayerName);
+			m_pPage4->m_comboPlayerName.AddString(arrayBatterNames->ElementAt(i));
 			break;
 		}
 	}
@@ -1651,7 +1660,7 @@ void PropertySheetBatters::BuildPlayerNameComboBox(int iPage)
 		m_pPage4->m_bChangedFlag = FALSE;
 		break;
 	}
-	m_lSeekPlayerFile = 0;
+	//m_lSeekPlayerFile = 0;
 
 	if (m_flagNew == TRUE)
 	{

@@ -454,6 +454,9 @@ protected:
 	afx_msg LRESULT OnOK(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT OnCancel(WPARAM wParam,LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+public:
+	long m_LeagueID;
+	long m_TeamID;
 };
 
 /////////////////////////////////////////////////////////////////////////////
