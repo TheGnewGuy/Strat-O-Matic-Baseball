@@ -308,6 +308,93 @@ int BatterStruct::BatterWrite(CFile * myFile)
 	return 1;
 }
 
+void BatterStruct::BatterRead(long BatterStatID)
+{
+	CString tmpBatterID;
+	CString tmpBatterStatID;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpBatterStatID.Format("%d", BatterStatID);
+	m_pBatterStats_set->m_strFilter = "[BatterStatsID] = " + tmpBatterStatID;
+	// Execute the query for BatterStats
+	m_pBatterStats_set->Requery();
+	tmpBatterID.Format("%d", m_pBatterStats_set->m_BatterID);
+	m_pBatter_set->m_strFilter = "[BatterID] = " + tmpBatterID;
+	// Execute the query for Batter
+	m_pBatter_set->Requery();
+
+	m_AB = m_pBatterStats_set->m_AB;
+	m_Runs = m_pBatterStats_set->m_Runs;
+	m_Hits = m_pBatterStats_set->m_Hits;
+	m_RBI = m_pBatterStats_set->m_RBI;
+	m_2B = m_pBatterStats_set->m_2B;
+	m_3B = m_pBatterStats_set->m_3B;
+	m_HomeRuns = m_pBatterStats_set->m_HomeRuns;
+	m_Walk = m_pBatterStats_set->m_Walk;
+	m_StrikeOut = m_pBatterStats_set->m_StrikeOut;
+	m_ReachedOnError = m_pBatterStats_set->m_ReachedOnError;
+	m_Sacrifice = m_pBatterStats_set->m_Sacrifice;
+	m_StolenBase = m_pBatterStats_set->m_StolenBase;
+	m_CS = m_pBatterStats_set->m_CS;
+	m_Games = m_pBatterStats_set->m_Games;
+	m_HBP = m_pBatterStats_set->m_HBP;
+	//m_pBatterStats_set->m_AVG;
+	//m_pBatterStats_set->m_SLG;
+	//m_pBatterStats_set->m_OBP;
+
+	m_Pitcher = m_pBatter_set->m_Pitcher;
+	m_Catcher = m_pBatter_set->m_Catcher;
+	m_FirstBase = m_pBatter_set->m_FirstBase;
+	m_SecondBase = m_pBatter_set->m_SecondBase;
+	m_ThirdBase = m_pBatter_set->m_ThirdBase;
+	m_ShortStop = m_pBatter_set->m_ShortStop;
+	m_LeftField = m_pBatter_set->m_LeftField;
+	m_CenterField = m_pBatter_set->m_CenterField;
+	m_RightField = m_pBatter_set->m_RightField;
+	m_bER1 = m_pBatter_set->m_ER1;
+	m_bER2 = m_pBatter_set->m_ER2;
+	m_bER3 = m_pBatter_set->m_ER3;
+	m_bER4 = m_pBatter_set->m_ER4;
+	m_bER5 = m_pBatter_set->m_ER5;
+	m_bER6 = m_pBatter_set->m_ER6;
+	m_bER7 = m_pBatter_set->m_ER7;
+	m_bER8 = m_pBatter_set->m_ER8;
+	m_bER9 = m_pBatter_set->m_ER9;
+	m_OBChanceBasic = m_pBatter_set->m_OBChanceBasic;
+	m_OBChanceLeft = m_pBatter_set->m_OBChanceLeft;
+	m_OBChanceRight = m_pBatter_set->m_OBChanceRight;
+	m_OBChanceWalk = m_pBatter_set->m_OBChanceWalk;
+	m_OBChanceSingle = m_pBatter_set->m_OBChanceSingle;
+	m_OBChanceDouble = m_pBatter_set->m_OBChanceDouble;
+	m_OBChanceTriple = m_pBatter_set->m_OBChanceTriple;
+	m_OBChanceHomeRun = m_pBatter_set->m_OBChanceHomeRun;
+	m_ChanceDoublePlay = m_pBatter_set->m_ChanceDoublePlay;
+	m_OBChanceWalkRight = m_pBatter_set->m_OBChanceWalkRight;
+	m_OBChanceSingleRight = m_pBatter_set->m_OBChanceSingleRight;
+	m_OBChanceDoubleRight = m_pBatter_set->m_OBChanceDoubleRight;
+	m_OBChanceTripleRight = m_pBatter_set->m_OBChanceTripleRight;
+	m_OBChanceHomeRunRight = m_pBatter_set->m_OBChanceHomeRunRight;
+	m_ChanceDoublePlayRight = m_pBatter_set->m_ChanceDoublePlayRight;
+	m_OBChanceWalkLeft = m_pBatter_set->m_OBChanceWalkLeft;
+	m_OBChanceSingleLeft = m_pBatter_set->m_OBChanceSingleLeft;
+	m_OBChanceDoubleLeft = m_pBatter_set->m_OBChanceDoubleLeft;
+	m_OBChanceTripleLeft = m_pBatter_set->m_OBChanceTripleLeft;
+	m_OBChanceHomeRunLeft = m_pBatter_set->m_OBChanceHomeRunLeft;
+	m_ChanceDoublePlayLeft = m_pBatter_set->m_ChanceDoublePlayLeft;
+	m_bBunting = m_pBatter_set->m_Bunting;
+	m_bHitRun = m_pBatter_set->m_HitRun;
+	m_bRunning = m_pBatter_set->m_Running;
+	m_bStealing = m_pBatter_set->m_Stealing;
+	m_bTRate = m_pBatter_set->m_TRate;
+	m_bPass = m_pBatter_set->m_Pass;
+	m_bPowerL = m_pBatter_set->m_PowerLeft;
+	m_bPowerR = m_pBatter_set->m_PowerRight;
+	m_bOutArm = m_pBatter_set->m_OutArm;
+	m_bCatchArm = m_pBatter_set->m_CatchArm;
+	//m_pBatter_set->m_BatterHits;
+}
+
 int BatterStruct::BatterRead(CFile * myFile)
 {
 	char cTemp[31];

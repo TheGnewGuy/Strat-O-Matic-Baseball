@@ -125,6 +125,7 @@ public:
 	CBatterStats* m_pBatterStats_set;
 	CBatter* m_pBatter_set;
 	CStringArray* m_arrayBatterNames;
+	void BatterRead(long BatterStatID);
 };
 
 /////////////////////////////////////////////////////////////////////////////
