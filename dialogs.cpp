@@ -1594,19 +1594,16 @@ LRESULT PropertySheetBatters::OnCancel(WPARAM wParam,LPARAM lParam)
 
 void PropertySheetBatters::BuildPlayerNameComboBox(int iPage)
 {
-	//BYTE count;
-	//int i;
-	//LONG lTeamSection = 74;
-	//LONG lPlayerSection = m_structBatter.m_RecordSize;
 	CString	strPlayerName;	// Length of 30
 	CStringArray* arrayBatterNames;
 	
-	//// If needed save Player Name
+	// If needed save Player Name because it gets wipped out in init routine
 	if (m_flagNew == TRUE)
 		strPlayerName = m_structBatter.m_PlayerName;
-	//// Get count of players in file
-	//count = m_structBatter.GetCountBatter(m_FileName);
+
 	arrayBatterNames = m_structBatter.GetBatterNameArray(m_TeamID);
+	// Use the following after figuring out a way to extract name.
+	// arrayBatterNames = m_structBatter.GetBatterLastFirstArray(m_TeamID);
 
 	// Open file and build player ComboBox
 	switch (iPage)
@@ -1626,12 +1623,9 @@ void PropertySheetBatters::BuildPlayerNameComboBox(int iPage)
 	}
 	for (int i = 0; i<arrayBatterNames->GetCount(); i++)
 	{
-		//m_lSeekPlayerFile = lTeamSection+(i*lPlayerSection);
-		//m_structBatter.GetBatter(m_FileName ,m_lSeekPlayerFile);
 		switch (iPage)
 		{
 		case 1:
-			// m_pPage1->m_comboPlayerName.AddString(m_structBatter.m_PlayerName);
 			m_pPage1->m_comboPlayerName.AddString(arrayBatterNames->ElementAt(i));
 			break;
 		case 2:
@@ -1660,7 +1654,6 @@ void PropertySheetBatters::BuildPlayerNameComboBox(int iPage)
 		m_pPage4->m_bChangedFlag = FALSE;
 		break;
 	}
-	//m_lSeekPlayerFile = 0;
 
 	if (m_flagNew == TRUE)
 	{
@@ -1687,11 +1680,6 @@ void PropertySheetBatters::BuildPlayerNameComboBox(int iPage)
 
 void PropertySheetBatters::OnCloseupComboPlayerName(int iPage)
 {
-	int i, rcompare;
-	BYTE count;
-	CString csPlayer;
-	LONG lTeamSection = 74;
-	LONG lPlayerSection = m_structBatter.m_RecordSize;
 	char buf[10];
 	int changed;
 	int yesno;
@@ -1761,28 +1749,9 @@ void PropertySheetBatters::OnCloseupComboPlayerName(int iPage)
 	}
 	if (m_rgetcursel != CB_ERR)
 	{
-		count = m_structBatter.GetCountBatter(m_FileName);
-		csPlayer.Empty();
-		rcompare = m_rString.Compare(csPlayer);
-		i = -1;
-		while (rcompare)
-		{
-			i++;
-			if (i >= count)
-			{
-				// Player compare failed so display message
-				AfxMessageBox("Player Compare Failed");
-				break;
-			}
-			// Read in the player Data
-			m_lSeekPlayerFile = lTeamSection+(i*lPlayerSection);
-			m_structBatter.GetBatter(m_FileName,m_lSeekPlayerFile);
-			csPlayer = m_structBatter.m_PlayerName;
-			rcompare = m_rString.Compare(csPlayer);
-		}
 
 		// Read in the player Data
-		m_structBatter.GetBatter(m_FileName,m_lSeekPlayerFile);
+		m_structBatter.GetBatter(m_rString, m_TeamID);
 		// Set the Dialog Items for page 1
 		if ((m_pPage1->m_hWnd != 0) && (m_pPage1->m_bChangedFlag == FALSE))
 		{
@@ -1899,7 +1868,7 @@ void PropertySheetBatters::OnCloseupComboPlayerName(int iPage)
 	else
 	{
 		// No player selected Edit Box being used, set seek to 0 as flag
-		m_lSeekPlayerFile = 0;
+		//m_lSeekPlayerFile = 0;
 	}
 }
 

@@ -122,10 +122,14 @@ protected:
 public:
 	// Get Batter Stats and then Batter for Name
 	CStringArray* GetBatterNameArray(long TeamID);
+	CStringArray* GetBatterLastFirstArray(long TeamID);
 	CBatterStats* m_pBatterStats_set;
 	CBatter* m_pBatter_set;
 	CStringArray* m_arrayBatterNames;
 	void BatterRead(long BatterStatID);
+	CTeams* m_pTeams_set;
+	long m_saveBatterStatsID;
+	long m_saveTeamID;
 };
 
 /////////////////////////////////////////////////////////////////////////////

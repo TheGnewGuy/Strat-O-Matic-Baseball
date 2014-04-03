@@ -27,7 +27,7 @@ BatterStruct::BatterStruct()
 	// Read Ballpark 30 char
 	//
 	// Player layout repeats
-		m_RecordSize = 30 +
+	m_RecordSize = 30 +
 		sizeof(m_AB)+
 		sizeof(m_Runs)+
 		sizeof(m_Hits)+
@@ -64,30 +64,30 @@ BatterStruct::BatterStruct()
 		sizeof(m_bER8)+
 		sizeof(m_bER9)+
 		sizeof(m_bBatterHits)+
-		6+				// On Base Chance Basic
-		6+				// On Base Chance Left
-		6+				// On Base Chance Right
-		6+				// On Base Chance Walk
-		6+				// On Base Chance Single
-		6+				// On Base Chance Double
-		6+				// On Base Chance Triple
-		6+				// On Base Chance HomeRun
-		6+				// Chance Double Play
-		6+				// On Base Chance Walk Right
-		6+				// On Base Chance Single Right
-		6+				// On Base Chance Double Right
-		6+				// On Base Chance Triple Right
-		6+				// On Base Chance HomeRun Right
-		6+				// Chance Double Play Right
-		6+				// On Base Chance Walk Left
-		6+				// On Base Chance Single Left
-		6+				// On Base Chance Double Left
-		6+				// On Base Chance Triple Left
-		6+				// On Base Chance HomeRun Left
-		6+				// Chance Double Play Left
-		6+				// Filler
-		6+				// Filler
-		6+				// Filler
+		6 +				// On Base Chance Basic
+		6 +				// On Base Chance Left
+		6 +				// On Base Chance Right
+		6 +				// On Base Chance Walk
+		6 +				// On Base Chance Single
+		6 +				// On Base Chance Double
+		6 +				// On Base Chance Triple
+		6 +				// On Base Chance HomeRun
+		6 +				// Chance Double Play
+		6 +				// On Base Chance Walk Right
+		6 +				// On Base Chance Single Right
+		6 +				// On Base Chance Double Right
+		6 +				// On Base Chance Triple Right
+		6 +				// On Base Chance HomeRun Right
+		6 +				// Chance Double Play Right
+		6 +				// On Base Chance Walk Left
+		6 +				// On Base Chance Single Left
+		6 +				// On Base Chance Double Left
+		6 +				// On Base Chance Triple Left
+		6 +				// On Base Chance HomeRun Left
+		6 +				// Chance Double Play Left
+		6 +				// Filler
+		6 +				// Filler
+		6 +				// Filler
 		sizeof(m_bBunting)+
 		sizeof(m_bHitRun)+
 		sizeof(m_bRunning)+
@@ -150,7 +150,24 @@ BatterStruct::BatterStruct()
 			AfxMessageBox("Database BatterStats RS error: " + e->m_strError);
 	}
 	END_CATCH;
+
+	// Allocate the recordset
+	m_pTeams_set = new CTeams(&pDoc->m_pDatabase);
+
+	TRY
+	{
+		// Execute the query
+		m_pTeams_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database m_pTeams_set RS error: " + e->m_strError);
+	}
+	END_CATCH;
 	m_arrayBatterNames = new CStringArray();
+	m_saveBatterStatsID = 0;
+	m_saveTeamID = 0;
 }
 
 BatterStruct::~BatterStruct()
@@ -175,6 +192,17 @@ BatterStruct::~BatterStruct()
 	{
 			// If a database exception occured, show error msg
 			AfxMessageBox("Database Close error BatterStruct: " + e->m_strError);
+	}
+	END_CATCH;
+	TRY
+	{
+		if (m_pTeams_set->IsOpen())
+		m_pTeams_set->Close();
+	}
+		CATCH(CDBException, e)
+	{
+			// If a database exception occured, show error msg
+			AfxMessageBox("Database Close error m_pTeams_set: " + e->m_strError);
 	}
 	END_CATCH;
 }
@@ -209,14 +237,40 @@ int BatterStruct::AddBatter(CString BatterFileName)
 	return 1;
 }
 
-int BatterStruct::GetBatter(CString BatterFileName, LONG SeekPosition)
+int BatterStruct::GetBatter(CString BatterName, LONG TeamID)
 {
-	CFile m_cFileTeam;
-	m_cFileTeam.Open( BatterFileName,CFile::modeRead);
-	m_cFileTeam.Seek( SeekPosition, CFile::begin );
-	BatterRead(&m_cFileTeam);
+	CString tmpBatterID;
+	CString tmpBatterStatID;
+	CString tmpTeamID;
+	long saveBatterID;
+
+	m_saveTeamID = TeamID;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpTeamID.Format("%d", TeamID);
+	m_pBatterStats_set->m_strFilter = "[TeamID] = " + tmpTeamID;
+	m_pBatterStats_set->Requery();	// Get list of BatterStats associated to this team.
+
+	while (!m_pBatterStats_set->IsEOF())
+	{
+		tmpBatterID.Format("%d", m_pBatterStats_set->m_BatterID);
+		m_pBatter_set->m_strFilter = "[BatterID] = " + tmpBatterID +
+			" AND [LastName] = '" + BatterName + "'";
+		m_pBatter_set->Requery();
+		if (!m_pBatter_set->IsBOF())
+		{
+			// Records have been returned. 
+			// This should be a single record with a match between Batter and Batterstats
+			saveBatterID = m_pBatter_set->m_BatterID;
+			m_saveBatterStatsID = m_pBatterStats_set->m_BatterStatsID;
+		}
+
+		m_pBatterStats_set->MoveNext();
+	}
+
+	BatterRead(m_saveBatterStatsID);
 	// Close file
-	m_cFileTeam.Close();
 	return 1;
 }
 
@@ -324,6 +378,7 @@ void BatterStruct::BatterRead(long BatterStatID)
 	// Execute the query for Batter
 	m_pBatter_set->Requery();
 
+	m_PlayerName = m_pBatter_set->m_LastName + ", " + m_pBatter_set->m_FirstName;
 	m_AB = m_pBatterStats_set->m_AB;
 	m_Runs = m_pBatterStats_set->m_Runs;
 	m_Hits = m_pBatterStats_set->m_Hits;
@@ -392,7 +447,7 @@ void BatterStruct::BatterRead(long BatterStatID)
 	m_bPowerR = m_pBatter_set->m_PowerRight;
 	m_bOutArm = m_pBatter_set->m_OutArm;
 	m_bCatchArm = m_pBatter_set->m_CatchArm;
-	//m_pBatter_set->m_BatterHits;
+	m_bBatterHits =  m_pBatter_set->m_BatterHits;
 }
 
 int BatterStruct::BatterRead(CFile * myFile)
@@ -628,6 +683,41 @@ CStringArray* BatterStruct::GetBatterNameArray(long TeamID)
 		while (!m_pBatter_set->IsEOF())
 		{
 			m_arrayBatterNames->Add(m_pBatter_set->m_LastName);
+			m_pBatter_set->MoveNext();
+		}
+
+		m_pBatterStats_set->MoveNext();
+	}
+
+	return m_arrayBatterNames;
+}
+
+// Return array with "Lastname, Firstname"
+CStringArray* BatterStruct::GetBatterLastFirstArray(long TeamID)
+{
+	CString tmpTeamID;
+	CString tmpBatterID;
+	CString tmpName;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpTeamID.Format("%d", TeamID);
+	m_pBatterStats_set->m_strFilter = "[TeamID] = " + tmpTeamID;
+	// Execute the query
+	m_pBatterStats_set->Requery();
+
+	m_arrayBatterNames->RemoveAll();
+
+	while (!m_pBatterStats_set->IsEOF())
+	{
+		tmpBatterID.Format("%d", m_pBatterStats_set->m_BatterID);
+		m_pBatter_set->m_strFilter = "[BatterID] = " + tmpBatterID;
+		m_pBatter_set->Requery();
+
+		while (!m_pBatter_set->IsEOF())
+		{
+			tmpName = m_pBatter_set->m_LastName + ", " + m_pBatter_set->m_FirstName;
+			m_arrayBatterNames->Add(tmpName);
 			m_pBatter_set->MoveNext();
 		}
 
