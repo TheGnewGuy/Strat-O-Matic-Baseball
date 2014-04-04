@@ -209,31 +209,14 @@ BatterStruct::~BatterStruct()
 
 int BatterStruct::UpdateBatter(CString BatterFileName, LONG SeekPosition)
 {
-	CFile m_cFileTeam;
-	m_cFileTeam.Open( BatterFileName,CFile::modeReadWrite);
-	m_cFileTeam.Seek( SeekPosition, CFile::begin );
-	BatterWrite(&m_cFileTeam);
-	// Close file
-	m_cFileTeam.Close();
+	BatterWrite(m_saveBatterStatsID);
 	return 1;
 }
 
 int BatterStruct::AddBatter(CString BatterFileName)
 {
-	BYTE count;
-	CFile m_cFileTeam;
-
-	count = 0;
-	// Open file and write new player
-	m_cFileTeam.Open(BatterFileName,CFile::modeReadWrite);
-	m_cFileTeam.Read(&count,sizeof(count));
-	count++;
-	m_cFileTeam.SeekToBegin();
-	m_cFileTeam.Write(&count,sizeof(count));
-	m_cFileTeam.SeekToEnd();
-	BatterWrite(&m_cFileTeam);
-	// Close file
-	m_cFileTeam.Close();
+	//m_pBatterStats_set->AddNew();
+	//BatterWrite(m_saveBatterStatsID);
 	return 1;
 }
 
@@ -274,93 +257,193 @@ int BatterStruct::GetBatter(CString BatterName, LONG TeamID)
 	return 1;
 }
 
-int BatterStruct::BatterWrite(CFile * myFile)
+void BatterStruct::BatterWrite(long BatterStatID)
 {
-	myFile->Write(m_PlayerName,30);
-	myFile->Write(&m_AB,sizeof(m_AB));
-	myFile->Write(&m_Runs,sizeof(m_Runs));
-	myFile->Write(&m_Hits,sizeof(m_Hits));
-	myFile->Write(&m_RBI,sizeof(m_RBI));
-	myFile->Write(&m_2B,sizeof(m_2B));
-	myFile->Write(&m_3B,sizeof(m_3B));
-	myFile->Write(&m_HomeRuns,sizeof(m_HomeRuns));
-	myFile->Write(&m_Walk,sizeof(m_Walk));
-	myFile->Write(&m_StrikeOut,sizeof(m_StrikeOut));
-	myFile->Write(&m_ReachedOnError,sizeof(m_ReachedOnError));
-	myFile->Write(&m_Sacrifice,sizeof(m_Sacrifice));
-	myFile->Write(&m_StolenBase,sizeof(m_StolenBase));
-	myFile->Write(&m_CS,sizeof(m_CS));
-	myFile->Write(&m_Filler1,sizeof(m_Filler1));
-	myFile->Write(&m_Filler2,sizeof(m_Filler2));
-	myFile->Write(&m_Games,sizeof(m_Games));
-	myFile->Write(&m_HBP,sizeof(m_HBP));
-	myFile->Write(&m_Pitcher,sizeof(m_Pitcher));
-	myFile->Write(&m_Catcher,sizeof(m_Catcher));
-	myFile->Write(&m_FirstBase,sizeof(m_FirstBase));
-	myFile->Write(&m_SecondBase,sizeof(m_SecondBase));
-	myFile->Write(&m_ShortStop,sizeof(m_ShortStop));
-	myFile->Write(&m_ThirdBase,sizeof(m_ThirdBase));
-	myFile->Write(&m_LeftField,sizeof(m_LeftField));
-	myFile->Write(&m_CenterField,sizeof(m_CenterField));
-	myFile->Write(&m_RightField,sizeof(m_RightField));
-	myFile->Write(&m_bER1,sizeof(m_bER1));
-	myFile->Write(&m_bER2,sizeof(m_bER2));
-	myFile->Write(&m_bER3,sizeof(m_bER3));
-	myFile->Write(&m_bER4,sizeof(m_bER4));
-	myFile->Write(&m_bER5,sizeof(m_bER5));
-	myFile->Write(&m_bER6,sizeof(m_bER6));
-	myFile->Write(&m_bER7,sizeof(m_bER7));
-	myFile->Write(&m_bER8,sizeof(m_bER8));
-	myFile->Write(&m_bER9,sizeof(m_bER9));
-	myFile->Write(&m_bBatterHits,sizeof(m_bBatterHits));
-	myFile->Write(m_OBChanceBasic,6);
-	myFile->Write(m_OBChanceLeft,6);
-	myFile->Write(m_OBChanceRight,6);
-	myFile->Write(m_OBChanceWalk,6);
-	myFile->Write(m_OBChanceSingle,6);
-	myFile->Write(m_OBChanceDouble,6);
-	myFile->Write(m_OBChanceTriple,6);
-	myFile->Write(m_OBChanceHomeRun,6);
-	myFile->Write(m_ChanceDoublePlay,6);
-	myFile->Write(m_OBChanceWalkRight,6);		// Filler
-	myFile->Write(m_OBChanceSingleRight,6);
-	myFile->Write(m_OBChanceDoubleRight,6);
-	myFile->Write(m_OBChanceTripleRight,6);
-	myFile->Write(m_OBChanceHomeRunRight,6);
-	myFile->Write(m_ChanceDoublePlayRight,6);
-	myFile->Write(m_OBChanceWalkLeft,6);
-	myFile->Write(m_OBChanceSingleLeft,6);
-	myFile->Write(m_OBChanceDoubleLeft,6);
-	myFile->Write(m_OBChanceTripleLeft,6);
-	myFile->Write(m_OBChanceHomeRunLeft,6);
-	myFile->Write(m_ChanceDoublePlayLeft,6);
-	myFile->Write("0     ",6);		// Filler
-	myFile->Write("0     ",6);		// Filler
-	myFile->Write("0     ",6);		// Filler
-	myFile->Write(&m_bBunting,sizeof(m_bBunting));
-	myFile->Write(&m_bHitRun,sizeof(m_bHitRun));
-	myFile->Write(&m_bRunning,sizeof(m_bRunning));
-	myFile->Write(&m_bStealing,sizeof(m_bStealing));
-	myFile->Write(&m_bTRate,sizeof(m_bTRate));	// Place holder for T Rating
-	myFile->Write(&m_bPass,sizeof(m_bPass));	// Place holder for Passball
-	myFile->Write(&m_bPowerL,sizeof(m_bPowerL));	// Place holder for Power Left
-	myFile->Write(&m_bPowerR,sizeof(m_bPowerR));	// Place holder for Power Right
-	myFile->Write(&m_bOutArm,sizeof(m_bOutArm));	// Place holder for Outfielder Arm
-	myFile->Write(&m_bCatchArm,sizeof(m_bCatchArm));	// Place holder for Catcher Arm
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
-	return 1;
+	CString tmpBatterID;
+	CString tmpBatterStatID;
+	SYSTEMTIME lt;
+	GetLocalTime(&lt);
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpBatterStatID.Format("%d", BatterStatID);
+	m_pBatterStats_set->m_strFilter = "[BatterStatsID] = " + tmpBatterStatID;
+	// Execute the query for BatterStats
+	m_pBatterStats_set->Requery();
+	tmpBatterID.Format("%d", m_pBatterStats_set->m_BatterID);
+	m_pBatter_set->m_strFilter = "[BatterID] = " + tmpBatterID;
+	// Execute the query for Batter
+	m_pBatter_set->Requery();
+
+	m_pBatterStats_set->Edit();
+
+	m_pBatterStats_set->m_AB = m_AB;
+	m_pBatterStats_set->m_Runs = m_Runs;
+	m_pBatterStats_set->m_Hits = m_Hits;
+	m_pBatterStats_set->m_RBI = m_RBI;
+	m_pBatterStats_set->m_2B = m_2B;
+	m_pBatterStats_set->m_3B = m_3B;
+	m_pBatterStats_set->m_HomeRuns = m_HomeRuns;
+	m_pBatterStats_set->m_Walk = m_Walk;
+	m_pBatterStats_set->m_StrikeOut = m_StrikeOut;
+	m_pBatterStats_set->m_ReachedOnError = m_ReachedOnError;
+	m_pBatterStats_set->m_Sacrifice = m_Sacrifice;
+	m_pBatterStats_set->m_StolenBase = m_StolenBase;
+	m_pBatterStats_set->m_CS = m_CS;
+	m_pBatterStats_set->m_Games = m_Games;
+	m_pBatterStats_set->m_HBP = m_HBP;
+	//m_pBatterStats_set->m_AVG;
+	//m_pBatterStats_set->m_SLG;
+	//m_pBatterStats_set->m_OBP;
+	m_pBatterStats_set->m_LastUpdateTime = lt;
+
+	m_pBatterStats_set->Update();
+
+	m_pBatter_set->Edit();
+
+	m_pBatter_set->m_Pitcher = m_Pitcher;
+	m_pBatter_set->m_Catcher = m_Catcher;
+	m_pBatter_set->m_FirstBase = m_FirstBase;
+	m_pBatter_set->m_SecondBase = m_SecondBase;
+	m_pBatter_set->m_ThirdBase = m_ThirdBase;
+	m_pBatter_set->m_ShortStop = m_ShortStop;
+	m_pBatter_set->m_LeftField = m_LeftField;
+	m_pBatter_set->m_CenterField = m_CenterField;
+	m_pBatter_set->m_RightField = m_RightField;
+	m_pBatter_set->m_ER1 = m_bER1;
+	m_pBatter_set->m_ER2 = m_bER2;
+	m_pBatter_set->m_ER3 = m_bER3;
+	m_pBatter_set->m_ER4 = m_bER4;
+	m_pBatter_set->m_ER5 = m_bER5;
+	m_pBatter_set->m_ER6 = m_bER6;
+	m_pBatter_set->m_ER7 = m_bER7;
+	m_pBatter_set->m_ER8 = m_bER8;
+	m_pBatter_set->m_ER9 = m_bER9;
+	m_pBatter_set->m_OBChanceBasic = m_OBChanceBasic;
+	m_pBatter_set->m_OBChanceLeft = m_OBChanceLeft;
+	m_pBatter_set->m_OBChanceRight = m_OBChanceRight;
+	m_pBatter_set->m_OBChanceWalk = m_OBChanceWalk;
+	m_pBatter_set->m_OBChanceSingle = m_OBChanceSingle;
+	m_pBatter_set->m_OBChanceDouble = m_OBChanceDouble;
+	m_pBatter_set->m_OBChanceTriple = m_OBChanceTriple;
+	m_pBatter_set->m_OBChanceHomeRun = m_OBChanceHomeRun;
+	m_pBatter_set->m_ChanceDoublePlay = m_ChanceDoublePlay;
+	m_pBatter_set->m_OBChanceWalkRight = m_OBChanceWalkRight;
+	m_pBatter_set->m_OBChanceSingleRight = m_OBChanceSingleRight;
+	m_pBatter_set->m_OBChanceDoubleRight = m_OBChanceDoubleRight;
+	m_pBatter_set->m_OBChanceTripleRight = m_OBChanceTripleRight;
+	m_pBatter_set->m_OBChanceHomeRunRight = m_OBChanceHomeRunRight;
+	m_pBatter_set->m_ChanceDoublePlayRight = m_ChanceDoublePlayRight;
+	m_pBatter_set->m_OBChanceWalkLeft = m_OBChanceWalkLeft;
+	m_pBatter_set->m_OBChanceSingleLeft = m_OBChanceSingleLeft;
+	m_pBatter_set->m_OBChanceDoubleLeft = m_OBChanceDoubleLeft;
+	m_pBatter_set->m_OBChanceTripleLeft = m_OBChanceTripleLeft;
+	m_pBatter_set->m_OBChanceHomeRunLeft = m_OBChanceHomeRunLeft;
+	m_pBatter_set->m_ChanceDoublePlayLeft = m_ChanceDoublePlayLeft;
+	m_pBatter_set->m_Bunting = m_bBunting;
+	m_pBatter_set->m_HitRun = m_bHitRun;
+	m_pBatter_set->m_Running = m_bRunning;
+	m_pBatter_set->m_Stealing = m_bStealing;
+	m_pBatter_set->m_TRate = m_bTRate;
+	m_pBatter_set->m_Pass = m_bPass;
+	m_pBatter_set->m_PowerLeft = m_bPowerL;
+	m_pBatter_set->m_PowerRight = m_bPowerR;
+	m_pBatter_set->m_OutArm = m_bOutArm;
+	m_pBatter_set->m_CatchArm = m_bCatchArm;
+	m_pBatter_set->m_BatterHits = m_bBatterHits;
+	m_pBatter_set->m_LastUpdateTime = lt;
+
+	m_pBatter_set->Update();
+
 }
+
+//int BatterStruct::BatterWrite(CFile * myFile)
+//{
+//	myFile->Write(m_PlayerName,30);
+//	myFile->Write(&m_AB,sizeof(m_AB));
+//	myFile->Write(&m_Runs,sizeof(m_Runs));
+//	myFile->Write(&m_Hits,sizeof(m_Hits));
+//	myFile->Write(&m_RBI,sizeof(m_RBI));
+//	myFile->Write(&m_2B,sizeof(m_2B));
+//	myFile->Write(&m_3B,sizeof(m_3B));
+//	myFile->Write(&m_HomeRuns,sizeof(m_HomeRuns));
+//	myFile->Write(&m_Walk,sizeof(m_Walk));
+//	myFile->Write(&m_StrikeOut,sizeof(m_StrikeOut));
+//	myFile->Write(&m_ReachedOnError,sizeof(m_ReachedOnError));
+//	myFile->Write(&m_Sacrifice,sizeof(m_Sacrifice));
+//	myFile->Write(&m_StolenBase,sizeof(m_StolenBase));
+//	myFile->Write(&m_CS,sizeof(m_CS));
+//	myFile->Write(&m_Filler1,sizeof(m_Filler1));
+//	myFile->Write(&m_Filler2,sizeof(m_Filler2));
+//	myFile->Write(&m_Games,sizeof(m_Games));
+//	myFile->Write(&m_HBP,sizeof(m_HBP));
+//	myFile->Write(&m_Pitcher,sizeof(m_Pitcher));
+//	myFile->Write(&m_Catcher,sizeof(m_Catcher));
+//	myFile->Write(&m_FirstBase,sizeof(m_FirstBase));
+//	myFile->Write(&m_SecondBase,sizeof(m_SecondBase));
+//	myFile->Write(&m_ShortStop,sizeof(m_ShortStop));
+//	myFile->Write(&m_ThirdBase,sizeof(m_ThirdBase));
+//	myFile->Write(&m_LeftField,sizeof(m_LeftField));
+//	myFile->Write(&m_CenterField,sizeof(m_CenterField));
+//	myFile->Write(&m_RightField,sizeof(m_RightField));
+//	myFile->Write(&m_bER1,sizeof(m_bER1));
+//	myFile->Write(&m_bER2,sizeof(m_bER2));
+//	myFile->Write(&m_bER3,sizeof(m_bER3));
+//	myFile->Write(&m_bER4,sizeof(m_bER4));
+//	myFile->Write(&m_bER5,sizeof(m_bER5));
+//	myFile->Write(&m_bER6,sizeof(m_bER6));
+//	myFile->Write(&m_bER7,sizeof(m_bER7));
+//	myFile->Write(&m_bER8,sizeof(m_bER8));
+//	myFile->Write(&m_bER9,sizeof(m_bER9));
+//	myFile->Write(&m_bBatterHits,sizeof(m_bBatterHits));
+//	myFile->Write(m_OBChanceBasic,6);
+//	myFile->Write(m_OBChanceLeft,6);
+//	myFile->Write(m_OBChanceRight,6);
+//	myFile->Write(m_OBChanceWalk,6);
+//	myFile->Write(m_OBChanceSingle,6);
+//	myFile->Write(m_OBChanceDouble,6);
+//	myFile->Write(m_OBChanceTriple,6);
+//	myFile->Write(m_OBChanceHomeRun,6);
+//	myFile->Write(m_ChanceDoublePlay,6);
+//	myFile->Write(m_OBChanceWalkRight,6);		// Filler
+//	myFile->Write(m_OBChanceSingleRight,6);
+//	myFile->Write(m_OBChanceDoubleRight,6);
+//	myFile->Write(m_OBChanceTripleRight,6);
+//	myFile->Write(m_OBChanceHomeRunRight,6);
+//	myFile->Write(m_ChanceDoublePlayRight,6);
+//	myFile->Write(m_OBChanceWalkLeft,6);
+//	myFile->Write(m_OBChanceSingleLeft,6);
+//	myFile->Write(m_OBChanceDoubleLeft,6);
+//	myFile->Write(m_OBChanceTripleLeft,6);
+//	myFile->Write(m_OBChanceHomeRunLeft,6);
+//	myFile->Write(m_ChanceDoublePlayLeft,6);
+//	myFile->Write("0     ",6);		// Filler
+//	myFile->Write("0     ",6);		// Filler
+//	myFile->Write("0     ",6);		// Filler
+//	myFile->Write(&m_bBunting,sizeof(m_bBunting));
+//	myFile->Write(&m_bHitRun,sizeof(m_bHitRun));
+//	myFile->Write(&m_bRunning,sizeof(m_bRunning));
+//	myFile->Write(&m_bStealing,sizeof(m_bStealing));
+//	myFile->Write(&m_bTRate,sizeof(m_bTRate));	// Place holder for T Rating
+//	myFile->Write(&m_bPass,sizeof(m_bPass));	// Place holder for Passball
+//	myFile->Write(&m_bPowerL,sizeof(m_bPowerL));	// Place holder for Power Left
+//	myFile->Write(&m_bPowerR,sizeof(m_bPowerR));	// Place holder for Power Right
+//	myFile->Write(&m_bOutArm,sizeof(m_bOutArm));	// Place holder for Outfielder Arm
+//	myFile->Write(&m_bCatchArm,sizeof(m_bCatchArm));	// Place holder for Catcher Arm
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	myFile->Write(&m_bFiller1,sizeof(BYTE));	// Filler
+//	return 1;
+//}
 
 void BatterStruct::BatterRead(long BatterStatID)
 {
@@ -651,7 +734,7 @@ int BatterStruct::CopyBatterFile(CString inFileName, CString outFileName)
 		m_HBP = 0;
 		m_Games = 0;
 		// Write Batter info at EOF, Already positioned there
-		BatterWrite(&outFile);
+		BatterWrite(m_saveBatterStatsID);
 	}
 	// Close file
 	inFile.Close();

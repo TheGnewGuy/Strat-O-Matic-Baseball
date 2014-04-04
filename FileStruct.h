@@ -116,7 +116,7 @@ public:
 protected:
 private:
 	int BatterRead(CFile* myFile);
-	int BatterWrite(CFile* myFile);
+	//int BatterWrite(CFile* myFile);
 protected:
 	// Generated message map functions
 public:
@@ -130,6 +130,7 @@ public:
 	CTeams* m_pTeams_set;
 	long m_saveBatterStatsID;
 	long m_saveTeamID;
+	void BatterWrite(long BatterStatID);
 };
 
 /////////////////////////////////////////////////////////////////////////////
