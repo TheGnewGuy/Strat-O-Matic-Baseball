@@ -100,23 +100,23 @@ public:
 	CString m_OBChanceSingleLeft;
 	CString m_OBChanceWalkLeft;
 	CString m_ChanceDoublePlayLeft;
-	int CopyBatterFile(CString inFileName, CString outFileName);
-	BYTE GetCountBatter(CString BatterFileName);
 	BYTE m_bBatterHits;
 	CString m_OBChanceRight;
 	CString m_OBChanceLeft;
 	CString m_OBChanceBasic;
 	BYTE m_bFiller1;
-	int GetBatter(CString BatterFileName, LONG SeekPosition);
-	int AddBatter(CString BatterFileName);
-	int UpdateBatter(CString BatterFileName, LONG SeekPosition);
+	int GetBatter(CString BatterName, LONG TeamID);
+	int AddBatter(CString BatterName);
+	int UpdateBatter(CString BatterName, LONG BatterStatsID);
+	int CopyBatterFile(CString inFileName, CString outFileName);
+	BYTE GetCountBatter(CString BatterFileName);
 	virtual ~BatterStruct();
 
 	// Generated message map functions
 protected:
 private:
-	int BatterRead(CFile* myFile);
-	//int BatterWrite(CFile* myFile);
+	void BatterRead(long BatterStatID);
+	void BatterWrite(long BatterStatID);
 protected:
 	// Generated message map functions
 public:
@@ -125,12 +125,10 @@ public:
 	CStringArray* GetBatterLastFirstArray(long TeamID);
 	CBatterStats* m_pBatterStats_set;
 	CBatter* m_pBatter_set;
-	CStringArray* m_arrayBatterNames;
-	void BatterRead(long BatterStatID);
 	CTeams* m_pTeams_set;
+	CStringArray* m_arrayBatterNames;
 	long m_saveBatterStatsID;
 	long m_saveTeamID;
-	void BatterWrite(long BatterStatID);
 };
 
 /////////////////////////////////////////////////////////////////////////////

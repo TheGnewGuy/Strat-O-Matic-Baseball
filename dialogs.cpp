@@ -1718,6 +1718,7 @@ void PropertySheetBatters::OnCloseupComboPlayerName(int iPage)
 			m_pPage4->m_bChangedFlag = FALSE;
 	}
 
+	// Get the string in the selected combo box. This string should be the player name.
 	switch (iPage)
 	{
 	case 1:
