@@ -1601,9 +1601,9 @@ void PropertySheetBatters::BuildPlayerNameComboBox(int iPage)
 	if (m_flagNew == TRUE)
 		strPlayerName = m_structBatter.m_PlayerName;
 
-	arrayBatterNames = m_structBatter.GetBatterNameArray(m_TeamID);
+	//arrayBatterNames = m_structBatter.GetBatterNameArray(m_TeamID);
 	// Use the following after figuring out a way to extract name.
-	// arrayBatterNames = m_structBatter.GetBatterLastFirstArray(m_TeamID);
+	arrayBatterNames = m_structBatter.GetBatterLastFirstArray(m_TeamID);
 
 	// Open file and build player ComboBox
 	switch (iPage)

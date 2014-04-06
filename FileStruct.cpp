@@ -7,6 +7,7 @@
 #include "Leagues.h"
 #include "Teams.h"
 #include "FileStruct.h"
+#include <string>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -229,6 +230,9 @@ int BatterStruct::GetBatter(CString BatterName, LONG TeamID)
 	CString tmpBatterStatID;
 	CString tmpTeamID;
 	long saveBatterID;
+	CString lLastName;
+	std::string strBatterLastName;
+	CString BatterFirstName;
 
 	m_saveTeamID = TeamID;
 
@@ -238,11 +242,32 @@ int BatterStruct::GetBatter(CString BatterName, LONG TeamID)
 	m_pBatterStats_set->m_strFilter = "[TeamID] = " + tmpTeamID;
 	m_pBatterStats_set->Requery();	// Get list of BatterStats associated to this team.
 
+	// When the last name is something like O'Tool, the "'" causes a problem
+	// with the SQL search. By editing the string to insert a double "'"
+	// in the search, the search works correctly.
+	lLastName = BatterName.Left(BatterName.Find(','));
+	std::string str1 = lLastName;
+	if (str1.find('\'', 0) != std::string::npos)
+	{
+		std::string str2 = str1.substr(0, str1.find('\'', 0));
+		// Insert the double "'" in the string.
+		str2 = str2 + '\'' + '\'';
+		strBatterLastName = str2 + str1.substr((str1.find('\'', 0) + 1), std::string::npos);
+	}
+	else
+	{
+		strBatterLastName = lLastName;
+	}
+
+	BatterFirstName = BatterName.Right(
+		BatterName.GetLength() - BatterName.Find(", ") - 2).TrimRight(' ');
+
 	while (!m_pBatterStats_set->IsEOF())
 	{
 		tmpBatterID.Format("%d", m_pBatterStats_set->m_BatterID);
-		m_pBatter_set->m_strFilter = "[BatterID] = " + tmpBatterID +
-			" AND [LastName] = '" + BatterName + "'";
+		m_pBatter_set->m_strFilter = "[FirstName] = '" + BatterFirstName + "'" +
+			" AND [LastName] = '" + strBatterLastName.c_str() + "'" +
+			" AND [BatterID] = " + tmpBatterID;
 		m_pBatter_set->Requery();
 		if (!m_pBatter_set->IsBOF())
 		{
