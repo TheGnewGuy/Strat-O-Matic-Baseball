@@ -129,6 +129,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Debug\Baseball.exe</OutputFile>
       <AdditionalDependencies>odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -257,6 +258,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Splash.h" />
     <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="targetver.h" />
     <ClInclude Include="Teams.h" />
   </ItemGroup>
   <ItemGroup>
