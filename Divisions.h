@@ -2,7 +2,7 @@
 
 #pragma once
 
-// code generated on Thursday, March 27, 2014, 6:38 PM
+// code generated on Wednesday, April 09, 2014, 6:34 PM
 
 class CDivisions : public CRecordset
 {
@@ -23,6 +23,7 @@ public:
 	long	m_DivisionID;
 	CString	m_DivisionName;
 	long	m_ConferenceID;
+	BOOL	m_BaseDivision;
 	COleDateTime	m_LastUpdateTime;
 
 // Overrides

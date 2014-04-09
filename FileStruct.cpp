@@ -128,7 +128,7 @@ BatterStruct::BatterStruct()
 	TRY
 	{
 		// Execute the query
-		m_pBatter_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
+		m_pBatter_set->Open(CRecordset::dynaset, NULL, CRecordset::none);
 	}
 		CATCH(CDBException, e)
 	{
@@ -143,7 +143,7 @@ BatterStruct::BatterStruct()
 	TRY
 	{
 		// Execute the query
-		m_pBatterStats_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
+		m_pBatterStats_set->Open(CRecordset::dynaset, NULL, CRecordset::none);
 	}
 		CATCH(CDBException, e)
 	{
@@ -158,7 +158,7 @@ BatterStruct::BatterStruct()
 	TRY
 	{
 		// Execute the query
-		m_pTeams_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
+		m_pTeams_set->Open(CRecordset::dynaset, NULL, CRecordset::none);
 	}
 		CATCH(CDBException, e)
 	{
@@ -981,7 +981,7 @@ LeagueStruct::LeagueStruct()
 	TRY
 	{
 		// Execute the query
-		m_pLeagues_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
+		m_pLeagues_set->Open(CRecordset::dynaset, NULL, CRecordset::none);
 	}
 		CATCH(CDBException, e)
 	{
@@ -1059,7 +1059,7 @@ TeamStruct::TeamStruct()
 	TRY
 	{
 		// Execute the query
-		m_pTeams_set->Open(CRecordset::snapshot, NULL, CRecordset::none);
+		m_pTeams_set->Open(CRecordset::dynaset, NULL, CRecordset::none);
 	}
 		CATCH(CDBException, e)
 	{

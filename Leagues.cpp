@@ -4,7 +4,7 @@
 
 // CLeagues implementation
 
-// code generated on Thursday, March 27, 2014, 6:39 PM
+// code generated on Wednesday, April 09, 2014, 6:35 PM
 
 #include "stdafx.h"
 #include "Leagues.h"
@@ -17,8 +17,9 @@ CLeagues::CLeagues(CDatabase* pdb)
 	m_LeagueName = L"";
 	m_NumberOfConferences = 0;
 	m_NumberOfDivisions = 0;
+	m_BaseLeague = FALSE;
 	m_LastUpdateTime;
-	m_nFields = 5;
+	m_nFields = 6;
 	m_nDefaultType = dynaset;
 }
 //#error Security Issue: The connection string may contain a password
@@ -46,6 +47,7 @@ void CLeagues::DoFieldExchange(CFieldExchange* pFX)
 	RFX_Text(pFX, _T("[LeagueName]"), m_LeagueName);
 	RFX_Int(pFX, _T("[NumberOfConferences]"), m_NumberOfConferences);
 	RFX_Int(pFX, _T("[NumberOfDivisions]"), m_NumberOfDivisions);
+	RFX_Bool(pFX, _T("[BaseLeague]"), m_BaseLeague);
 	RFX_Date(pFX, _T("[LastUpdateTime]"), m_LastUpdateTime);
 
 }

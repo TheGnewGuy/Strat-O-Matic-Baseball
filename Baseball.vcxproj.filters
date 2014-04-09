@@ -75,6 +75,12 @@
     <ClCompile Include="BatterStats.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Pitcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PitcherStats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Conferences.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -82,12 +88,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Leagues.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Pitcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PitcherStats.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Teams.cpp">
@@ -160,6 +160,15 @@
     <ClInclude Include="BatterStats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Pitcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PitcherStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Conferences.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -169,16 +178,7 @@
     <ClInclude Include="Leagues.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Pitcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PitcherStats.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Teams.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

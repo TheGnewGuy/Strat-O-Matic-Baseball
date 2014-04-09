@@ -4,7 +4,7 @@
 
 // CDivisions implementation
 
-// code generated on Thursday, March 27, 2014, 6:38 PM
+// code generated on Wednesday, April 09, 2014, 6:34 PM
 
 #include "stdafx.h"
 #include "Divisions.h"
@@ -16,8 +16,9 @@ CDivisions::CDivisions(CDatabase* pdb)
 	m_DivisionID = 0;
 	m_DivisionName = L"";
 	m_ConferenceID = 0;
+	m_BaseDivision = FALSE;
 	m_LastUpdateTime;
-	m_nFields = 4;
+	m_nFields = 5;
 	m_nDefaultType = dynaset;
 }
 //#error Security Issue: The connection string may contain a password
@@ -44,6 +45,7 @@ void CDivisions::DoFieldExchange(CFieldExchange* pFX)
 	RFX_Long(pFX, _T("[DivisionID]"), m_DivisionID);
 	RFX_Text(pFX, _T("[DivisionName]"), m_DivisionName);
 	RFX_Long(pFX, _T("[ConferenceID]"), m_ConferenceID);
+	RFX_Bool(pFX, _T("[BaseDivision]"), m_BaseDivision);
 	RFX_Date(pFX, _T("[LastUpdateTime]"), m_LastUpdateTime);
 
 }
