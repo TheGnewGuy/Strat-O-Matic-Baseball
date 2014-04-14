@@ -219,8 +219,15 @@ int BatterStruct::UpdateBatter(CString BatterFileName, LONG BatterStatsID)
 // needs to be created in the Batter table as well as a new entry in BatterStats,
 int BatterStruct::AddBatter(CString BatterName)
 {
-	//m_pBatterStats_set->AddNew();
-	//BatterWrite(m_saveBatterStatsID);
+	if (m_pTeams_set->m_BaseTeam)
+	{
+		// Yes this is a Base team. Create a new Batter and Batterstats records.
+	}
+	else
+	{
+		// This is not a base team. Add by pointing back to base Batter and 
+		// zeroing out the batterstats
+	}
 	return 1;
 }
 

@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by Baseball.rc
 //
 #define IDD_ABOUTBOX                    100
@@ -42,6 +42,7 @@
 #define IDD_PITCHERSSTATS               171
 #define IDD_PITCHERSCHANCE              172
 #define IDD_LEAGUEHTMLOPTIONS           173
+#define IDD_TEAMEDIT                    174
 #define IDC_LEAGUE1                     1000
 #define IDC_CONFERENCE1                 1001
 #define IDC_CONFERENCE2                 1002
@@ -207,8 +208,11 @@
 #define IDC_COMBOTEXTCOLOR              1169
 #define IDC_COMBO_STEALING              1170
 #define IDC_COMBOLINKCOLOR              1170
+#define IDC_CHECK1                      1170
 #define IDC_COMBO_TRATE                 1171
 #define IDC_COMBOVLINKCOLOR             1171
+#define IDC_EDIT1                       1171
+#define IDC_EDITTEAMYEAR                1171
 #define IDC_COMBOBGCOLOR                1172
 #define ID_FORMS_SCORESHEETFORM         32771
 #define ID_FORMS_STATISTCSFORM          32772
@@ -247,7 +251,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        167
 #define _APS_NEXT_COMMAND_VALUE         32808
-#define _APS_NEXT_CONTROL_VALUE         1170
+#define _APS_NEXT_CONTROL_VALUE         1172
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

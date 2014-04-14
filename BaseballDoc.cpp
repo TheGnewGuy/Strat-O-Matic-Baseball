@@ -1867,16 +1867,16 @@ void CBaseballDoc::OnTeamsEditLeagueTeams()
 
 	strLeague = GetLeagues(TRUE);
 
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-	}
-	else
-	{
-		strLeagueDir = "data";
-	}
+	//strLeagueName = strLeague.Left(30);
+	//if (strncmp(strLeagueName,"All",3))
+	//{
+	//	strLeagueFile = strLeague.Right(12);
+	//	strLeagueDir = strLeagueFile.Left(8);
+	//}
+	//else
+	//{
+	//	strLeagueDir = "data";
+	//}
 
 	EditTeams(strLeagueDir);
 }
@@ -1896,22 +1896,23 @@ void CBaseballDoc::EditTeams(CString strLeagueDir)
 	char temp[41];
 
 	strTeam = GetTeams(strLeagueDir);
-	strTeamFile = strTeam.Right(12);
-	strTeamName = strTeam.Left(30);
+	
+	//strTeamFile = strTeam.Right(12);
+	//strTeamName = strTeam.Left(30);
 
 	// Process Batter file
-	strFileNameBatter = strLeagueDir+"\\TB"+strTeamFile.Right(10);
-	myFileBatter.Open(strFileNameBatter, CFile::modeReadWrite);
-	myFileBatter.Read(&count,sizeof(count));
-	myFileBatter.Read(temp,40);	// Team Name
-	temp[40] = NULL;
-	dlg.m_TeamName = temp;
-	myFileBatter.Read(temp,3);	// Short Team Name
-	temp[3] = NULL;
-	dlg.m_ShortTeamName = temp;
-	myFileBatter.Read(temp,30);	// Ballpark Name
-	temp[30] = NULL;
-	dlg.m_BallPark = temp;
+	//strFileNameBatter = strLeagueDir+"\\TB"+strTeamFile.Right(10);
+	//myFileBatter.Open(strFileNameBatter, CFile::modeReadWrite);
+	//myFileBatter.Read(&count,sizeof(count));
+	//myFileBatter.Read(temp,40);	// Team Name
+	//temp[40] = NULL;
+	//dlg.m_TeamName = temp;
+	//myFileBatter.Read(temp,3);	// Short Team Name
+	//temp[3] = NULL;
+	//dlg.m_ShortTeamName = temp;
+	//myFileBatter.Read(temp,30);	// Ballpark Name
+	//temp[30] = NULL;
+	//dlg.m_BallPark = temp;
 	if (dlg.DoModal() == IDOK)
 	{
 		// Update the Batter file with team name, Short name, and Ballpark
@@ -1919,12 +1920,12 @@ void CBaseballDoc::EditTeams(CString strLeagueDir)
 		strShortTeamName = dlg.m_ShortTeamName;
 		strBallPark = dlg.m_BallPark;
 		// skip counter field and write data
-		myFileBatter.Seek((long)sizeof(count),CFile::begin);
-		myFileBatter.Write(strTeamName, 40);
-		myFileBatter.Write(strShortTeamName, 3);
-		myFileBatter.Write(strBallPark, 30);
+		//myFileBatter.Seek((long)sizeof(count),CFile::begin);
+		//myFileBatter.Write(strTeamName, 40);
+		//myFileBatter.Write(strShortTeamName, 3);
+		//myFileBatter.Write(strBallPark, 30);
 	}
-	myFileBatter.Close();
+	//myFileBatter.Close();
 }
 
 void CBaseballDoc::OnStatisticsHTMLLeagueStats() 
@@ -3772,6 +3773,7 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 	myBattersSheet.DoModal();
 }
 
+// Return selected league name
 CString CBaseballDoc::GetLeagues(BOOL baseFlag)
 {
 	DlgSelLeague dlgSelLeague;
