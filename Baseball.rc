@@ -225,7 +225,7 @@ BEGIN
     POPUP "&Teams"
     BEGIN
         MENUITEM "&Add Teams",                  ID_TEAMS_ADDTEAMS
-        MENUITEM "Edit Teams",                  ID_TEAMS_EDITLEAGUETEAMS
+        MENUITEM "Edit Teams",                  ID_TEAMS_EDITTEAMS
     END
     POPUP "&Players"
     BEGIN

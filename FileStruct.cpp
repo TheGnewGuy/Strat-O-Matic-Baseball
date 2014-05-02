@@ -1132,7 +1132,6 @@ long TeamStruct::GetTeamID(CString strTeamName, long LeagueID)
 	return m_pTeams_set->m_TeamID;
 }
 
-
 CString TeamStruct::GetTeamName(long TeamID)
 {
 	CString tmpTeamID;
@@ -1145,4 +1144,32 @@ CString TeamStruct::GetTeamName(long TeamID)
 	m_pTeams_set->Requery();
 
 	return m_pTeams_set->m_TeamName;
+}
+
+CString TeamStruct::GetTeamShortName(long TeamID)
+{
+	CString tmpTeamID;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpTeamID.Format("%d", TeamID);
+	m_pTeams_set->m_strFilter = "[TeamID] = " + tmpTeamID;
+	// Execute the query
+	m_pTeams_set->Requery();
+
+	return m_pTeams_set->m_TeamNameShort;
+}
+
+CString TeamStruct::GetBallparkName(long TeamID)
+{
+	CString tmpTeamID;
+
+	// Update the filter which is the WHERE portion to find the teams
+	// based on a given league.
+	tmpTeamID.Format("%d", TeamID);
+	m_pTeams_set->m_strFilter = "[TeamID] = " + tmpTeamID;
+	// Execute the query
+	m_pTeams_set->Requery();
+
+	return m_pTeams_set->m_BallparkName;
 }

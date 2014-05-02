@@ -147,6 +147,7 @@
     <ClCompile Include="Divisions.cpp" />
     <ClCompile Include="DlgAddDivision.cpp" />
     <ClCompile Include="DlgAddTeams.cpp" />
+    <ClCompile Include="EditTeams.cpp" />
     <ClCompile Include="FileStruct.cpp" />
     <ClCompile Include="FormA.cpp" />
     <ClCompile Include="FormB.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="Divisions.h" />
     <ClInclude Include="DlgAddDivision.h" />
     <ClInclude Include="DlgAddTeams.h" />
+    <ClInclude Include="EditTeams.h" />
     <ClInclude Include="FileStruct.h" />
     <ClInclude Include="FormA.h" />
     <ClInclude Include="FormB.h" />

@@ -74,6 +74,7 @@ protected:
 	afx_msg void OnUpdateViewNormal(CCmdUI* pCmdUI);
 	afx_msg void OnLeaguesAddleague();
 	afx_msg void OnTeamsAddteams();
+	afx_msg void OnTeamsEditTeams();
 	afx_msg void OnFileExportLeagueTeams();
 	afx_msg void OnFileExportHTMLLeagueTeams();
 	afx_msg void OnTeamsEditLeagueTeams();

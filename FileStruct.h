@@ -325,6 +325,8 @@ public:
 	CStringArray* m_arrayTeamNames;
 	long GetTeamID(CString strTeamName, long LeagueID);
 	CString GetTeamName(long TeamID);
+	CString GetTeamShortName(long TeamID);
+	CString GetBallparkName(long TeamID);
 };
 
 /////////////////////////////////////////////////////////////////////////////

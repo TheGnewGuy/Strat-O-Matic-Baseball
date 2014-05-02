@@ -89,10 +89,10 @@ BEGIN_MESSAGE_MAP(CBaseballDoc, CDocument)
 	ON_COMMAND(ID_VIEW_NORMAL, OnViewNormal)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_NORMAL, OnUpdateViewNormal)
 	ON_COMMAND(ID_LEAGUES_ADDLEAGUE, OnLeaguesAddleague)
-	ON_COMMAND(ID_TEAMS_ADDTEAMS, OnTeamsAddteams)
 	ON_COMMAND(ID_FILE_EXPORTLEAGUETEAMS, OnFileExportLeagueTeams)
 	ON_COMMAND(ID_FILE_EXPORTHTMLLEAGUETEAMS, OnFileExportHTMLLeagueTeams)
-	ON_COMMAND(ID_TEAMS_EDITLEAGUETEAMS, OnTeamsEditLeagueTeams)
+	ON_COMMAND(ID_TEAMS_ADDTEAMS, OnTeamsAddteams)
+	ON_COMMAND(ID_TEAMS_EDITTEAMS, OnTeamsEditTeams)
 	ON_COMMAND(ID_STATISTICS_HTMLLEAGUESTATS, OnStatisticsHTMLLeagueStats)
 	ON_COMMAND(ID_FILE_EXPORTHTMLLEAGUETEAMSALL, OnFileExportHtmlLeagueTeamsAll)
 	ON_COMMAND(ID_FILE_EXPORTLEAGUETEAMSALL, OnFileExportLeagueTeamsAll)
@@ -1853,7 +1853,7 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	free(aiCount);
 }
 
-void CBaseballDoc::OnTeamsEditLeagueTeams() 
+void CBaseballDoc::OnTeamsEditTeams() 
 {
 	// TODO: Add your command handler code here
 	DlgSelLeague dlgSelLeague;
@@ -1865,67 +1865,40 @@ void CBaseballDoc::OnTeamsEditLeagueTeams()
 	CString strLeagueFile;
 	CString strLeagueDir;
 
+	// Get the League Name
 	strLeague = GetLeagues(TRUE);
 
-	//strLeagueName = strLeague.Left(30);
-	//if (strncmp(strLeagueName,"All",3))
-	//{
-	//	strLeagueFile = strLeague.Right(12);
-	//	strLeagueDir = strLeagueFile.Left(8);
-	//}
-	//else
-	//{
-	//	strLeagueDir = "data";
-	//}
-
-	EditTeams(strLeagueDir);
+	// Send League Name to EditTeams
+	EditTeams(strLeague);
 }
 
-void CBaseballDoc::EditTeams(CString strLeagueDir)
+void CBaseballDoc::EditTeams(CString strLeague)
 {
 	EditTeam dlg;
-	CFile myFileBatter;
-	BYTE count;
-	CString strTeam;
-	CString strTeamFile;
 	CString strTeamName;
 	CString strShortTeamName;
 	CString strBallPark;
-	CString filler10("          ");
-	CString strFileNameBatter;
-	char temp[41];
+	long myLeagueID;
+	long myTeamID;
+	LeagueStruct* myLeagues = new LeagueStruct();
+	TeamStruct* myTeams = new TeamStruct();
 
-	strTeam = GetTeams(strLeagueDir);
-	
-	//strTeamFile = strTeam.Right(12);
-	//strTeamName = strTeam.Left(30);
+	strTeamName = GetTeams(strLeague);
 
-	// Process Batter file
-	//strFileNameBatter = strLeagueDir+"\\TB"+strTeamFile.Right(10);
-	//myFileBatter.Open(strFileNameBatter, CFile::modeReadWrite);
-	//myFileBatter.Read(&count,sizeof(count));
-	//myFileBatter.Read(temp,40);	// Team Name
-	//temp[40] = NULL;
-	//dlg.m_TeamName = temp;
-	//myFileBatter.Read(temp,3);	// Short Team Name
-	//temp[3] = NULL;
-	//dlg.m_ShortTeamName = temp;
-	//myFileBatter.Read(temp,30);	// Ballpark Name
-	//temp[30] = NULL;
-	//dlg.m_BallPark = temp;
+	myLeagueID = myLeagues->GetLeagueID(strLeague);
+	myTeamID = myTeams->GetTeamID(strTeamName, myLeagueID);
+
+	dlg.m_TeamName = myTeams->GetTeamName(myTeamID);
+	dlg.m_ShortTeamName = myTeams->GetTeamShortName(myTeamID);
+	dlg.m_BallPark = myTeams->GetBallparkName(myTeamID);
+
 	if (dlg.DoModal() == IDOK)
 	{
 		// Update the Batter file with team name, Short name, and Ballpark
-		strTeamName = dlg.m_TeamName+filler10+filler10+filler10+filler10;
+		strTeamName = dlg.m_TeamName;
 		strShortTeamName = dlg.m_ShortTeamName;
 		strBallPark = dlg.m_BallPark;
-		// skip counter field and write data
-		//myFileBatter.Seek((long)sizeof(count),CFile::begin);
-		//myFileBatter.Write(strTeamName, 40);
-		//myFileBatter.Write(strShortTeamName, 3);
-		//myFileBatter.Write(strBallPark, 30);
 	}
-	//myFileBatter.Close();
 }
 
 void CBaseballDoc::OnStatisticsHTMLLeagueStats() 
