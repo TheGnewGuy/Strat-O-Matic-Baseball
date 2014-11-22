@@ -109,7 +109,8 @@ CBaseballDoc::CBaseballDoc()
 {
 	CString sDriver = _T("MICROSOFT ACCESS DRIVER (*.mdb, *.accdb)");
 	CString sDsn;
-	CString sFile = _T("C:\\Family\\SOURCE\\C\\Strat-O-Matic-Baseball\\Baseball.accdb");
+	CString sFile = _T("C:\\Data\\Source\\Projects\\Strat-O-Matic-Baseball\\Baseball.accdb");
+//	CString sFile = _T("C:\\Family\\SOURCE\\C\\Strat-O-Matic-Baseball\\Baseball.accdb");
 	CString SqlString;
 
 	SetAllFormsFalse();
