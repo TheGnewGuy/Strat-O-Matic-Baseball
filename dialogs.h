@@ -730,6 +730,8 @@ public:
 
 // Operations
 public:
+	long m_LeagueID;
+	long m_TeamID;
 
 // Overrides
 	// ClassWizard generated virtual function overrides

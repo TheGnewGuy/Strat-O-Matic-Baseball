@@ -8,6 +8,8 @@
 #include "Teams.h"
 #include "Batter.h"
 #include "BatterStats.h"
+#include "Pitcher.h"
+#include "PitcherStats.h"
 
 // FileStruct.h : header file
 //
@@ -150,7 +152,9 @@ public:
 	short	m_Loss;
 	short	m_Saves;
 	short	m_ER;
-	CString	m_IP;
+	CString	m_IP;	// Float
+	CString m_ERA;	// Float
+	CString m_WHIP;	// Float
 	short	m_Hits;
 	short	m_Walks;
 	short	m_Strikeouts;
@@ -202,17 +206,27 @@ public:
 	CString m_OBChanceRight;
 	CString m_OBChanceLeft;
 	CString m_OBChanceBasic;
-	int GetPitcher(CString PitcherFileName, LONG SeekPosition);
+	int GetPitcher(CString PitcherName, LONG TeamID);
 	BYTE GetCountPitcher(CString PitcherFileName);
-	int AddPitcher(CString PitcherFileName);
-	int UpdatePitcher(CString PitcherFileName, LONG SeekPosition);
+	int AddPitcher(CString PitcherName);
+	int UpdatePitcher(CString PitcherFileName, LONG BatterStatsID);
 	virtual ~PitcherStruct();
 
 protected:
 	// Generated message map functions
 private:
-	int PitcherWrite(CFile * myFile);
-	int PitcherRead(CFile * myFile);
+	void PitcherWrite(long PitcherStatID);
+	void PitcherRead(long PitcherStatID);
+public:
+	// Get Batter Stats and then Batter for Name
+	CStringArray* GetPitcherNameArray(long TeamID);
+	CStringArray* GetPitcherLastFirstArray(long TeamID);
+	CPitcherStats* m_pPitcherStats_set;
+	CPitcher* m_pPitcher_set;
+	CTeams* m_pTeams_set;
+	CStringArray* m_arrayPitcherNames;
+	long m_savePitcherStatsID;
+	long m_saveTeamID;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -3809,13 +3809,13 @@ CString CBaseballDoc::GetTeams(CString strLeagueName)
 
 void CBaseballDoc::OnPlayersAddEditPitchers()
 {
-	CString strLeagueName;
-	CString strLeagueFile;
-	CString strLeagueDir;
+	//CString strLeagueName;
+	//CString strLeagueFile;
+	//CString strLeagueDir;
 	CString strLeague;
 	CString strTeam;
-	CString strTeamFile;
-	CString strTeamName;
+	//CString strTeamFile;
+	//CString strTeamName;
 	PropertyPagePitchersInfo myPitchers1;
 	PropertyPagePitchersChance myPitchers2;
 	PropertyPagePitchersStats myPitchers3;
@@ -3834,22 +3834,14 @@ void CBaseballDoc::OnPlayersAddEditPitchers()
 	// For testing force to a team name
 	strLeague = GetLeagues(TRUE);
 
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-	}
-	else
-	{
-		strLeagueDir = "data";
-	}
-	strTeam = GetTeams(strLeagueDir);
-	strTeamFile = "TP";
-	strTeamFile += strTeam.Right(10);
-	strTeamName = strTeam.Left(30);
-	myPitchersSheet.m_FileName = strLeagueDir+"\\"+strTeamFile;
-	myPitchersSheet.m_TeamName = strTeamName;
+	LeagueStruct* myLeague = new LeagueStruct();
+	myPitchersSheet.m_LeagueID = myLeague->GetLeagueID(strLeague);
+
+	strTeam = GetTeams(strLeague);
+	TeamStruct* myTeam = new TeamStruct();
+	myPitchersSheet.m_TeamID = myTeam->GetTeamID(strTeam, myPitchersSheet.m_LeagueID);
+
+	myPitchersSheet.m_TeamName = strTeam;
 
 	// Remove the APPLY button from the display
 	myPitchersSheet.m_psh.dwFlags |= PSH_NOAPPLYNOW;
