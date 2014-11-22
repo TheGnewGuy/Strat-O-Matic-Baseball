@@ -34,6 +34,7 @@
 //      Version 1.0.0.11 and Copyright to 2014
 //  01/22/14 Changed the XBteam.txt and XPteam.txt to trim trailing spaces from team name
 //      resulting in "XP1997 Baltland       .txt" being changed to "XP1997 Baltland.txt"
+//	11/22/14 Modified ODBC driver information in CBaseballDoc()
 //
 //	New Features to add:
 //		1.	Deletion of players and pitchers
@@ -108,6 +109,8 @@ END_MESSAGE_MAP()
 CBaseballDoc::CBaseballDoc()
 {
 	CString sDriver = _T("MICROSOFT ACCESS DRIVER (*.mdb, *.accdb)");
+	// The following for excel has not been tested
+//	CString sDriver = _T("MICROSOFT EXCEL DRIVER (*.xls, *.xlsx, *.xlsm, *.xlsb)");
 	CString sDsn;
 	CString sFile = _T("C:\\Data\\Source\\Projects\\Strat-O-Matic-Baseball\\Baseball.accdb");
 //	CString sFile = _T("C:\\Family\\SOURCE\\C\\Strat-O-Matic-Baseball\\Baseball.accdb");
