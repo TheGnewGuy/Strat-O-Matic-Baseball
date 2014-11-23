@@ -862,7 +862,7 @@ int PitcherStruct::GetPitcher(CString PitcherName, LONG TeamID)
 	// based on a given league.
 	tmpTeamID.Format("%d", TeamID);
 	m_pPitcherStats_set->m_strFilter = "[TeamID] = " + tmpTeamID;
-	m_pPitcherStats_set->Requery();	// Get list of BatterStats associated to this team.
+	m_pPitcherStats_set->Requery();	// Get list of PitcherStats associated to this team.
 
 	// When the last name is something like O'Tool, the "'" causes a problem
 	// with the SQL search. By editing the string to insert a double "'"

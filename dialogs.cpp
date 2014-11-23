@@ -3393,18 +3393,15 @@ BOOL PropertySheetPitchers::OnInitDialog()
 
 void PropertySheetPitchers::BuildPlayerNameComboBox(int iPage)
 {
-	BYTE count;
-	int i;
-	LONG lTeamSection = sizeof(BYTE);
-	LONG lPlayerSection = m_structPitcher.m_RecordSize;
 	CString	strPlayerName;	// Length of 30
+	CStringArray* arrayPitcherNames;
 
-
-	// If needed save Player Name
+	// If needed save Player Name because it gets wipped out in init routine
 	if (m_flagNew == TRUE)
 		strPlayerName = m_structPitcher.m_PitcherName;
 	// Get count of players in file
-	count = m_structPitcher.GetCountPitcher(m_FileName);
+	//count = m_structPitcher.GetCountPitcher(m_FileName);
+	arrayPitcherNames = m_structPitcher.GetPitcherLastFirstArray(m_TeamID);
 	// Open file and build player ComboBox
 	switch (iPage)
 	{
@@ -3418,20 +3415,24 @@ void PropertySheetPitchers::BuildPlayerNameComboBox(int iPage)
 		m_pPage3->m_comboPlayerName.ResetContent();
 		break;
 	}
-	for (i=0; i<count; i++)
+	//for (i=0; i<count; i++)
+	for (int i = 0; i<arrayPitcherNames->GetCount(); i++)
 	{
-		m_lSeekPlayerFile = lTeamSection+(i*lPlayerSection);
-		m_structPitcher.GetPitcher(m_FileName ,m_lSeekPlayerFile);
+		// m_lSeekPlayerFile = lTeamSection+(i*lPlayerSection);
+		// m_structPitcher.GetPitcher(m_FileName ,m_lSeekPlayerFile);
 		switch (iPage)
 		{
 		case 1:
-			m_pPage1->m_comboPlayerName.AddString(m_structPitcher.m_PitcherName);
+			// m_pPage1->m_comboPlayerName.AddString(m_structPitcher.m_PitcherName);
+			m_pPage1->m_comboPlayerName.AddString(arrayPitcherNames->ElementAt(i));
 			break;
 		case 2:
-			m_pPage2->m_comboPlayerName.AddString(m_structPitcher.m_PitcherName);
+			// m_pPage2->m_comboPlayerName.AddString(m_structPitcher.m_PitcherName);
+			m_pPage2->m_comboPlayerName.AddString(arrayPitcherNames->ElementAt(i));
 			break;
 		case 3:
-			m_pPage3->m_comboPlayerName.AddString(m_structPitcher.m_PitcherName);
+			// m_pPage3->m_comboPlayerName.AddString(m_structPitcher.m_PitcherName);
+			m_pPage3->m_comboPlayerName.AddString(arrayPitcherNames->ElementAt(i));
 			break;
 		}
 	}
@@ -3447,7 +3448,7 @@ void PropertySheetPitchers::BuildPlayerNameComboBox(int iPage)
 		m_pPage3->m_bChangedFlag = FALSE;
 		break;
 	}
-	m_lSeekPlayerFile = 0;
+	// m_lSeekPlayerFile = 0;
 
 	if (m_flagNew == TRUE)
 	{
@@ -3575,8 +3576,6 @@ void PropertySheetPitchers::SetPlayerNameCB(int iPage)
 
 void PropertySheetPitchers::OnCloseupComboPlayerName(int iPage)
 {
-	int i, rcompare;
-	BYTE count;
 	CString csPlayer;
 	LONG lTeamSection = sizeof(BYTE);
 	LONG lPlayerSection = m_structPitcher.m_RecordSize;
@@ -3642,28 +3641,8 @@ void PropertySheetPitchers::OnCloseupComboPlayerName(int iPage)
 	}
 	if (m_rgetcursel != CB_ERR)
 	{
-		count = m_structPitcher.GetCountPitcher(m_FileName);
-		csPlayer.Empty();
-		rcompare = m_rString.Compare(csPlayer);
-		i = -1;
-		while (rcompare)
-		{
-			i++;
-			if (i >= count)
-			{
-				// Player compare failed so display message
-				AfxMessageBox("Player Compare Failed");
-				break;
-			}
-			// Read in the player Data
-			m_lSeekPlayerFile = lTeamSection+(i*lPlayerSection);
-			m_structPitcher.GetPitcher(m_FileName,m_lSeekPlayerFile);
-			csPlayer = m_structPitcher.m_PitcherName;
-			rcompare = m_rString.Compare(csPlayer);
-		}
-
 		// Read in the player Data
-		m_structPitcher.GetPitcher(m_FileName,m_lSeekPlayerFile);
+		m_structPitcher.GetPitcher(m_rString, m_TeamID);
 		// Set the Dialog Items for page 1
 		if ((m_pPage1->m_hWnd != 0) && (m_pPage1->m_bChangedFlag == FALSE))
 		{
@@ -3750,7 +3729,7 @@ void PropertySheetPitchers::OnCloseupComboPlayerName(int iPage)
 	else
 	{
 		// No player selected Edit Box being used, set seek to 0 as flag
-		m_lSeekPlayerFile = 0;
+		// m_lSeekPlayerFile = 0;
 	}
 }
 
