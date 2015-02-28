@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Baseball", "Baseball.vcxproj", "{C14B680B-9DE8-D875-6925-0439E6351BDC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5A480A2F-19EC-4E2A-82C9-ADB93220B783} = {5A480A2F-19EC-4E2A-82C9-ADB93220B783}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{750001E9-9E38-424D-876C-5DDDEF4ECBB2}"
 	ProjectSection(SolutionItems) = preProject

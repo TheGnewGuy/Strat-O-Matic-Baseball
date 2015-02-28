@@ -100,7 +100,7 @@ void FormA::OnDraw(CDC * pDC, CBaseballDoc* pDoc)
 	CFont* origFont;
 	CFont myFont;
 	LOGFONT lf;
-	char szFontName[LF_FACESIZE] = "Times New Roman";
+//	char szFontName[LF_FACESIZE] = "Times New Roman";
 
 	CSize l_bitmapsize;
 	CWnd* pmyCWnd;
@@ -109,7 +109,9 @@ void FormA::OnDraw(CDC * pDC, CBaseballDoc* pDoc)
 	pmyCWnd = AfxGetMainWnd();
 
 	memset(&lf, 0, sizeof(LOGFONT));
-	lstrcpy(lf.lfFaceName, szFontName);
+//	lstrcpy(lf.lfFaceName, szFontName);
+	//	lstrcpy((LPWSTR)&lf.lfFaceName, _T("Times New Roman"));
+	lstrcpy(lf.lfFaceName, _T("Times New Roman"));
 	lf.lfHeight = -100;
 	VERIFY(myFont.CreateFontIndirect(&lf));
 	origFont = pDC->SelectObject(&myFont);
@@ -148,49 +150,49 @@ void FormA::OnDraw(CDC * pDC, CBaseballDoc* pDoc)
 	pDC->LineTo(xStopStats,-yStopInnings);
 	pDC->LineTo(xStopStats,-yStartForm);
 	pDC->LineTo(437,-yStartForm);
-	pDC->TextOut(xStart+49,-(yStartForm+45),"FLDG",4);
+	pDC->TextOut(xStart+49,-(yStartForm+45),_T("FLDG"),4);
 	if (pDoc->GetScoresheetFormXtra())
 	{
-		pDC->TextOut(xStart+150+(1*xIncInning),-(yStartForm+45),"13",2);
-		pDC->TextOut(xStart+150+(2*xIncInning),-(yStartForm+45),"14",2);
-		pDC->TextOut(xStart+150+(3*xIncInning),-(yStartForm+45),"15",2);
-		pDC->TextOut(xStart+150+(4*xIncInning),-(yStartForm+45),"16",2);
-		pDC->TextOut(xStart+150+(5*xIncInning),-(yStartForm+45),"17",2);
-		pDC->TextOut(xStart+150+(6*xIncInning),-(yStartForm+45),"18",2);
-		pDC->TextOut(xStart+150+(7*xIncInning),-(yStartForm+45),"19",2);
-		pDC->TextOut(xStart+150+(8*xIncInning),-(yStartForm+45),"20",2);
-		pDC->TextOut(xStart+150+(9*xIncInning),-(yStartForm+45),"21",2);
-		pDC->TextOut(xStart+113+(10*xIncInning),-(yStartForm+45),"22",2);
-		pDC->TextOut(xStart+113+(11*xIncInning),-(yStartForm+45),"23",2);
-		pDC->TextOut(xStart+113+(12*xIncInning),-(yStartForm+45),"24",2);
+		pDC->TextOut(xStart + 150 + (1 * xIncInning), -(yStartForm + 45), _T("13"), 2);
+		pDC->TextOut(xStart + 150 + (2 * xIncInning), -(yStartForm + 45), _T("14"), 2);
+		pDC->TextOut(xStart + 150 + (3 * xIncInning), -(yStartForm + 45), _T("15"), 2);
+		pDC->TextOut(xStart + 150 + (4 * xIncInning), -(yStartForm + 45), _T("16"), 2);
+		pDC->TextOut(xStart + 150 + (5 * xIncInning), -(yStartForm + 45), _T("17"), 2);
+		pDC->TextOut(xStart + 150 + (6 * xIncInning), -(yStartForm + 45), _T("18"), 2);
+		pDC->TextOut(xStart + 150 + (7 * xIncInning), -(yStartForm + 45), _T("19"), 2);
+		pDC->TextOut(xStart + 150 + (8 * xIncInning), -(yStartForm + 45), _T("20"), 2);
+		pDC->TextOut(xStart + 150 + (9 * xIncInning), -(yStartForm + 45), _T("21"), 2);
+		pDC->TextOut(xStart + 113 + (10 * xIncInning), -(yStartForm + 45), _T("22"), 2);
+		pDC->TextOut(xStart + 113 + (11 * xIncInning), -(yStartForm + 45), _T("23"), 2);
+		pDC->TextOut(xStart + 113 + (12 * xIncInning), -(yStartForm + 45), _T("24"), 2);
 	}
 	else
 	{
-		pDC->TextOut(xStart+150+(1*xIncInning),-(yStartForm+45),"1",1);
-		pDC->TextOut(xStart+150+(2*xIncInning),-(yStartForm+45),"2",1);
-		pDC->TextOut(xStart+150+(3*xIncInning),-(yStartForm+45),"3",1);
-		pDC->TextOut(xStart+150+(4*xIncInning),-(yStartForm+45),"4",1);
-		pDC->TextOut(xStart+150+(5*xIncInning),-(yStartForm+45),"5",1);
-		pDC->TextOut(xStart+150+(6*xIncInning),-(yStartForm+45),"6",1);
-		pDC->TextOut(xStart+150+(7*xIncInning),-(yStartForm+45),"7",1);
-		pDC->TextOut(xStart+150+(8*xIncInning),-(yStartForm+45),"8",1);
-		pDC->TextOut(xStart+150+(9*xIncInning),-(yStartForm+45),"9",1);
-		pDC->TextOut(xStart+113+(10*xIncInning),-(yStartForm+45),"10",2);
-		pDC->TextOut(xStart+113+(11*xIncInning),-(yStartForm+45),"11",2);
-		pDC->TextOut(xStart+113+(12*xIncInning),-(yStartForm+45),"12",2);
+		pDC->TextOut(xStart + 150 + (1 * xIncInning), -(yStartForm + 45), _T("1"), 1);
+		pDC->TextOut(xStart + 150 + (2 * xIncInning), -(yStartForm + 45), _T("2"), 1);
+		pDC->TextOut(xStart + 150 + (3 * xIncInning), -(yStartForm + 45), _T("3"), 1);
+		pDC->TextOut(xStart + 150 + (4 * xIncInning), -(yStartForm + 45), _T("4"), 1);
+		pDC->TextOut(xStart + 150 + (5 * xIncInning), -(yStartForm + 45), _T("5"), 1);
+		pDC->TextOut(xStart + 150 + (6 * xIncInning), -(yStartForm + 45), _T("6"), 1);
+		pDC->TextOut(xStart + 150 + (7 * xIncInning), -(yStartForm + 45), _T("7"), 1);
+		pDC->TextOut(xStart + 150 + (8 * xIncInning), -(yStartForm + 45), _T("8"), 1);
+		pDC->TextOut(xStart + 150 + (9 * xIncInning), -(yStartForm + 45), _T("9"), 1);
+		pDC->TextOut(xStart + 113 + (10 * xIncInning), -(yStartForm + 45), _T("10"), 2);
+		pDC->TextOut(xStart + 113 + (11 * xIncInning), -(yStartForm + 45), _T("11"), 2);
+		pDC->TextOut(xStart + 113 + (12 * xIncInning), -(yStartForm + 45), _T("12"), 2);
 	}
-	pDC->TextOut(xStart+33+(13*xIncInning),-(yStartForm+45),"AB",2);
-	pDC->TextOut(xStart+88+(13*xIncInning)+(1*xIncStats),-(yStartForm+45),"R",1);
-	pDC->TextOut(xStart+88+(13*xIncInning)+(2*xIncStats),-(yStartForm+45),"H",1);
-	pDC->TextOut(xStart+25+(13*xIncInning)+(3*xIncStats),-(yStartForm+45),"RBI",3);
-	pDC->TextOut(xStart+33+(13*xIncInning)+(4*xIncStats),-(yStartForm+45),"2B",2);
-	pDC->TextOut(xStart+33+(13*xIncInning)+(5*xIncStats),-(yStartForm+45),"3B",2);
-	pDC->TextOut(xStart+33+(13*xIncInning)+(6*xIncStats),-(yStartForm+45),"HR",2);
-	pDC->TextOut(xStart+88+(13*xIncInning)+(7*xIncStats),-(yStartForm+45),"W",1);
-	pDC->TextOut(xStart+88+(13*xIncInning)+(8*xIncStats),-(yStartForm+45),"K",1);
-	pDC->TextOut(xStart+33+(13*xIncInning)+(9*xIncStats),-(yStartForm+45),"RE",2);
-	pDC->TextOut(xStart+25+(13*xIncInning)+(10*xIncStats),-(yStartForm+45-30),"SB",2);
-	pDC->TextOut(xStart+75+(13*xIncInning)+(10*xIncStats),-(yStartForm+45+70),"CS",2);
+	pDC->TextOut(xStart + 33 + (13 * xIncInning), -(yStartForm + 45), _T("AB"), 2);
+	pDC->TextOut(xStart + 88 + (13 * xIncInning) + (1 * xIncStats), -(yStartForm + 45), _T("R"), 1);
+	pDC->TextOut(xStart + 88 + (13 * xIncInning) + (2 * xIncStats), -(yStartForm + 45), _T("H"), 1);
+	pDC->TextOut(xStart + 25 + (13 * xIncInning) + (3 * xIncStats), -(yStartForm + 45), _T("RBI"), 3);
+	pDC->TextOut(xStart + 33 + (13 * xIncInning) + (4 * xIncStats), -(yStartForm + 45), _T("2B"), 2);
+	pDC->TextOut(xStart + 33 + (13 * xIncInning) + (5 * xIncStats), -(yStartForm + 45), _T("3B"), 2);
+	pDC->TextOut(xStart + 33 + (13 * xIncInning) + (6 * xIncStats), -(yStartForm + 45), _T("HR"), 2);
+	pDC->TextOut(xStart + 88 + (13 * xIncInning) + (7 * xIncStats), -(yStartForm + 45), _T("W"), 1);
+	pDC->TextOut(xStart + 88 + (13 * xIncInning) + (8 * xIncStats), -(yStartForm + 45), _T("K"), 1);
+	pDC->TextOut(xStart + 33 + (13 * xIncInning) + (9 * xIncStats), -(yStartForm + 45), _T("RE"), 2);
+	pDC->TextOut(xStart + 25 + (13 * xIncInning) + (10 * xIncStats), -(yStartForm + 45 - 30), _T("SB"), 2);
+	pDC->TextOut(xStart + 75 + (13 * xIncInning) + (10 * xIncStats), -(yStartForm + 45 + 70), _T("CS"), 2);
 
 	// Boxes for Inning Scores
 	pDC->MoveTo(437,-7000);
@@ -207,40 +209,40 @@ void FormA::OnDraw(CDC * pDC, CBaseballDoc* pDoc)
 		pDC->MoveTo(i,-6750);
 		pDC->LineTo(i,-7990);
 	}
-	pDC->TextOut(712,-6800,"TEAMS",5);
+	pDC->TextOut(712,-6800,_T("TEAMS"),5);
 	if (pDoc->GetScoresheetFormXtra())
 	{
-		pDC->TextOut(1437+150,-6800,"13",2);
-		pDC->TextOut(1437+150+(1*375),-6800,"14",2);
-		pDC->TextOut(1437+150+(2*375),-6800,"15",2);
-		pDC->TextOut(1437+150+(3*375),-6800,"16",2);
-		pDC->TextOut(1437+150+(4*375),-6800,"17",2);
-		pDC->TextOut(1437+150+(5*375),-6800,"18",2);
-		pDC->TextOut(1437+150+(6*375),-6800,"19",2);
-		pDC->TextOut(1437+150+(7*375),-6800,"20",2);
-		pDC->TextOut(1437+150+(8*375),-6800,"21",2);
-		pDC->TextOut(1437+113+(9*375),-6800,"22",2);
-		pDC->TextOut(1437+113+(10*375),-6800,"23",2);
-		pDC->TextOut(1437+113+(11*375),-6800,"24",2);
+		pDC->TextOut(1437 + 150, -6800, _T("13"), 2);
+		pDC->TextOut(1437 + 150 + (1 * 375), -6800, _T("14"), 2);
+		pDC->TextOut(1437 + 150 + (2 * 375), -6800, _T("15"), 2);
+		pDC->TextOut(1437 + 150 + (3 * 375), -6800, _T("16"), 2);
+		pDC->TextOut(1437 + 150 + (4 * 375), -6800, _T("17"), 2);
+		pDC->TextOut(1437 + 150 + (5 * 375), -6800, _T("18"), 2);
+		pDC->TextOut(1437 + 150 + (6 * 375), -6800, _T("19"), 2);
+		pDC->TextOut(1437 + 150 + (7 * 375), -6800, _T("20"), 2);
+		pDC->TextOut(1437 + 150 + (8 * 375), -6800, _T("21"), 2);
+		pDC->TextOut(1437 + 113 + (9 * 375), -6800, _T("22"), 2);
+		pDC->TextOut(1437 + 113 + (10 * 375), -6800, _T("23"), 2);
+		pDC->TextOut(1437 + 113 + (11 * 375), -6800, _T("24"), 2);
 	}
 	else
 	{
-		pDC->TextOut(1437+150,-6800,"1",1);
-		pDC->TextOut(1437+150+(1*375),-6800,"2",1);
-		pDC->TextOut(1437+150+(2*375),-6800,"3",1);
-		pDC->TextOut(1437+150+(3*375),-6800,"4",1);
-		pDC->TextOut(1437+150+(4*375),-6800,"5",1);
-		pDC->TextOut(1437+150+(5*375),-6800,"6",1);
-		pDC->TextOut(1437+150+(6*375),-6800,"7",1);
-		pDC->TextOut(1437+150+(7*375),-6800,"8",1);
-		pDC->TextOut(1437+150+(8*375),-6800,"9",1);
-		pDC->TextOut(1437+113+(9*375),-6800,"10",2);
-		pDC->TextOut(1437+113+(10*375),-6800,"11",2);
-		pDC->TextOut(1437+113+(11*375),-6800,"12",2);
+		pDC->TextOut(1437 + 150, -6800, _T("1"), 1);
+		pDC->TextOut(1437 + 150 + (1 * 375), -6800, _T("2"), 1);
+		pDC->TextOut(1437 + 150 + (2 * 375), -6800, _T("3"), 1);
+		pDC->TextOut(1437 + 150 + (3 * 375), -6800, _T("4"), 1);
+		pDC->TextOut(1437 + 150 + (4 * 375), -6800, _T("5"), 1);
+		pDC->TextOut(1437 + 150 + (5 * 375), -6800, _T("6"), 1);
+		pDC->TextOut(1437 + 150 + (6 * 375), -6800, _T("7"), 1);
+		pDC->TextOut(1437 + 150 + (7 * 375), -6800, _T("8"), 1);
+		pDC->TextOut(1437 + 150 + (8 * 375), -6800, _T("9"), 1);
+		pDC->TextOut(1437 + 113 + (9 * 375), -6800, _T("10"), 2);
+		pDC->TextOut(1437 + 113 + (10 * 375), -6800, _T("11"), 2);
+		pDC->TextOut(1437 + 113 + (11 * 375), -6800, _T("12"), 2);
 	}
-		pDC->TextOut(1437+150+(12*375),-6800,"R",1);
-		pDC->TextOut(1437+150+(13*375),-6800,"H",1);
-		pDC->TextOut(1437+150+(14*375),-6800,"E",1);
+	pDC->TextOut(1437 + 150 + (12 * 375), -6800, _T("R"), 1);
+	pDC->TextOut(1437 + 150 + (13 * 375), -6800, _T("H"), 1);
+	pDC->TextOut(1437 + 150 + (14 * 375), -6800, _T("E"), 1);
 
 	// Pitcher Stats
 	pDC->MoveTo(xStopStats,-yStopInnings-125);
@@ -258,13 +260,13 @@ void FormA::OnDraw(CDC * pDC, CBaseballDoc* pDoc)
 		pDC->MoveTo(xStopStats-1000-(6*375),-i);
 		pDC->LineTo(xStopStats,-i);
 	}
-	pDC->TextOut(xStopStats-1000-(6*375)+192,-yStopInnings-125-50,"PITCHER",7);
-	pDC->TextOut(xStopStats-(6*375)+113,-yStopInnings-125-50,"IP",2);
-	pDC->TextOut(xStopStats-(6*375)+150+(1*375),-yStopInnings-125-50,"H",1);
-	pDC->TextOut(xStopStats-(6*375)+150+(2*375),-yStopInnings-125-50,"W",1);
-	pDC->TextOut(xStopStats-(6*375)+150+(3*375),-yStopInnings-125-50,"K",1);
-	pDC->TextOut(xStopStats-(6*375)+113+(4*375),-yStopInnings-125-50,"HR",2);
-	pDC->TextOut(xStopStats-(6*375)+113+(5*375),-yStopInnings-125-50,"ER",2);
+	pDC->TextOut(xStopStats - 1000 - (6 * 375) + 192, -yStopInnings - 125 - 50, _T("PITCHER"), 7);
+	pDC->TextOut(xStopStats - (6 * 375) + 113, -yStopInnings - 125 - 50, _T("IP"), 2);
+	pDC->TextOut(xStopStats - (6 * 375) + 150 + (1 * 375), -yStopInnings - 125 - 50, _T("H"), 1);
+	pDC->TextOut(xStopStats - (6 * 375) + 150 + (2 * 375), -yStopInnings - 125 - 50, _T("W"), 1);
+	pDC->TextOut(xStopStats - (6 * 375) + 150 + (3 * 375), -yStopInnings - 125 - 50, _T("K"), 1);
+	pDC->TextOut(xStopStats - (6 * 375) + 113 + (4 * 375), -yStopInnings - 125 - 50, _T("HR"), 2);
+	pDC->TextOut(xStopStats - (6 * 375) + 113 + (5 * 375), -yStopInnings - 125 - 50, _T("ER"), 2);
 
 	// Game Number
 	pDC->MoveTo(xStopStats,-7990);
@@ -274,7 +276,7 @@ void FormA::OnDraw(CDC * pDC, CBaseballDoc* pDoc)
 	pDC->LineTo(xStopStats,-7990);
 	pDC->MoveTo(xStopStats-1000,-7500);
 	pDC->LineTo(xStopStats,-7500);
-	pDC->TextOut(xStopStats-1000+50,-7250-50,"GAME NUMBER",11);
+	pDC->TextOut(xStopStats - 1000 + 50, -7250 - 50, _T("GAME NUMBER"), 11);
 
 	// Load the Bitmap
 	pDC->SelectPalette(&hPalette, FALSE);

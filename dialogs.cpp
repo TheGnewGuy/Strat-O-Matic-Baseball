@@ -1020,27 +1020,27 @@ void PropertyPageBattersChance::OnPlayerUpdate()
 void PropertyPageBattersChance::OnInitDialogPublic()
 {
 	SetDlgItemText( IDC_COMBO_PLAYERNAME1, NULL );
-	SetDlgItemText( IDC_CHANCEBASIC, "0" );
-	SetDlgItemText( IDC_CHANCELEFT, "0" );
-	SetDlgItemText( IDC_CHANCERIGHT, "0" );
-	SetDlgItemText( IDC_CHANCEWALK, "0" );
-	SetDlgItemText( IDC_CHANCETRIPLE, "0" );
-	SetDlgItemText( IDC_CHANCESINGLE, "0" );
-	SetDlgItemText( IDC_CHANCEHR, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLE, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLEPLAY, "0" );
-	SetDlgItemText( IDC_CHANCEWALKL, "0" );
-	SetDlgItemText( IDC_CHANCETRIPLEL, "0" );
-	SetDlgItemText( IDC_CHANCESINGLEL, "0" );
-	SetDlgItemText( IDC_CHANCEHRL, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLEL, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLEPLAYL, "0" );
-	SetDlgItemText( IDC_CHANCEWALKR, "0" );
-	SetDlgItemText( IDC_CHANCETRIPLER, "0" );
-	SetDlgItemText( IDC_CHANCESINGLER, "0" );
-	SetDlgItemText( IDC_CHANCEHRR, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLER, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLEPLAYR, "0" );
+	SetDlgItemText( IDC_CHANCEBASIC, _T("0") );
+	SetDlgItemText( IDC_CHANCELEFT, _T("0") );
+	SetDlgItemText( IDC_CHANCERIGHT, _T("0") );
+	SetDlgItemText( IDC_CHANCEWALK, _T("0") );
+	SetDlgItemText( IDC_CHANCETRIPLE, _T("0") );
+	SetDlgItemText( IDC_CHANCESINGLE, _T("0") );
+	SetDlgItemText( IDC_CHANCEHR, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLE, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLEPLAY, _T("0") );
+	SetDlgItemText( IDC_CHANCEWALKL, _T("0") );
+	SetDlgItemText( IDC_CHANCETRIPLEL, _T("0") );
+	SetDlgItemText( IDC_CHANCESINGLEL, _T("0") );
+	SetDlgItemText( IDC_CHANCEHRL, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLEL, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLEPLAYL, _T("0") );
+	SetDlgItemText( IDC_CHANCEWALKR, _T("0") );
+	SetDlgItemText( IDC_CHANCETRIPLER, _T("0") );
+	SetDlgItemText( IDC_CHANCESINGLER, _T("0") );
+	SetDlgItemText( IDC_CHANCEHRR, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLER, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLEPLAYR, _T("0") );
 }
 
 void PropertyPageBattersChance::OnNew() 
@@ -1318,27 +1318,27 @@ void PropertySheetBatters::OnNewInitStruct()
 	m_structBatter.m_bER7		= 0;
 	m_structBatter.m_bER8		= 0;
 	m_structBatter.m_bER9		= 0;
-	m_structBatter.m_OBChanceBasic		= "0"+filler10;
-	m_structBatter.m_OBChanceLeft		= "0"+filler10;
-	m_structBatter.m_OBChanceRight		= "0"+filler10;
-	m_structBatter.m_OBChanceHomeRun	= "0"+filler10;
-	m_structBatter.m_OBChanceDouble		= "0"+filler10;
-	m_structBatter.m_OBChanceSingle		= "0"+filler10;
-	m_structBatter.m_OBChanceTriple		= "0"+filler10;
-	m_structBatter.m_OBChanceWalk		= "0"+filler10;
-	m_structBatter.m_ChanceDoublePlay	= "0"+filler10;
-	m_structBatter.m_OBChanceHomeRunLeft	= "0"+filler10;
-	m_structBatter.m_OBChanceDoubleLeft		= "0"+filler10;
-	m_structBatter.m_OBChanceSingleLeft		= "0"+filler10;
-	m_structBatter.m_OBChanceTripleLeft		= "0"+filler10;
-	m_structBatter.m_OBChanceWalkLeft		= "0"+filler10;
-	m_structBatter.m_ChanceDoublePlayLeft	= "0"+filler10;
-	m_structBatter.m_OBChanceHomeRunRight	= "0"+filler10;
-	m_structBatter.m_OBChanceDoubleRight	= "0"+filler10;
-	m_structBatter.m_OBChanceSingleRight	= "0"+filler10;
-	m_structBatter.m_OBChanceTripleRight	= "0"+filler10;
-	m_structBatter.m_OBChanceWalkRight		= "0"+filler10;
-	m_structBatter.m_ChanceDoublePlayRight	= "0"+filler10;
+	m_structBatter.m_OBChanceBasic		= _T("0")+filler10;
+	m_structBatter.m_OBChanceLeft		= _T("0")+filler10;
+	m_structBatter.m_OBChanceRight		= _T("0")+filler10;
+	m_structBatter.m_OBChanceHomeRun	= _T("0")+filler10;
+	m_structBatter.m_OBChanceDouble		= _T("0")+filler10;
+	m_structBatter.m_OBChanceSingle		= _T("0")+filler10;
+	m_structBatter.m_OBChanceTriple		= _T("0")+filler10;
+	m_structBatter.m_OBChanceWalk		= _T("0")+filler10;
+	m_structBatter.m_ChanceDoublePlay	= _T("0")+filler10;
+	m_structBatter.m_OBChanceHomeRunLeft	= _T("0")+filler10;
+	m_structBatter.m_OBChanceDoubleLeft		= _T("0")+filler10;
+	m_structBatter.m_OBChanceSingleLeft		= _T("0")+filler10;
+	m_structBatter.m_OBChanceTripleLeft		= _T("0")+filler10;
+	m_structBatter.m_OBChanceWalkLeft		= _T("0")+filler10;
+	m_structBatter.m_ChanceDoublePlayLeft	= _T("0")+filler10;
+	m_structBatter.m_OBChanceHomeRunRight	= _T("0")+filler10;
+	m_structBatter.m_OBChanceDoubleRight	= _T("0")+filler10;
+	m_structBatter.m_OBChanceSingleRight	= _T("0")+filler10;
+	m_structBatter.m_OBChanceTripleRight	= _T("0")+filler10;
+	m_structBatter.m_OBChanceWalkRight		= _T("0")+filler10;
+	m_structBatter.m_ChanceDoublePlayRight	= _T("0")+filler10;
 	m_structBatter.m_AB				= 0;
 	m_structBatter.m_Runs			= 0;
 	m_structBatter.m_Hits			= 0;
@@ -1531,9 +1531,9 @@ LRESULT PropertySheetBatters::OnUpdate(WPARAM wParam,LPARAM lParam)
 			{
 				if (m_structBatter.m_AB == 0)
 				{
-					m_pPage3->SetDlgItemText( IDC_BATTINGAVERAGE, "0" );
-					m_pPage3->SetDlgItemText( IDC_SLG, "0" );
-					m_pPage3->SetDlgItemText( IDC_ONBASEPERCENT, "0" );
+					m_pPage3->SetDlgItemText( IDC_BATTINGAVERAGE, _T("0") );
+					m_pPage3->SetDlgItemText( IDC_SLG, _T("0") );
+					m_pPage3->SetDlgItemText( IDC_ONBASEPERCENT, _T("0") );
 					m_pPage3->m_bChangedFlag		= FALSE;
 				}
 				else
@@ -1849,9 +1849,9 @@ void PropertySheetBatters::OnCloseupComboPlayerName(int iPage)
 			m_pPage3->SetDlgItemInt( IDC_HBP1, m_structBatter.m_HBP, FALSE );
 			if (m_structBatter.m_AB == 0)
 			{
-				m_pPage3->SetDlgItemText( IDC_BATTINGAVERAGE, "0" );
-				m_pPage3->SetDlgItemText( IDC_SLG, "0" );
-				m_pPage3->SetDlgItemText( IDC_ONBASEPERCENT, "0" );
+				m_pPage3->SetDlgItemText( IDC_BATTINGAVERAGE, _T("0") );
+				m_pPage3->SetDlgItemText( IDC_SLG, _T("0") );
+				m_pPage3->SetDlgItemText( IDC_ONBASEPERCENT, _T("0") );
 			}
 			else
 			{
@@ -2756,27 +2756,27 @@ BOOL PropertyPagePitchersChance::OnInitDialog()
 void PropertyPagePitchersChance::OnInitDialogPublic()
 {
 	SetDlgItemText( IDC_COMBO_PLAYERNAME1, NULL );
-	SetDlgItemText( IDC_CHANCELEFT, "0" );
-	SetDlgItemText( IDC_CHANCEBASIC, "0" );
-	SetDlgItemText( IDC_CHANCERIGHT, "0" );
-	SetDlgItemText( IDC_CHANCEWALK, "0" );
-	SetDlgItemText( IDC_CHANCETRIPLE, "0" );
-	SetDlgItemText( IDC_CHANCESINGLE, "0" );
-	SetDlgItemText( IDC_CHANCEHR, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLE, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLEPLAY, "0" );
-	SetDlgItemText( IDC_CHANCEWALKL, "0" );
-	SetDlgItemText( IDC_CHANCETRIPLEL, "0" );
-	SetDlgItemText( IDC_CHANCESINGLEL, "0" );
-	SetDlgItemText( IDC_CHANCEHRL, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLEL, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLEPLAYL, "0" );
-	SetDlgItemText( IDC_CHANCEWALKR, "0" );
-	SetDlgItemText( IDC_CHANCETRIPLER, "0" );
-	SetDlgItemText( IDC_CHANCESINGLER, "0" );
-	SetDlgItemText( IDC_CHANCEHRR, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLER, "0" );
-	SetDlgItemText( IDC_CHANCEDOUBLEPLAYR, "0" );
+	SetDlgItemText( IDC_CHANCELEFT, _T("0") );
+	SetDlgItemText( IDC_CHANCEBASIC, _T("0") );
+	SetDlgItemText( IDC_CHANCERIGHT, _T("0") );
+	SetDlgItemText( IDC_CHANCEWALK, _T("0") );
+	SetDlgItemText( IDC_CHANCETRIPLE, _T("0") );
+	SetDlgItemText( IDC_CHANCESINGLE, _T("0") );
+	SetDlgItemText( IDC_CHANCEHR, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLE, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLEPLAY, _T("0") );
+	SetDlgItemText( IDC_CHANCEWALKL, _T("0") );
+	SetDlgItemText( IDC_CHANCETRIPLEL, _T("0") );
+	SetDlgItemText( IDC_CHANCESINGLEL, _T("0") );
+	SetDlgItemText( IDC_CHANCEHRL, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLEL, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLEPLAYL, _T("0") );
+	SetDlgItemText( IDC_CHANCEWALKR, _T("0") );
+	SetDlgItemText( IDC_CHANCETRIPLER, _T("0") );
+	SetDlgItemText( IDC_CHANCESINGLER, _T("0") );
+	SetDlgItemText( IDC_CHANCEHRR, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLER, _T("0") );
+	SetDlgItemText( IDC_CHANCEDOUBLEPLAYR, _T("0") );
 }
 
 void PropertyPagePitchersChance::BuildPlayerNameComboBox()
@@ -3524,28 +3524,28 @@ void PropertySheetPitchers::OnNewInitStruct()
 	m_structPitcher.m_Throws		= 0;
 	m_structPitcher.m_Hold			= 0;
 	m_structPitcher.m_Bunting		= 0;
-	m_structPitcher.m_OBChanceBasic		= "0"+filler10;
-	m_structPitcher.m_OBChanceLeft		= "0"+filler10;
-	m_structPitcher.m_OBChanceRight		= "0"+filler10;
-	m_structPitcher.m_OBChanceHomeRun	= "0"+filler10;
-	m_structPitcher.m_OBChanceDouble	= "0"+filler10;
-	m_structPitcher.m_OBChanceSingle	= "0"+filler10;
-	m_structPitcher.m_OBChanceTriple	= "0"+filler10;
-	m_structPitcher.m_OBChanceWalk		= "0"+filler10;
-	m_structPitcher.m_ChanceDoublePlay	= "0"+filler10;
-	m_structPitcher.m_OBChanceHomeRunLeft	= "0"+filler10;
-	m_structPitcher.m_OBChanceDoubleLeft	= "0"+filler10;
-	m_structPitcher.m_OBChanceSingleLeft	= "0"+filler10;
-	m_structPitcher.m_OBChanceTripleLeft	= "0"+filler10;
-	m_structPitcher.m_OBChanceWalkLeft		= "0"+filler10;
-	m_structPitcher.m_ChanceDoublePlayLeft	= "0"+filler10;
-	m_structPitcher.m_OBChanceHomeRunRight	= "0"+filler10;
-	m_structPitcher.m_OBChanceDoubleRight	= "0"+filler10;
-	m_structPitcher.m_OBChanceSingleRight	= "0"+filler10;
-	m_structPitcher.m_OBChanceTripleRight	= "0"+filler10;
-	m_structPitcher.m_OBChanceWalkRight		= "0"+filler10;
-	m_structPitcher.m_ChanceDoublePlayRight	= "0"+filler10;
-	m_structPitcher.m_IP			= "0"+filler10;
+	m_structPitcher.m_OBChanceBasic		= _T("0")+filler10;
+	m_structPitcher.m_OBChanceLeft		= _T("0")+filler10;
+	m_structPitcher.m_OBChanceRight		= _T("0")+filler10;
+	m_structPitcher.m_OBChanceHomeRun	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceDouble	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceSingle	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceTriple	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceWalk		= _T("0")+filler10;
+	m_structPitcher.m_ChanceDoublePlay	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceHomeRunLeft	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceDoubleLeft	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceSingleLeft	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceTripleLeft	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceWalkLeft		= _T("0")+filler10;
+	m_structPitcher.m_ChanceDoublePlayLeft	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceHomeRunRight	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceDoubleRight	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceSingleRight	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceTripleRight	= _T("0")+filler10;
+	m_structPitcher.m_OBChanceWalkRight		= _T("0")+filler10;
+	m_structPitcher.m_ChanceDoublePlayRight	= _T("0")+filler10;
+	m_structPitcher.m_IP			= _T("0")+filler10;
 	m_structPitcher.m_Starts		= 0;
 	m_structPitcher.m_Wins			= 0;
 	m_structPitcher.m_Walks			= 0;
@@ -3751,8 +3751,8 @@ void PropertySheetPitchers::OnCloseupComboPlayerName(int iPage)
 
 			if (fIP == 0)
 			{
-				m_pPage3->SetDlgItemText( IDC_ERA1, "0" );
-				m_pPage3->SetDlgItemText( IDC_TRG1, "0" );
+				m_pPage3->SetDlgItemText( IDC_ERA1, _T("0") );
+				m_pPage3->SetDlgItemText( IDC_TRG1, _T("0") );
 			}
 			else
 			{
@@ -3929,8 +3929,8 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 
 				if (fIP == 0)
 				{
-					m_pPage3->SetDlgItemText( IDC_ERA1, "0" );
-					m_pPage3->SetDlgItemText( IDC_TRG1, "0" );
+					m_pPage3->SetDlgItemText( IDC_ERA1, _T("0") );
+					m_pPage3->SetDlgItemText( IDC_TRG1, _T("0") );
 				}
 				else
 				{

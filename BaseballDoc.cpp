@@ -60,6 +60,7 @@
 #include <errno.h>
 
 #include "BaseballDoc.h"
+#include "sqlite3.h"
 
 #define HTML_DISP_LINES 10
 
@@ -109,10 +110,21 @@ CBaseballDoc::CBaseballDoc()
 {
 	// TODO: add one-time construction code here
 	SetAllFormsFalse();
+	// Load the sqlite DataBase file
+	//bWorking = myFileFind.FindFile("data\\TB*.dat", 0);
+
+
+	m_DBFileName = _T("");
+	m_dbOpen = 99;		// SQLITE_OK is set to '0'
 }
 
 CBaseballDoc::~CBaseballDoc()
 {
+	if (m_dbOpen = SQLITE_OK)
+	{
+		sqlite3_close(m_db);
+		m_dbOpen = 99;
+	}
 }
 
 BOOL CBaseballDoc::OnNewDocument()

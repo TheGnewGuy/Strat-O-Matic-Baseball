@@ -2,6 +2,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+#include "sqlite3.h"
+
 #if !defined(AFX_BASEBALLDOC_H__20B4846F_70F7_11D2_B0EE_444553540000__INCLUDED_)
 #define AFX_BASEBALLDOC_H__20B4846F_70F7_11D2_B0EE_444553540000__INCLUDED_
 
@@ -92,6 +94,11 @@ private:
 	CString m_Conference2;
 	CString m_Conference1;
 	CString m_NewLeagueName;
+public:
+	CString m_DBFileName;
+	int m_dbOpen;
+	sqlite3 *m_db;
+	sqlite3_stmt *m_stmt;
 };
 
 /////////////////////////////////////////////////////////////////////////////
