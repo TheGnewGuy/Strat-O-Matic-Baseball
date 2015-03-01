@@ -4351,13 +4351,11 @@ CBaseballDoc::m_TeamRecord CBaseballDoc::GetTeam(int TeamID)
 	return teamResult;
 }
 
-
 int CBaseballDoc::TeamUpdate(m_TeamRecord TeamRecord)
 {
 	char *sqlTeam;
 	int rc;
 	CHAR buffer[100];
-	//m_TeamRecord teamResult;
 
 	/* Create SQL statement */
 	sqlTeam = "UPDATE TEAM "  \
@@ -4472,7 +4470,1248 @@ int CBaseballDoc::TeamUpdate(m_TeamRecord TeamRecord)
 
 	if (rc != SQLITE_DONE)
 	{
-		sprintf_s(buffer, sizeof(buffer), "Failed to Update Team item: %s\n", sqlite3_errmsg(m_db));
+		sprintf_s(buffer, sizeof(buffer), "Failed to Update TEAM item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return 0;
+}
+
+int CBaseballDoc::LeagueUpdate(m_LeagueRecord LeagueRecord)
+{
+	char *sqlLeague;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlLeague = "UPDATE LEAGUES "  \
+		"SET " \
+		"LeagueName = ?1," \
+		"NumberOfConferences = ?2," \
+		"NumberOfDivisions = ?3," \
+		"BaseLeague = ?4," \
+		"LastUpdateTime = datetime('NOW','localtime')" \
+		" WHERE LeagueID = ?5 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlLeague, strlen(sqlLeague), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, LeagueRecord.LeagueName, strlen(LeagueRecord.LeagueName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, LeagueRecord.NumberOfConferences);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind NumberOfConferences int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 3, LeagueRecord.NumberOfDivisions);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind NumberOfDivisions int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 4, LeagueRecord.BaseLeague);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BaseLeague int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 5, LeagueRecord.LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to Update LEAGUES item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return 0;
+}
+
+int CBaseballDoc::ConfUpdate(m_ConferenceRecord ConferenceRecord)
+{
+	char *sqlConference;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlConference = "UPDATE CONFERENCES "  \
+		"SET " \
+		"ConferenceName = ?1," \
+		"LeagueID = ?2," \
+		"BaseConference = ?3," \
+		"LastUpdateTime = datetime('NOW','localtime')" \
+		" WHERE ConferenceID = ?4 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlConference, strlen(sqlConference), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, ConferenceRecord.ConferenceName, strlen(ConferenceRecord.ConferenceName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ConferenceName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, ConferenceRecord.LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 3, ConferenceRecord.BaseConference);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BaseConference int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 4, ConferenceRecord.ConferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ConferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to Update CONFERENCES item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return 0;
+}
+
+int CBaseballDoc::DivisionUpdate(m_DivisionRecord DivisionRecord)
+{
+	char *sqlDivision;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlDivision = "UPDATE DIVISIONS "  \
+		"SET " \
+		"DivisionName = ?1," \
+		"LeagueID = ?2," \
+		"ConferenceID = ?3," \
+		"BaseDivisions = ?4," \
+		"LastUpdateTime = datetime('NOW','localtime')" \
+		" WHERE ConferenceID = ?5 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlDivision, strlen(sqlDivision), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, DivisionRecord.DivisionName, strlen(DivisionRecord.DivisionName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind DivisionName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, DivisionRecord.LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 3, DivisionRecord.ConferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ConferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 4, DivisionRecord.BaseDivisions);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BaseDivisions int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 5, DivisionRecord.DivisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind DivisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to Update DIVISIONS item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return 0;
+}
+
+int CBaseballDoc::BatterUpdate(m_BatterRecord BatterRecord)
+{
+	char *sqlBatter;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlBatter = "UPDATE BATTER "  \
+		"SET " \
+		"FirstName = ?1," \
+		"LastName = ?2," \
+		"Pitcher = ?3," \
+		"Catcher = ?4," \
+		"FirstBase = ?5," \
+		"SecondBase = ?6," \
+		"ShortStop = ?7," \
+		"ThirdBase = ?8," \
+		"LeftField = ?9," \
+		"CenterField = ?10," \
+		"RightField = ?11," \
+		"Bunting = ?12," \
+		"HitRun = ?13," \
+		"Running = ?14," \
+		"Stealing = ?15," \
+		"CatchArm = ?16," \
+		"OutArm = ?17," \
+		"PowerRight = ?18," \
+		"PowerLeft = ?19," \
+		"Pass = ?20," \
+		"TRate = ?21," \
+		"ER1 = ?22," \
+		"ER2 = ?23," \
+		"ER3 = ?24," \
+		"ER4 = ?25," \
+		"ER5 = ?26," \
+		"ER6 = ?27," \
+		"ER7 = ?28," \
+		"ER8 = ?29," \
+		"ER9 = ?30," \
+		"BatterHits = ?31," \
+		"TeamID = ?32," \
+		"OBChanceHomeRun = ?33," \
+		"OBChanceTriple = ?34," \
+		"OBChanceDouble = ?35," \
+		"OBChanceSingle = ?36," \
+		"OBChanceWalk = ?37," \
+		"ChanceDoublePlay = ?38," \
+		"OBChanceHomeRunRight = ?39," \
+		"OBChanceTripleRight = ?40," \
+		"OBChanceDoubleRight = ?41," \
+		"OBChanceSingleRight = ?42," \
+		"OBChanceWalkRight = ?43," \
+		"ChanceDoublePlayRight = ?44," \
+		"OBChanceHomeRunLeft = ?45," \
+		"OBChanceTripleLeft = ?46," \
+		"OBChanceDoubleLeft = ?47," \
+		"OBChanceSingleLeft = ?48," \
+		"OBChanceWalkLeft = ?49," \
+		"ChanceDoublePlayLeft = ?50," \
+		"OBChanceBasic = ?51," \
+		"OBChanceLeft = ?52," \
+		"OBChanceRight = ?53," \
+		"LastUpdateTime = datetime('NOW','localtime')" \
+		" WHERE BatterID = ?54 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlBatter, strlen(sqlBatter), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, BatterRecord.FirstName, strlen(BatterRecord.FirstName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind FirstName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 2, BatterRecord.LastName, strlen(BatterRecord.LastName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LastName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 3, BatterRecord.Pitcher);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Pitcher int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 4, BatterRecord.Catcher);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Catcher int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 5, BatterRecord.FirstBase);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind FirstBase int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 6, BatterRecord.SecondBase);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind SecondBase int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 7, BatterRecord.ShortStop);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ShortStop int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 8, BatterRecord.ThirdBase);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ThirdBase int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 9, BatterRecord.LeftField);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeftField int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 10, BatterRecord.CenterField);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind CenterField int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 11, BatterRecord.RightField);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind RightField int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 12, BatterRecord.Bunting);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Bunting int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 13, BatterRecord.HitRun);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind HitRun int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 14, BatterRecord.Running);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Running int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 15, BatterRecord.Stealing);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Stealing int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 16, BatterRecord.CatchArm);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind CatchArm int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 17, BatterRecord.OutArm);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OutArm int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 18, BatterRecord.PowerRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind PowerRight int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 19, BatterRecord.PowerLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind PowerLeft int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 20, BatterRecord.Pass);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Pass int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 21, BatterRecord.TRate);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TRate int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 22, BatterRecord.ER1);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER1 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 23, BatterRecord.ER2);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER2 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 24, BatterRecord.ER3);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER3 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 25, BatterRecord.ER4);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER4 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 26, BatterRecord.ER5);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER5 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 27, BatterRecord.ER6);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER6 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 28, BatterRecord.ER7);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER7 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 29, BatterRecord.ER8);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER8 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 30, BatterRecord.ER9);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER9 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 31, BatterRecord.BatterHits);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BatterHits int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 32, BatterRecord.TeamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 33, BatterRecord.OBChanceHomeRun);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceHomeRun double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 34, BatterRecord.OBChanceTriple);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceTriple double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 35, BatterRecord.OBChanceDouble);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceDouble double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 36, BatterRecord.OBChanceSingle);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceSingle double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 37, BatterRecord.OBChanceWalk);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceWalk double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 38, BatterRecord.ChanceDoublePlay);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ChanceDoublePlay double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 39, BatterRecord.OBChanceHomeRunRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceHomeRunRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 40, BatterRecord.OBChanceTripleRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceTripleRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 41, BatterRecord.OBChanceDoubleRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceDoubleRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 42, BatterRecord.OBChanceSingleRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceSingleRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 43, BatterRecord.OBChanceWalkRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceWalkRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 44, BatterRecord.ChanceDoublePlayRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ChanceDoublePlayRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 45, BatterRecord.OBChanceHomeRunLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceHomeRunLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 46, BatterRecord.OBChanceTripleLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceTripleLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 47, BatterRecord.OBChanceDoubleLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceDoubleLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 48, BatterRecord.OBChanceSingleLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceSingleLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 49, BatterRecord.OBChanceWalkLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceWalkLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 50, BatterRecord.ChanceDoublePlayLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ChanceDoublePlayLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 51, BatterRecord.OBChanceBasic);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceBasic double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 52, BatterRecord.OBChanceLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 53, BatterRecord.OBChanceRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_bind_int(m_stmt, 54, BatterRecord.BatterID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BatterID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to Update BATTER item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return 0;
+}
+
+int CBaseballDoc::BatterStatsUpdate(m_BatterStatsRecord BatterStatsRecord)
+{
+	char *sqlBatterStats;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlBatterStats = "UPDATE BATTERSTATS "  \
+		"SET " \
+		"AB = ?1," \
+		"Runs = ?2," \
+		"Hits = ?3," \
+		"RBI = ?4," \
+		"Doubles = ?5," \
+		"Triples = ?6," \
+		"HomeRuns = ?7," \
+		"Walk = ?8," \
+		"Stirkeout = ?9," \
+		"ReachedOnError = ?10," \
+		"Sacrifice = ?11," \
+		"StolenBase = ?12," \
+		"CS = ?13," \
+		"Games = ?14," \
+		"HBP = ?15," \
+		"AVG = ?16," \
+		"SLG = ?17," \
+		"OBP = ?18," \
+		"BatterID = ?19," \
+		"TeamID = ?20," \
+		"LastUpdateTime = datetime('NOW','localtime')" \
+		" WHERE BatterStatsID = ?21 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlBatterStats, strlen(sqlBatterStats), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, BatterStatsRecord.AB);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind AB int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, BatterStatsRecord.Runs);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Runs int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 3, BatterStatsRecord.Hits);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Hits int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 4, BatterStatsRecord.RBI);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind RBI int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 5, BatterStatsRecord.Doubles);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Doubles int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 6, BatterStatsRecord.Triples);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Triples int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 7, BatterStatsRecord.HomeRuns);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind HomeRuns int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 8, BatterStatsRecord.Walk);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Walk int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 9, BatterStatsRecord.Stirkeout);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Stirkeout int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 10, BatterStatsRecord.ReachedOnError);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ReachedOnError int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 11, BatterStatsRecord.Sacrifice);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Sacrifice int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 12, BatterStatsRecord.StolenBase);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind StolenBase int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 13, BatterStatsRecord.CS);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind CS int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 14, BatterStatsRecord.Games);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Games int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 15, BatterStatsRecord.HBP);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind HBP int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 16, BatterStatsRecord.AVG);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind AVG double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 17, BatterStatsRecord.SLG);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind SLG double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 18, BatterStatsRecord.OBP);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBP double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 19, BatterStatsRecord.BatterID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BatterID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 20, BatterStatsRecord.TeamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 21, BatterStatsRecord.BatterStatsID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BatterStatsID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to Update BatterStats item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return 0;
+}
+
+int CBaseballDoc::PitcherUpdate(m_PitcherRecord PitcherRecord)
+{
+	char *sqlPitcher;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlPitcher = "UPDATE PITCHER "  \
+		"SET " \
+		"FirstName = ?1," \
+		"LastName = ?2," \
+		"OBChanceHomeRun = ?3," \
+		"OBChanceTriple = ?4," \
+		"OBChanceDouble = ?5," \
+		"OBChanceSingle = ?6," \
+		"OBChanceWalk = ?7," \
+		"ChanceDoublePlay = ?8," \
+		"OBChanceHomeRunRight = ?9," \
+		"OBChanceTripleRight = ?10," \
+		"OBChanceDoubleRight = ?11," \
+		"OBChanceSingleRight = ?12," \
+		"OBChanceWalkRight = ?13," \
+		"ChanceDoublePlayRight = ?14," \
+		"OBChanceHomeRunLeft = ?15," \
+		"OBChanceTripleLeft = ?16," \
+		"OBChanceDoubleLeft = ?17," \
+		"OBChanceSingleLeft = ?18," \
+		"OBChanceWalkLeft = ?19," \
+		"ChanceDoublePlayLeft = ?20," \
+		"OBChanceBasic = ?21," \
+		"OBChanceLeft = ?22," \
+		"OBChanceRight = ?23," \
+		"Starter = ?24," \
+		"Relief = ?25," \
+		"Throws = ?26," \
+		"Bunting = ?27," \
+		"Hold = ?28," \
+		"WP = ?29," \
+		"Balk = ?30," \
+		"Pitcher = ?31," \
+		"ER1 = ?32," \
+		"TeamID = ?33," \
+		"LastUpdateTime = datetime('NOW','localtime')" \
+		" WHERE BatterID = ?34 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlPitcher, strlen(sqlPitcher), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, PitcherRecord.FirstName, strlen(PitcherRecord.FirstName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind FirstName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 2, PitcherRecord.LastName, strlen(PitcherRecord.LastName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LastName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 3, PitcherRecord.OBChanceHomeRun);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceHomeRun double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 4, PitcherRecord.OBChanceTriple);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceTriple double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 5, PitcherRecord.OBChanceDouble);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceDouble double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 6, PitcherRecord.OBChanceSingle);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceSingle double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 7, PitcherRecord.OBChanceWalk);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceWalk double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 8, PitcherRecord.ChanceDoublePlay);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ChanceDoublePlay double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 9, PitcherRecord.OBChanceHomeRunRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceHomeRunRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 10, PitcherRecord.OBChanceTripleRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceTripleRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 11, PitcherRecord.OBChanceDoubleRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceDoubleRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 12, PitcherRecord.OBChanceSingleRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceSingleRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 13, PitcherRecord.OBChanceWalkRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceWalkRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 14, PitcherRecord.ChanceDoublePlayRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ChanceDoublePlayRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 15, PitcherRecord.OBChanceHomeRunLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceHomeRunLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 16, PitcherRecord.OBChanceTripleLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceTripleLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 17, PitcherRecord.OBChanceDoubleLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceDoubleLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 18, PitcherRecord.OBChanceSingleLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceSingleLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 19, PitcherRecord.OBChanceWalkLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceWalkLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 20, PitcherRecord.ChanceDoublePlayLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ChanceDoublePlayLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 21, PitcherRecord.OBChanceBasic);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceBasic double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 22, PitcherRecord.OBChanceLeft);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceLeft double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 23, PitcherRecord.OBChanceRight);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind OBChanceRight double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 24, PitcherRecord.Starter);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Starter int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 25, PitcherRecord.Relief);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Relief int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 26, PitcherRecord.Throws);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Throws int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 27, PitcherRecord.Bunting);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Bunting int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 28, PitcherRecord.Hold);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Hold int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 29, PitcherRecord.WP);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind WP int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 30, PitcherRecord.Balk);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Balk int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 31, PitcherRecord.Pitcher);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Pitcher int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 32, PitcherRecord.ER1);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER1 int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 33, PitcherRecord.TeamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_bind_int(m_stmt, 34, PitcherRecord.PitcherID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind PitcherID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to Update BATTER item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return 0;
+}
+
+int CBaseballDoc::PitcherStatsUpdate(m_PitcherStatsRecord PitcherStatsRecord)
+{
+	char *sqlPitcher;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlPitcher = "UPDATE PITCHERSTATS "  \
+		"SET " \
+		"Wins = ?1," \
+		"Loss = ?2," \
+		"Saves = ?3," \
+		"InningsPitched = ?4," \
+		"ER = ?5," \
+		"Hits = ?6," \
+		"Walks = ?7," \
+		"Strikeouts = ?8," \
+		"HomeRuns = ?9," \
+		"Games = ?10," \
+		"CompleteGames = ?11," \
+		"Starts = ?12," \
+		"ERA = ?13," \
+		"WHIP = ?14," \
+		"PitcherID = ?15," \
+		"TeamID = ?16," \
+		"LastUpdateTime = datetime('NOW','localtime')" \
+		" WHERE BatterStatsID = ?17 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlPitcher, strlen(sqlPitcher), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, PitcherStatsRecord.Wins);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Wins int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, PitcherStatsRecord.Loss);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Loss int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 3, PitcherStatsRecord.Saves);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Saves int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 4, PitcherStatsRecord.InningsPitched);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind InningsPitched double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 5, PitcherStatsRecord.ER);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ER int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 6, PitcherStatsRecord.Hits);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Hits int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 7, PitcherStatsRecord.Walks);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Walks int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 8, PitcherStatsRecord.Strikeouts);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Strikeouts int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 9, PitcherStatsRecord.HomeRuns);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind HomeRuns int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 10, PitcherStatsRecord.Games);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Games int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 11, PitcherStatsRecord.CompleteGames);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind CompleteGames int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 12, PitcherStatsRecord.Starts);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Starts int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 13, PitcherStatsRecord.ERA);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ERA double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_double(m_stmt, 14, PitcherStatsRecord.WHIP);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind WHIP double: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 15, PitcherStatsRecord.PitcherID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind PitcherID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 16, PitcherStatsRecord.TeamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 17, PitcherStatsRecord.PitcherStatsID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind PitcherStatsID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to Update BatterStats item: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
 
