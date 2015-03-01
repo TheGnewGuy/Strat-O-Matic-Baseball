@@ -53,6 +53,7 @@
 #include "AddLeague.h"
 #include "DlgAddDivision.h"
 #include "DlgAddTeams.h"
+#include "DlgEditLeague.h"
 #include "AddTeam.h"
 #include "FileStruct.h"
 #include "registry.h"
@@ -101,6 +102,8 @@ BEGIN_MESSAGE_MAP(CBaseballDoc, CDocument)
 	ON_COMMAND(ID_PLAYERS_ADDEDITPITCHERS, OnPlayersAddEditPitchers)
 	ON_COMMAND(ID_LEAGUES_LEAGUEOPTIONSHTML, OnLeaguesLeagueOptionsHTML)
 	//}}AFX_MSG_MAP
+	ON_COMMAND(ID_FILE_OPEN, &CBaseballDoc::OnFileOpen)
+	ON_COMMAND(ID_LEAGUES_EDITLEAGUE, &CBaseballDoc::OnLeaguesEditLeague)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -659,17 +662,52 @@ void CBaseballDoc::OnLeaguesAddleague()
 	}		//end - dlg.DoModal()
 }
 
+void CBaseballDoc::OnLeaguesEditLeague()
+{
+	// TODO: Add your command handler code here
+	DlgEditLeague dlg;
+	INT_PTR nRet = -1;
+
+	nRet = dlg.DoModal();
+
+	// Handle the return value from DoModal 
+	switch (nRet)
+	{
+	case -1:
+		AfxMessageBox(_T("Dialog box could not be created!"));
+		break;
+	case IDABORT:
+		// Do something 
+		AfxMessageBox(_T("Abort pressed!"));
+		break;
+	case IDOK:
+		// Do something 
+		AfxMessageBox(_T("OK pressed!"));
+		break;
+	case IDCANCEL:
+		// Do something 
+		AfxMessageBox(_T("Cancel pressed!"));
+		break;
+	default:
+		// Do something 
+		AfxMessageBox(_T("Default pressed!"));
+		break;
+	};
+}
+
 void CBaseballDoc::OnFileExportLeagueTeams() 
 {
 	HCURSOR hCursorWait;
 	HCURSOR hCursorNormal;
 
 	CString strLeague;
+	int leagueID = 0;
 	CString strLeagueName;
 	CString strLeagueFile;
 	CString strLeagueDir;
 
-	strLeague = GetLeagues(TRUE);
+//	strLeague = GetLeagues(TRUE);
+	leagueID = GetLeagues(TRUE);
 
 	strLeagueName = strLeague.Left(30);
 	if (strncmp(strLeagueName,"All",3))
@@ -709,11 +747,13 @@ void CBaseballDoc::OnFileExportLeagueTeamsAll()
 	HCURSOR hCursorNormal;
 
 	CString strLeague;
+	int leagueID = 0;
 	CString strLeagueName;
 	CString strLeagueFile;
 	CString strLeagueDir;
 
-	strLeague = GetLeagues(TRUE);
+//	strLeague = GetLeagues(TRUE);
+	leagueID = GetLeagues(TRUE);
 
 	strLeagueName = strLeague.Left(30);
 	if (strncmp(strLeagueName,"All",3))
@@ -789,7 +829,7 @@ void CBaseballDoc::Export(CString strLeagueDir)
 	CString strTeamFile;
 	CString strTeamName;
 
-	strTeam = GetTeams(strLeagueDir);
+//	strTeam = GetTeams(strLeagueDir);
 	strTeamFile = strTeam.Right(12);
 	strTeamName = strTeam.Left(30);
 
@@ -1130,11 +1170,13 @@ void CBaseballDoc::ExportFile(CString strDir, CString strTeamName)
 void CBaseballDoc::OnFileExportHTMLLeagueTeams() 
 {
 	CString strLeague;
+	int leagueID = 0;
 	CString strLeagueName;
 	CString strLeagueFile;
 	CString strLeagueDir;
 
-	strLeague = GetLeagues(TRUE);
+//	strLeague = GetLeagues(TRUE);
+	leagueID = GetLeagues(TRUE);
 
 	strLeagueName = strLeague.Left(30);
 	if (strncmp(strLeagueName,"All",3))
@@ -1165,11 +1207,13 @@ void CBaseballDoc::OnFileExportHtmlLeagueTeamsAll()
 	HCURSOR hCursorNormal;
 
 	CString strLeague;
+	int leagueID = 0;
 	CString strLeagueName;
 	CString strLeagueFile;
 	CString strLeagueDir;
 
-	strLeague = GetLeagues(TRUE);
+//	strLeague = GetLeagues(TRUE);
+	leagueID = GetLeagues(TRUE);
 
 	strLeagueName = strLeague.Left(30);
 	if (strncmp(strLeagueName,"All",3))
@@ -1816,80 +1860,80 @@ void CBaseballDoc::OnTeamsEditLeagueTeams()
 	CStringArray arrayFileNames;
 	CFile myInFile;
 	CString strLeague;
+	int leagueID = 0;
 	CString strLeagueName;
 	CString strLeagueFile;
 	CString strLeagueDir;
 
-	strLeague = GetLeagues(TRUE);
+//	strLeague = GetLeagues(TRUE);
+	leagueID = GetLeagues(TRUE);
 
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-	}
-	else
-	{
-		strLeagueDir = "data";
-	}
+	//strLeagueName = strLeague.Left(30);
+	//if (strncmp(strLeagueName,"All",3))
+	//{
+	//	strLeagueFile = strLeague.Right(12);
+	//	strLeagueDir = strLeagueFile.Left(8);
+	//}
+	//else
+	//{
+	//	strLeagueDir = "data";
+	//}
 
-	EditTeams(strLeagueDir);
+//	EditTeams(strLeagueDir);
+	EditTeams(leagueID);
 }
 
-void CBaseballDoc::EditTeams(CString strLeagueDir)
+void CBaseballDoc::EditTeams(int leagueID)
 {
 	EditTeam dlg;
-	CFile myFileBatter;
-	BYTE count;
-	CString strTeam;
-	CString strTeamFile;
+	int teamID = 0;
 	CString strTeamName;
 	CString strShortTeamName;
 	CString strBallPark;
-	CString filler10("          ");
-	CString strFileNameBatter;
-	char temp[41];
+	m_TeamRecord teamResult;
+	m_TeamRecord teamUpdate;
 
-	strTeam = GetTeams(strLeagueDir);
-	strTeamFile = strTeam.Right(12);
-	strTeamName = strTeam.Left(30);
+	teamID = GetTeams(leagueID);
+	teamResult = GetTeam(teamID);
 
-	// Process Batter file
-	strFileNameBatter = strLeagueDir+"\\TB"+strTeamFile.Right(10);
-	myFileBatter.Open(strFileNameBatter, CFile::modeReadWrite);
-	myFileBatter.Read(&count,sizeof(count));
-	myFileBatter.Read(temp,40);	// Team Name
-	temp[40] = NULL;
-	dlg.m_TeamName = temp;
-	myFileBatter.Read(temp,3);	// Short Team Name
-	temp[3] = NULL;
-	dlg.m_ShortTeamName = temp;
-	myFileBatter.Read(temp,30);	// Ballpark Name
-	temp[30] = NULL;
-	dlg.m_BallPark = temp;
+	strTeamName = teamResult.TeamName;
+
+	dlg.m_TeamName = teamResult.TeamName;
+	dlg.m_ShortTeamName = teamResult.TeamNameShort;
+	dlg.m_BallPark = teamResult.BallparkName;
 	if (dlg.DoModal() == IDOK)
 	{
-		// Update the Batter file with team name, Short name, and Ballpark
-		strTeamName = dlg.m_TeamName+filler10+filler10+filler10+filler10;
-		strShortTeamName = dlg.m_ShortTeamName;
-		strBallPark = dlg.m_BallPark;
-		// skip counter field and write data
-		myFileBatter.Seek((long)sizeof(count),CFile::begin);
-		myFileBatter.Write(strTeamName, 40);
-		myFileBatter.Write(strShortTeamName, 3);
-		myFileBatter.Write(strBallPark, 30);
+		// Update the Database with team name, Short name, and Ballpark
+		// That is all that is setup
+		// TeamUpdate(...);
+		teamUpdate.TeamID = teamResult.TeamID;
+		teamUpdate.TeamName = dlg.m_TeamName;
+		teamUpdate.TeamNameShort = dlg.m_ShortTeamName;
+		teamUpdate.BallparkName = dlg.m_BallPark;
+		teamUpdate.HomeWins = teamResult.HomeWins;
+		teamUpdate.HomeLosses = teamResult.HomeLosses;
+		teamUpdate.AwayWins = teamResult.AwayWins;
+		teamUpdate.AwayLosses = teamResult.AwayLosses;
+		teamUpdate.LeagueID = teamResult.LeagueID;
+		teamUpdate.ConferenceID = teamResult.ConferenceID;
+		teamUpdate.DivisionID = teamResult.DivisionID;
+		teamUpdate.TeamYear = teamResult.TeamYear;
+		teamUpdate.BaseTeam = teamResult.BaseTeam;
+
+		TeamUpdate(teamUpdate);
 	}
-	myFileBatter.Close();
 }
 
 void CBaseballDoc::OnStatisticsHTMLLeagueStats() 
 {
 	CString strLeague;
+	int leagueID = 0;
 	CString strLeagueName;
 	CString strLeagueFile;
 	CString strLeagueDir;
 
-	strLeague = GetLeagues(FALSE);
+//	strLeague = GetLeagues(FALSE);
+	leagueID = GetLeagues(FALSE);
 
 	strLeagueName = strLeague.Left(30);
 	if (strncmp(strLeagueName,"All",3))
@@ -3695,7 +3739,9 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 	CString strLeagueFile;
 	CString strLeagueDir;
 	CString strLeague;
+	int leagueID = 0;
 	CString strTeam;
+	int teamID = 0;
 	CString strTeamFile;
 	CString strTeamName;
 	PropertyPageBatters myBatters1;
@@ -3717,7 +3763,8 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 	myBattersSheet.AddPage(&myBatters3);
 	myBattersSheet.AddPage(&myBatters4);
 	// For testing force to a team name
-	strLeague = GetLeagues(TRUE);
+//	strLeague = GetLeagues(TRUE);
+	leagueID = GetLeagues(TRUE);
 
 	strLeagueName = strLeague.Left(30);
 	if (strncmp(strLeagueName,"All",3))
@@ -3729,7 +3776,8 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 	{
 		strLeagueDir = "data";
 	}
-	strTeam = GetTeams(strLeagueDir);
+//	strTeam = GetTeams(strLeagueDir);
+	teamID = GetTeams(leagueID);
 	strTeamFile = strTeam.Right(12);
 	strTeamName = strTeam.Left(30);
 	myBattersSheet.m_FileName = strLeagueDir+"\\"+strTeamFile;
@@ -3740,185 +3788,151 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 	myBattersSheet.DoModal();
 }
 
-// Parse the GetLeagues() subroutine as follows:
-//
-//	CString strLeague;
-//	CString strLeagueName;
-//	CString strLeagueFile;
-//	CString strLeagueDir;
-//
-//	strLeague = GetLeagues(TRUE);
-//
-//	strLeagueName = strLeague.Left(30);
-//	if (strncmp(strLeagueName,"All",3))
-//	{
-//		strLeagueFile = strLeague.Right(12);
-//		strLeagueDir = strLeagueFile.Left(8);
-//	}
-//	else
-//	{
-//		// This is the base directory
-//		strLeagueDir = "data";
-//	}
-//
-CString CBaseballDoc::GetLeagues(BOOL baseFlag)
+int CBaseballDoc::GetLeagues(BOOL baseFlag)
 {
-	CFileFind myFileFind;
-	CFile myInFile;
-	BOOL bWorking;
-	CStringArray arrayFileNames;
-	int sortflag;
-	int i;
 	DlgSelLeague dlgSelLeague;
+	int leagueID = 0;
 	CString strLeagueName;
-	CString strTemp;
-	BYTE version;
-	BYTE count;
-	char temp[41];
+	int numConf = 0;
+	int numDivision = 0;
+	int base = false;
+	char *sqlLeague;
+	int rc;
+	CHAR buffer[100];
 
-	bWorking = myFileFind.FindFile("data\\L*.dat",0);
-	if (bWorking)
+	/* Create SQL statement */
+	sqlLeague = "SELECT "  \
+		"LeagueID," \
+		"LeagueName," \
+		"NumberOfConferences," \
+		"NumberOfDivisions," \
+		"BaseLeague" \
+		" FROM LEAGUES ";
+//		" WHERE BaseLeague = ?1 " ;
+
+	rc = sqlite3_prepare_v2(m_db, sqlLeague, strlen(sqlLeague), &m_stmt, 0);
+	if (rc != SQLITE_OK)
 	{
-		while (bWorking)
-		{
-			bWorking = myFileFind.FindNextFile();
-			arrayFileNames.Add(myFileFind.GetFileName());
-		}
-		myFileFind.Close();
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for LEAGUES Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	//// Bind the data to field '1' which is the first '?' in the INSERT statement
+	//rc = sqlite3_bind_int(m_stmt, 1, baseFlag);
+	//if (rc != SQLITE_OK)
+	//{
+	//	sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+	//	AfxMessageBox(buffer);
+	//}
 
-		// Since the FindNextFile does not return the files in any order
-		// we must sort the file names
-		sortflag = 1;
-		while (sortflag)
-		{
-			sortflag = 0;
-			for (i=0; i<(arrayFileNames.GetSize()-1);i++)
-			{
-				if (arrayFileNames[i].Compare(arrayFileNames[i+1]) == 1)
-				{
-					strTemp = arrayFileNames[i];
-					arrayFileNames[i] = arrayFileNames[i+1];
-					arrayFileNames[i+1] = strTemp;
-					sortflag = 1;
-				}
-			}
-		}
-
-		for (i=0; i<arrayFileNames.GetSize(); i++)
-		{
-			myInFile.Open("data\\"+arrayFileNames[i],CFile::modeRead);
-			myInFile.Read(&version,sizeof(version));
-			myInFile.Read(&count,sizeof(count));
-			myInFile.Read(temp,30);
-			myInFile.Close();
-			temp[30] = NULL;
-			strLeagueName = temp;
-			strLeagueName = strLeagueName+"\t"+arrayFileNames[i];
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		//leagueID = sqlite3_column_int(m_stmt, 0);
+		strLeagueName = sqlite3_column_text(m_stmt, 1);
+		//numConf = sqlite3_column_int(m_stmt, 2);
+		//numDivision = sqlite3_column_int(m_stmt, 3);
+		//base = sqlite3_column_int(m_stmt, 4);
+		if (strLeagueName != "DEFAULT")
 			dlgSelLeague.m_arrayLeagues.Add(strLeagueName);
-		}
-		// If TRUE add in Base directory
-		if (baseFlag == TRUE)
-		{
-			//           123456789012345678901234567890
-			strcpy_s(temp,"All Base Teams                ");
-			temp[30] = NULL;
-			strLeagueName = temp;
-			strLeagueName = strLeagueName+"\t"+"data";
-			dlgSelLeague.m_arrayLeagues.Add(strLeagueName);
-		}
+	}
 
-		if (dlgSelLeague.DoModal() == IDOK)
-		{
-			strLeagueName = dlgSelLeague.m_arrayLeagues[0];
-		}
+	sqlite3_finalize(m_stmt);
+
+	if (dlgSelLeague.DoModal() == IDOK)
+	{
+		strLeagueName = dlgSelLeague.m_arrayLeagues[0];
 	}
 	else
 	{
 		// No Leagues found so display message
-		AfxMessageBox("Could not find any Leagues files. Please create a League");
-		return "";
+		AfxMessageBox(_T("Could not find any Leagues files. Please create a League"));
+		return 0;
 	}
-	return strLeagueName;
+	
+	leagueID = GetLeagueID(strLeagueName);
+
+	return leagueID;
 }
 
-//	Parse the team names as follows:
-//
-//	CString strTeam;
-//	CString strTeamFile;
-//	CString strTeamName;
-//
-//	strTeam = GetTeams(strLeagueDir);
-//	strTeamFile = strTeam.Right(12);
-//	strTeamName = strTeam.Left(30);
-//
-CString CBaseballDoc::GetTeams(CString strDir)
+int CBaseballDoc::GetTeams(int leagueID)
 {
 	dlgSelTeam dlgSelTeam;
-	BOOL bWorking;
-	BYTE count;
-	CFile myInFile;
-	CStringArray arrayFileNames;
-	int sortflag;
-	int i;
-	CString strTemp;
-	char temp[41];
+	int teamID = 0;
 	CString strTeamName;
-	CFileFind myFileFind;
+	int numConf = 0;
+	int numDivision = 0;
+	int base = false;
+	char *sqlTeam;
+	int rc;
+	CHAR buffer[100];
 
-	count = 0;
+	/* Create SQL statement */
+	sqlTeam = "SELECT "  \
+		"TeamID," \
+		"TeamName," \
+		"TeamNameShort," \
+		"BallparkName," \
+		"HomeWins," \
+		"HomeLosses," \
+		"AwayWins," \
+		"AwayLosses," \
+		"LeagueID," \
+		"ConferenceID," \
+		"DivisionID," \
+		"TeamYear," \
+		"BaseTeam" \
+		" FROM TEAM " \
+		" WHERE LeagueID = ?1 " ;
 
-	bWorking = myFileFind.FindFile(strDir+"\\TB*.dat",0);
-	if (bWorking)
+	rc = sqlite3_prepare_v2(m_db, sqlTeam, strlen(sqlTeam), &m_stmt, 0);
+	if (rc != SQLITE_OK)
 	{
-		while (bWorking)
-		{
-			bWorking = myFileFind.FindNextFile();
-			arrayFileNames.Add(myFileFind.GetFileName());
-		}
-		myFileFind.Close();
-
-		// Since the FindNextFile does not return the files in any order
-		// we must sort the file names
-		sortflag = 1;
-		while (sortflag)
-		{
-			sortflag = 0;
-			for (i=0; i<(arrayFileNames.GetSize()-1);i++)
-			{
-				if (arrayFileNames[i].Compare(arrayFileNames[i+1]) == 1)
-				{
-					strTemp = arrayFileNames[i];
-					arrayFileNames[i] = arrayFileNames[i+1];
-					arrayFileNames[i+1] = strTemp;
-					sortflag = 1;
-				}
-			}
-		}
-
-		for (i=0; i<arrayFileNames.GetSize(); i++)
-		{
-			myInFile.Open(strDir+"\\"+arrayFileNames[i],CFile::modeRead);
-			myInFile.Read(&count,sizeof(count));
-			myInFile.Read(temp,40);
-			myInFile.Close();
-			temp[40] = NULL;
-			strTeamName = temp;
-			strTeamName = strTeamName+"\t"+arrayFileNames[i];
-			dlgSelTeam.m_arrayTeams.Add(strTeamName);
-		}
-
-		if (dlgSelTeam.DoModal() == IDOK)
-		{
-			strTeamName = dlgSelTeam.m_arrayTeams[0];
-		}
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
 	}
 	else
 	{
-		// No teams found so display message
-		AfxMessageBox("Could not find any Team files. Please create a team");
-		return "";
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
 	}
-	return strTeamName;
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		//TeamID = sqlite3_column_int(m_stmt, 0);
+		strTeamName = sqlite3_column_text(m_stmt, 1);
+		//TeamNameShort = sqlite3_column_text(m_stmt, 2);
+		//BallparkName = sqlite3_column_text(m_stmt, 3);
+		//HomeWins = sqlite3_column_int(m_stmt, 4);
+		dlgSelTeam.m_arrayTeams.Add(strTeamName);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	if (dlgSelTeam.DoModal() == IDOK)
+	{
+		strTeamName = dlgSelTeam.m_arrayTeams[0];
+	}
+	else
+	{
+		// No Teams found so display message
+		AfxMessageBox(_T("Could not find any Teams files. Please create a Team"));
+		return 0;
+	}
+
+	teamID = GetTeamID(strTeamName, leagueID);
+
+	return teamID;
 }
 
 void CBaseballDoc::OnPlayersAddEditPitchers() 
@@ -3927,7 +3941,9 @@ void CBaseballDoc::OnPlayersAddEditPitchers()
 	CString strLeagueFile;
 	CString strLeagueDir;
 	CString strLeague;
+	int leagueID = 0;
 	CString strTeam;
+	int teamID = 0;
 	CString strTeamFile;
 	CString strTeamName;
 	PropertyPagePitchersInfo myPitchers1;
@@ -3946,7 +3962,8 @@ void CBaseballDoc::OnPlayersAddEditPitchers()
 	myPitchersSheet.AddPage(&myPitchers2);
 	myPitchersSheet.AddPage(&myPitchers3);
 	// For testing force to a team name
-	strLeague = GetLeagues(TRUE);
+//	strLeague = GetLeagues(TRUE);
+	leagueID = GetLeagues(TRUE);
 
 	strLeagueName = strLeague.Left(30);
 	if (strncmp(strLeagueName,"All",3))
@@ -3958,7 +3975,8 @@ void CBaseballDoc::OnPlayersAddEditPitchers()
 	{
 		strLeagueDir = "data";
 	}
-	strTeam = GetTeams(strLeagueDir);
+//	strTeam = GetTeams(strLeagueDir);
+	teamID = GetTeams(leagueID);
 	strTeamFile = "TP";
 	strTeamFile += strTeam.Right(10);
 	strTeamName = strTeam.Left(30);
@@ -3973,12 +3991,14 @@ void CBaseballDoc::OnPlayersAddEditPitchers()
 void CBaseballDoc::OnLeaguesLeagueOptionsHTML() 
 {
 	CString strLeague;
+	int leagueID = 0;
 	CString strLeagueName;
 	CString strLeagueFile;
 	CString strLeagueDir;
 
 	// Do not retrieve the Base directory
-	strLeague = GetLeagues(FALSE);
+//	strLeague = GetLeagues(FALSE);
+	leagueID = GetLeagues(FALSE);
 
 	strLeagueName = strLeague.Left(30);
 	strLeagueFile = strLeague.Right(12);
@@ -3995,4 +4015,468 @@ void CBaseballDoc::OnLeaguesLeagueOptionsHTML()
 	myLeagueOptions.AddPage(&myLeagueHTMLOptions);
 
 	myLeagueOptions.DoModal();
+}
+
+
+void CBaseballDoc::OnFileOpen()
+{
+	// TODO: Add your command handler code here
+	CFileDialog* myfiledlg;
+	INT_PTR nRet = -1;
+
+	LPCTSTR lpszFilter = _T("DataBase Files (*.db)|*.db|All Files (*.*)|*.*||");
+	myfiledlg = new CFileDialog(TRUE, _T("*.db"), _T("baseball.db"), NULL, lpszFilter, NULL);
+	myfiledlg->m_ofn.lpstrTitle = _T("Load DataBase File");
+	nRet = myfiledlg->DoModal();
+
+	// Handle the return value from DoModal 
+	switch (nRet)
+	{
+	case -1:
+		AfxMessageBox(_T("Dialog box could not be created!"));
+		break;
+	case IDABORT:
+		// Do something 
+		break;
+	case IDOK:
+		// Do something 
+		m_DBFileName = myfiledlg->GetPathName();
+		OpenDatabase();
+		//AfxMessageBox(_T("OK pressed!"));
+		break;
+	case IDCANCEL:
+		// Do something 
+		AfxMessageBox(_T("Cancel pressed!"));
+		break;
+	default:
+		// Do something 
+		break;
+	};
+}
+
+
+int CBaseballDoc::OpenDatabase()
+{
+	CStringA ansiString(m_DBFileName);
+	CHAR buffer[100];
+
+	if (m_dbOpen = SQLITE_OK)
+	{
+		sqlite3_close(m_db);
+		m_dbOpen = 99;
+	}
+
+	m_dbOpen = sqlite3_open(ansiString, &m_db);
+	if (m_dbOpen)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Can't open database: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Database opened: %s\n", ansiString);
+		AfxMessageBox(buffer);
+
+		// Display version of Database
+		//DBVersion();
+
+		// Enable Foregin Keyss support in sqlite
+		DBSetForeginKeys(true);
+	}
+
+	return 0;
+}
+
+
+int CBaseballDoc::DBSetForeginKeys(bool OnOff)
+{
+	CHAR buffer[100];
+	int rc = 0;
+
+	// Display that initial setting for foregin keys is off or "0"
+	rc = sqlite3_prepare_v2(m_db, "PRAGMA foreign_keys", -1, &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "PRAGMA foreign_keys 1 Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc == SQLITE_ROW)
+	{
+		sprintf_s(buffer, sizeof(buffer), "%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		//AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	if (OnOff)
+	{
+	// Turn on foreign key support
+		rc = sqlite3_prepare_v2(m_db, "PRAGMA foreign_keys = ON", -1, &m_stmt, 0);
+	}
+	else
+	{
+		rc = sqlite3_prepare_v2(m_db, "PRAGMA foreign_keys = OFF", -1, &m_stmt, 0);
+	}
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "PRAGMA foreign_keys 2 Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc == SQLITE_ROW)
+	{
+		sprintf_s(buffer, sizeof(buffer), "%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		//AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	// Display that the setting for foregin keys is now on or "1"
+	rc = sqlite3_prepare_v2(m_db, "PRAGMA foreign_keys", -1, &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "PRAGMA foreign_keys 3 Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc == SQLITE_ROW)
+	{
+		sprintf_s(buffer, sizeof(buffer), "%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		//AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+	return 0;
+}
+
+
+int CBaseballDoc::DBVersion()
+{
+	CHAR buffer[100];
+	int rc;
+
+	rc = sqlite3_prepare_v2(m_db, "SELECT SQLITE_VERSION()", -1, &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		//fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		sprintf_s(buffer, sizeof(buffer), "SELECT SQLITE_VERSION Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc == SQLITE_ROW)
+	{
+		//printf("%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		sprintf_s(buffer, sizeof(buffer), "%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return 0;
+}
+
+
+int CBaseballDoc::GetLeagueID(CStringA strLeagueName)
+{
+	int rc;
+	CHAR buffer[100];
+	char *sqlSelect;
+	int myLeagueID = 0;
+
+	// Select the LeagueId
+	sqlSelect = "SELECT LeagueId from LEAGUES WHERE LeagueName = ?1";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "SELECT LeagueId Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the SELECT statement
+	rc = sqlite3_bind_text(m_stmt, 1, strLeagueName, strlen(strLeagueName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueName: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc == SQLITE_ROW)
+	{
+		sprintf_s(buffer, sizeof(buffer), "%s  %i\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_int(m_stmt, 0));
+		//AfxMessageBox(buffer);
+		myLeagueID = sqlite3_column_int(m_stmt, 0);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "LeagueID Select returned nothing: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+	return myLeagueID;
+}
+
+
+int CBaseballDoc::GetTeamID(CStringA strTeamName, int LeagueID)
+{
+	int myTeamId = 0;
+	int rc;
+	CHAR buffer[100];
+	char *sqlSelect;
+
+	sqlSelect = "SELECT TeamId from TEAM WHERE TeamName = ?1 and LeagueID = ?2";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch SELECT TeamId data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	// Bind the data to field '1' which is the first '?' in the SELECT statement
+	rc = sqlite3_bind_text(m_stmt, 1, strTeamName, strlen(strTeamName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind teamname: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc == SQLITE_ROW)
+	{
+		sprintf_s(buffer, sizeof(buffer), "%s  %i\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_int(m_stmt, 0));
+		//AfxMessageBox(buffer);
+		myTeamId = sqlite3_column_int(m_stmt, 0);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Select TeamID returned nothing: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	return myTeamId;
+}
+
+
+CBaseballDoc::m_TeamRecord CBaseballDoc::GetTeam(int TeamID)
+{
+	char *sqlTeam;
+	int rc;
+	CHAR buffer[100];
+	m_TeamRecord teamResult;
+
+	/* Create SQL statement */
+	sqlTeam = "SELECT "  \
+		"TeamID," \
+		"TeamName," \
+		"TeamNameShort," \
+		"BallparkName," \
+		"HomeWins," \
+		"HomeLosses," \
+		"AwayWins," \
+		"AwayLosses," \
+		"LeagueID," \
+		"ConferenceID," \
+		"DivisionID," \
+		"TeamYear," \
+		"BaseTeam," \
+		"CreateTime," \
+		"LastUpdateTime" \
+		" FROM TEAM " \
+		" WHERE TeamID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlTeam, strlen(sqlTeam), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, TeamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		teamResult.TeamID = sqlite3_column_int(m_stmt, 0);
+		teamResult.TeamName = sqlite3_column_text(m_stmt, 1);
+		teamResult.TeamNameShort = sqlite3_column_text(m_stmt, 2);
+		teamResult.BallparkName = sqlite3_column_text(m_stmt, 3);
+		teamResult.HomeWins = sqlite3_column_int(m_stmt, 4);
+		teamResult.HomeLosses = sqlite3_column_int(m_stmt, 5);
+		teamResult.AwayWins = sqlite3_column_int(m_stmt, 6);
+		teamResult.AwayLosses = sqlite3_column_int(m_stmt, 7);
+		teamResult.LeagueID = sqlite3_column_int(m_stmt, 8);
+		teamResult.ConferenceID = sqlite3_column_int(m_stmt, 9);
+		teamResult.DivisionID = sqlite3_column_int(m_stmt, 10);
+		teamResult.TeamYear = sqlite3_column_int(m_stmt, 11);
+		teamResult.BaseTeam = sqlite3_column_int(m_stmt, 12);
+		teamResult.CreateTime = sqlite3_column_text(m_stmt, 13);
+		teamResult.LastUpdateTime = sqlite3_column_text(m_stmt, 14);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return teamResult;
+}
+
+
+int CBaseballDoc::TeamUpdate(m_TeamRecord TeamRecord)
+{
+	char *sqlTeam;
+	int rc;
+	CHAR buffer[100];
+	//m_TeamRecord teamResult;
+
+	/* Create SQL statement */
+	sqlTeam = "UPDATE TEAM "  \
+		"SET " \
+		"TeamName = ?1," \
+		"TeamNameShort = ?2," \
+		"BallparkName = ?3," \
+		"HomeWins = ?4," \
+		"HomeLosses = ?5," \
+		"AwayWins = ?6," \
+		"AwayLosses = ?7," \
+		"LeagueID = ?8," \
+		"ConferenceID = ?9," \
+		"DivisionID = ?10," \
+		"TeamYear = ?11," \
+		"BaseTeam = ?12," \
+		"LastUpdateTime = datetime('NOW','localtime')" \
+		" WHERE TeamID = ?13 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlTeam, strlen(sqlTeam), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, TeamRecord.TeamName, strlen(TeamRecord.TeamName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 2, TeamRecord.TeamNameShort, strlen(TeamRecord.TeamNameShort), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamNameShort int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 3, TeamRecord.BallparkName, strlen(TeamRecord.BallparkName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BallparkName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 4, TeamRecord.HomeWins);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind HomeWins int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 5, TeamRecord.HomeLosses);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind HomeLosses int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 6, TeamRecord.AwayWins);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind AwayWins int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 7, TeamRecord.AwayLosses);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind AwayLosses int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 8, TeamRecord.LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 9, TeamRecord.ConferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ConferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 10, TeamRecord.DivisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind DivisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 11, TeamRecord.TeamYear);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamYear int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 12, TeamRecord.BaseTeam);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BaseTeam int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 13, TeamRecord.TeamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to Update Team item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return 0;
 }

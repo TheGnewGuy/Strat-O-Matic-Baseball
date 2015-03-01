@@ -35,14 +35,16 @@ public:
 
 // Implementation
 public:
-	CString GetTeams(CString strDir);
-	CString GetLeagues(BOOL baseFlag);
+//	CString GetTeams(CString strDir);
+	int GetTeams(int leagueID);
+	int GetLeagues(BOOL baseFlag);
 	PropertySheetBatters* m_pPropertySheetBatters;
 	PropertySheetPitchers* m_pPropertySheetPitchers;
 	int m_StatCount;
 	void BuildPlayerArray(CStringArray* arrayFileNames, CString strLeagueName, CString strDivisionName, CString strConferenceName, int iDiv);
 	void HTMLLeagueStats(CString strLeagueName);
-	void EditTeams(CString strDir);
+//	void EditTeams(CString strDir);
+	void EditTeams(int leagueID);
 	void ExportHTML(CString strDir);
 	void ExportHTMLFile(CString strDir, CString strTeamName);
 	BOOL GetNormalView();
@@ -99,6 +101,32 @@ public:
 	int m_dbOpen;
 	sqlite3 *m_db;
 	sqlite3_stmt *m_stmt;
+	afx_msg void OnFileOpen();
+	int OpenDatabase();
+	int DBSetForeginKeys(bool OnOff);
+	int DBVersion();
+	afx_msg void OnLeaguesEditLeague();
+	int GetLeagueID(CStringA strLeagueName);
+	int GetTeamID(CStringA strTeamName, int LeagueID);
+	struct m_TeamRecord{
+		int TeamID;
+		CStringA TeamName;
+		CStringA TeamNameShort;
+		CStringA BallparkName;
+		int HomeWins;
+		int HomeLosses;
+		int AwayWins;
+		int AwayLosses;
+		int LeagueID;
+		int ConferenceID;
+		int DivisionID;
+		int TeamYear;
+		int BaseTeam;
+		CStringA CreateTime;
+		CStringA LastUpdateTime;
+	};
+	m_TeamRecord GetTeam(int TeamID);
+	int TeamUpdate(m_TeamRecord TeamRecord);
 };
 
 /////////////////////////////////////////////////////////////////////////////

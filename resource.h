@@ -1,8 +1,9 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by Baseball.rc
 //
 #define IDD_ABOUTBOX                    100
+#define IDD_DLGEDITLEAGUE               103
 #define IDR_MAINFRAME                   128
 #define IDR_BASEBATYPE                  129
 #define IDB_UpArrowPressed              130
@@ -248,6 +249,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        167
 #define _APS_NEXT_COMMAND_VALUE         32808
 #define _APS_NEXT_CONTROL_VALUE         1170
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

@@ -144,6 +144,7 @@
     <ClCompile Include="dialogs.cpp" />
     <ClCompile Include="DlgAddDivision.cpp" />
     <ClCompile Include="DlgAddTeams.cpp" />
+    <ClCompile Include="DlgEditLeague.cpp" />
     <ClCompile Include="FileStruct.cpp" />
     <ClCompile Include="FormA.cpp" />
     <ClCompile Include="FormB.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="dialogs.h" />
     <ClInclude Include="DlgAddDivision.h" />
     <ClInclude Include="DlgAddTeams.h" />
+    <ClInclude Include="DlgEditLeague.h" />
     <ClInclude Include="FileStruct.h" />
     <ClInclude Include="FormA.h" />
     <ClInclude Include="FormB.h" />
