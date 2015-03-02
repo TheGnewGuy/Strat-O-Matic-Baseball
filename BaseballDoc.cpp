@@ -4280,7 +4280,6 @@ int CBaseballDoc::GetTeamID(CStringA strTeamName, int LeagueID)
 	return myTeamId;
 }
 
-
 CBaseballDoc::m_TeamRecord CBaseballDoc::GetTeam(int TeamID)
 {
 	char *sqlTeam;
@@ -4349,6 +4348,516 @@ CBaseballDoc::m_TeamRecord CBaseballDoc::GetTeam(int TeamID)
 	sqlite3_finalize(m_stmt);
 
 	return teamResult;
+}
+
+CBaseballDoc::m_LeagueRecord CBaseballDoc::GetLeague(int LeagueID)
+{
+	m_LeagueRecord leagueResult;
+	char *sqlLeague;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlLeague = "SELECT "  \
+		"LeagueID," \
+		"LeagueName," \
+		"NumberOfConferences," \
+		"NumberOfDivisions," \
+		"BaseLeague," \
+		"CreateTime," \
+		"LastUpdateTime" \
+		" FROM LEAGUES " \
+		" WHERE LeagueID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlLeague, strlen(sqlLeague), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for LEAGUES Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		leagueResult.LeagueID = sqlite3_column_int(m_stmt, 0);
+		leagueResult.LeagueName = sqlite3_column_text(m_stmt, 1);
+		leagueResult.NumberOfConferences = sqlite3_column_int(m_stmt, 2);
+		leagueResult.NumberOfDivisions = sqlite3_column_int(m_stmt, 3);
+		leagueResult.BaseLeague = sqlite3_column_int(m_stmt, 4);
+		leagueResult.CreateTime = sqlite3_column_text(m_stmt, 5);
+		leagueResult.LastUpdateTime = sqlite3_column_text(m_stmt, 6);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return leagueResult;
+}
+
+CBaseballDoc::m_ConferenceRecord CBaseballDoc::GetConference(int ConferenceID)
+{
+	m_ConferenceRecord conferenceResult;
+	char *sqlConference;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlConference = "SELECT "  \
+		"ConferenceID," \
+		"ConferenceName," \
+		"LeagueID," \
+		"BaseConference," \
+		"CreateTime," \
+		"LastUpdateTime" \
+		" FROM CONFERENCES " \
+		" WHERE ConferenceID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlConference, strlen(sqlConference), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for CONFERENCES Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, ConferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ConferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		conferenceResult.ConferenceID = sqlite3_column_int(m_stmt, 0);
+		conferenceResult.ConferenceName = sqlite3_column_text(m_stmt, 1);
+		conferenceResult.LeagueID = sqlite3_column_int(m_stmt, 2);
+		conferenceResult.BaseConference = sqlite3_column_int(m_stmt, 3);
+		conferenceResult.CreateTime = sqlite3_column_text(m_stmt, 4);
+		conferenceResult.LastUpdateTime = sqlite3_column_text(m_stmt, 5);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return conferenceResult;
+}
+
+CBaseballDoc::m_DivisionRecord CBaseballDoc::GetDivision(int DivisionID)
+{
+	m_DivisionRecord divisionResult;
+	char *sqlDivision;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlDivision = "SELECT "  \
+		"DivisionID," \
+		"DivisionName," \
+		"LeagueID," \
+		"ConferenceID," \
+		"BaseDivisions," \
+		"CreateTime," \
+		"LastUpdateTime" \
+		" FROM DIVISIONS " \
+		" WHERE DivisionID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlDivision, strlen(sqlDivision), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for DIVISIONS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, DivisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind DivisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		divisionResult.DivisionID = sqlite3_column_int(m_stmt, 0);
+		divisionResult.DivisionName = sqlite3_column_text(m_stmt, 1);
+		divisionResult.LeagueID = sqlite3_column_int(m_stmt, 2);
+		divisionResult.ConferenceID = sqlite3_column_int(m_stmt, 3);
+		divisionResult.BaseDivisions = sqlite3_column_int(m_stmt, 4);
+		divisionResult.CreateTime = sqlite3_column_text(m_stmt, 5);
+		divisionResult.LastUpdateTime = sqlite3_column_text(m_stmt, 6);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return divisionResult;
+}
+
+CBaseballDoc::m_BatterRecord CBaseballDoc::GetBatter(int BatterID)
+{
+	m_BatterRecord batterResult;
+	char *sqlBatter;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlBatter = "SELECT "  \
+		"BatterID," \
+		"DivisionName," \
+		"LeagueID," \
+		"ConferenceID," \
+		"BaseDivisions," \
+		"CreateTime," \
+		"LastUpdateTime" \
+		" FROM BATTER " \
+		" WHERE BatterID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlBatter, strlen(sqlBatter), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTER Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, BatterID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BatterID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		batterResult.BatterID = sqlite3_column_int(m_stmt, 0);
+		batterResult.FirstName = sqlite3_column_text(m_stmt, 1);
+		batterResult.LastName = sqlite3_column_text(m_stmt, 2);
+		batterResult.Pitcher = sqlite3_column_int(m_stmt, 3);
+		batterResult.Catcher = sqlite3_column_int(m_stmt, 4);
+		batterResult.FirstBase = sqlite3_column_int(m_stmt, 5);
+		batterResult.SecondBase = sqlite3_column_int(m_stmt, 6);
+		batterResult.ShortStop = sqlite3_column_int(m_stmt, 7);
+		batterResult.ThirdBase = sqlite3_column_int(m_stmt, 8);
+		batterResult.LeftField = sqlite3_column_int(m_stmt, 9);
+		batterResult.CenterField = sqlite3_column_int(m_stmt, 10);
+		batterResult.RightField = sqlite3_column_int(m_stmt, 11);
+		batterResult.Bunting = sqlite3_column_int(m_stmt, 12);
+		batterResult.HitRun = sqlite3_column_int(m_stmt, 13);
+		batterResult.Running = sqlite3_column_int(m_stmt, 14);
+		batterResult.Stealing = sqlite3_column_int(m_stmt, 15);
+		batterResult.CatchArm = sqlite3_column_int(m_stmt, 16);
+		batterResult.OutArm = sqlite3_column_int(m_stmt, 17);
+		batterResult.PowerRight = sqlite3_column_int(m_stmt, 18);
+		batterResult.PowerLeft = sqlite3_column_int(m_stmt, 19);
+		batterResult.Pass = sqlite3_column_int(m_stmt, 20);
+		batterResult.TRate = sqlite3_column_int(m_stmt, 21);
+		batterResult.ER1 = sqlite3_column_int(m_stmt, 22);
+		batterResult.ER2 = sqlite3_column_int(m_stmt, 23);
+		batterResult.ER3 = sqlite3_column_int(m_stmt, 24);
+		batterResult.ER4 = sqlite3_column_int(m_stmt, 25);
+		batterResult.ER5 = sqlite3_column_int(m_stmt, 26);
+		batterResult.ER6 = sqlite3_column_int(m_stmt, 27);
+		batterResult.ER7 = sqlite3_column_int(m_stmt, 28);
+		batterResult.ER8 = sqlite3_column_int(m_stmt, 29);
+		batterResult.ER9 = sqlite3_column_int(m_stmt, 30);
+		batterResult.BatterHits = sqlite3_column_int(m_stmt, 31);
+		batterResult.TeamID = sqlite3_column_int(m_stmt, 32);
+		batterResult.OBChanceHomeRun = sqlite3_column_double(m_stmt, 33);
+		batterResult.OBChanceTriple = sqlite3_column_double(m_stmt, 34);
+		batterResult.OBChanceDouble = sqlite3_column_double(m_stmt, 35);
+		batterResult.OBChanceSingle = sqlite3_column_double(m_stmt, 36);
+		batterResult.OBChanceWalk = sqlite3_column_double(m_stmt, 37);
+		batterResult.ChanceDoublePlay = sqlite3_column_double(m_stmt, 38);
+		batterResult.OBChanceHomeRunRight = sqlite3_column_double(m_stmt, 39);
+		batterResult.OBChanceTripleRight = sqlite3_column_double(m_stmt, 40);
+		batterResult.OBChanceDoubleRight = sqlite3_column_double(m_stmt, 41);
+		batterResult.OBChanceSingleRight = sqlite3_column_double(m_stmt, 42);
+		batterResult.OBChanceWalkRight = sqlite3_column_double(m_stmt, 43);
+		batterResult.ChanceDoublePlayRight = sqlite3_column_double(m_stmt, 44);
+		batterResult.OBChanceHomeRunLeft = sqlite3_column_double(m_stmt, 45);
+		batterResult.OBChanceTripleLeft = sqlite3_column_double(m_stmt, 46);
+		batterResult.OBChanceDoubleLeft = sqlite3_column_double(m_stmt, 47);
+		batterResult.OBChanceSingleLeft = sqlite3_column_double(m_stmt, 48);
+		batterResult.OBChanceWalkLeft = sqlite3_column_double(m_stmt, 49);
+		batterResult.ChanceDoublePlayLeft = sqlite3_column_double(m_stmt, 50);
+		batterResult.OBChanceBasic = sqlite3_column_double(m_stmt, 51);
+		batterResult.OBChanceLeft = sqlite3_column_double(m_stmt, 52);
+		batterResult.OBChanceRight = sqlite3_column_double(m_stmt, 53);
+		batterResult.CreateTime = sqlite3_column_text(m_stmt, 54);
+		batterResult.LastUpdateTime = sqlite3_column_text(m_stmt, 55);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return batterResult;
+}
+
+CBaseballDoc::m_BatterStatsRecord CBaseballDoc::GetBatterStats(int BatterStatsID)
+{
+	m_BatterStatsRecord batterstatsResult;
+	char *sqlBatterStats;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlBatterStats = "SELECT "  \
+		"BatterStatsID," \
+		"AB," \
+		"Runs," \
+		"Hits," \
+		"RBI," \
+		"Doubles," \
+		"Triples," \
+		"HomeRuns," \
+		"Walk," \
+		"Stirkeout," \
+		"ReachedOnError," \
+		"Sacrifice," \
+		"StolenBase," \
+		"CS," \
+		"Games," \
+		"HBP," \
+		"AVG," \
+		"SLG," \
+		"OBP," \
+		"BatterID," \
+		"TeamID," \
+		"CreateTime," \
+		"LastUpdateTime" \
+		" FROM BATTERSTATS " \
+		" WHERE BatterStatsID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlBatterStats, strlen(sqlBatterStats), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, BatterStatsID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind BatterStatsID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		batterstatsResult.BatterStatsID = sqlite3_column_int(m_stmt, 0);
+		batterstatsResult.AB = sqlite3_column_int(m_stmt, 1);
+		batterstatsResult.Runs = sqlite3_column_int(m_stmt, 2);
+		batterstatsResult.Hits = sqlite3_column_int(m_stmt, 3);
+		batterstatsResult.RBI = sqlite3_column_int(m_stmt, 4);
+		batterstatsResult.Doubles = sqlite3_column_int(m_stmt, 5);
+		batterstatsResult.Triples = sqlite3_column_int(m_stmt, 6);
+		batterstatsResult.HomeRuns = sqlite3_column_int(m_stmt, 7);
+		batterstatsResult.Walk = sqlite3_column_int(m_stmt, 8);
+		batterstatsResult.Stirkeout = sqlite3_column_int(m_stmt, 9);
+		batterstatsResult.ReachedOnError = sqlite3_column_int(m_stmt, 10);
+		batterstatsResult.Sacrifice = sqlite3_column_int(m_stmt, 11);
+		batterstatsResult.StolenBase = sqlite3_column_int(m_stmt, 12);
+		batterstatsResult.CS = sqlite3_column_int(m_stmt, 13);
+		batterstatsResult.Games = sqlite3_column_int(m_stmt, 14);
+		batterstatsResult.HBP = sqlite3_column_int(m_stmt, 15);
+		batterstatsResult.AVG = sqlite3_column_double(m_stmt, 16);
+		batterstatsResult.SLG = sqlite3_column_double(m_stmt, 17);
+		batterstatsResult.OBP = sqlite3_column_double(m_stmt, 18);
+		batterstatsResult.BatterID = sqlite3_column_int(m_stmt, 19);
+		batterstatsResult.TeamID = sqlite3_column_int(m_stmt, 20);
+		batterstatsResult.CreateTime = sqlite3_column_text(m_stmt, 21);
+		batterstatsResult.LastUpdateTime = sqlite3_column_text(m_stmt, 22);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return batterstatsResult;
+}
+
+CBaseballDoc::m_PitcherRecord CBaseballDoc::GetPitcher(int PitcherID)
+{
+	m_PitcherRecord pitcherResult;
+	char *sqlPitcher;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlPitcher = "SELECT "  \
+		"BatterID," \
+		"DivisionName," \
+		"LeagueID," \
+		"ConferenceID," \
+		"BaseDivisions," \
+		"CreateTime," \
+		"LastUpdateTime" \
+		" FROM PITCHER " \
+		" WHERE PitcherID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlPitcher, strlen(sqlPitcher), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHER Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, PitcherID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind PitcherID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		pitcherResult.PitcherID = sqlite3_column_int(m_stmt, 0);
+		pitcherResult.FirstName = sqlite3_column_text(m_stmt, 1);
+		pitcherResult.LastName = sqlite3_column_text(m_stmt, 2);
+		pitcherResult.OBChanceHomeRun = sqlite3_column_double(m_stmt, 3);
+		pitcherResult.OBChanceTriple = sqlite3_column_double(m_stmt, 4);
+		pitcherResult.OBChanceDouble = sqlite3_column_double(m_stmt, 5);
+		pitcherResult.OBChanceSingle = sqlite3_column_double(m_stmt, 6);
+		pitcherResult.OBChanceWalk = sqlite3_column_double(m_stmt, 7);
+		pitcherResult.ChanceDoublePlay = sqlite3_column_double(m_stmt, 8);
+		pitcherResult.OBChanceHomeRunRight = sqlite3_column_double(m_stmt, 9);
+		pitcherResult.OBChanceTripleRight = sqlite3_column_double(m_stmt, 10);
+		pitcherResult.OBChanceDoubleRight = sqlite3_column_double(m_stmt, 11);
+		pitcherResult.OBChanceSingleRight = sqlite3_column_double(m_stmt, 12);
+		pitcherResult.OBChanceWalkRight = sqlite3_column_double(m_stmt, 13);
+		pitcherResult.ChanceDoublePlayRight = sqlite3_column_double(m_stmt, 14);
+		pitcherResult.OBChanceHomeRunLeft = sqlite3_column_double(m_stmt, 15);
+		pitcherResult.OBChanceTripleLeft = sqlite3_column_double(m_stmt, 16);
+		pitcherResult.OBChanceDoubleLeft = sqlite3_column_double(m_stmt, 17);
+		pitcherResult.OBChanceSingleLeft = sqlite3_column_double(m_stmt, 18);
+		pitcherResult.OBChanceWalkLeft = sqlite3_column_double(m_stmt, 19);
+		pitcherResult.ChanceDoublePlayLeft = sqlite3_column_double(m_stmt, 20);
+		pitcherResult.OBChanceBasic = sqlite3_column_double(m_stmt, 21);
+		pitcherResult.OBChanceLeft = sqlite3_column_double(m_stmt, 22);
+		pitcherResult.OBChanceRight = sqlite3_column_double(m_stmt, 23);
+		pitcherResult.Starter = sqlite3_column_int(m_stmt, 24);
+		pitcherResult.Relief = sqlite3_column_int(m_stmt, 25);
+		pitcherResult.Throws = sqlite3_column_int(m_stmt, 26);
+		pitcherResult.Bunting = sqlite3_column_int(m_stmt, 27);
+		pitcherResult.Hold = sqlite3_column_int(m_stmt, 28);
+		pitcherResult.WP = sqlite3_column_int(m_stmt, 29);
+		pitcherResult.Balk = sqlite3_column_int(m_stmt, 30);
+		pitcherResult.Pitcher = sqlite3_column_int(m_stmt, 31);
+		pitcherResult.ER1 = sqlite3_column_int(m_stmt, 32);
+		pitcherResult.TeamID = sqlite3_column_int(m_stmt, 33);
+		pitcherResult.CreateTime = sqlite3_column_text(m_stmt, 34);
+		pitcherResult.LastUpdateTime = sqlite3_column_text(m_stmt, 35);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return pitcherResult;
+}
+
+CBaseballDoc::m_PitcherStatsRecord CBaseballDoc::GetPitcherStats(int PitcherStatsID)
+{
+	m_PitcherStatsRecord pitcherstatsResult;
+	char *sqlPitcherStats;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlPitcherStats = "SELECT "  \
+		"PitcherStatsID," \
+		"Wins," \
+		"Loss," \
+		"Saves," \
+		"InningsPitched," \
+		"ER," \
+		"Hits," \
+		"Walks," \
+		"Strikeouts," \
+		"HomeRuns," \
+		"Games," \
+		"CompleteGames," \
+		"Starts," \
+		"ERA," \
+		"WHIP," \
+		"PitcherID," \
+		"TeamID," \
+		"CreateTime," \
+		"LastUpdateTime" \
+		" FROM PITCHERSTATS " \
+		" WHERE PitcherStatsID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlPitcherStats, strlen(sqlPitcherStats), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, PitcherStatsID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind PitcherStatsID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		pitcherstatsResult.PitcherStatsID = sqlite3_column_int(m_stmt, 0);
+		pitcherstatsResult.Wins = sqlite3_column_int(m_stmt, 1);
+		pitcherstatsResult.Loss = sqlite3_column_int(m_stmt, 2);
+		pitcherstatsResult.Saves = sqlite3_column_int(m_stmt, 3);
+		pitcherstatsResult.InningsPitched = sqlite3_column_double(m_stmt, 4);
+		pitcherstatsResult.ER = sqlite3_column_int(m_stmt, 5);
+		pitcherstatsResult.Hits = sqlite3_column_int(m_stmt, 6);
+		pitcherstatsResult.Walks = sqlite3_column_int(m_stmt, 7);
+		pitcherstatsResult.Strikeouts = sqlite3_column_int(m_stmt, 8);
+		pitcherstatsResult.HomeRuns = sqlite3_column_int(m_stmt, 9);
+		pitcherstatsResult.Games = sqlite3_column_int(m_stmt, 10);
+		pitcherstatsResult.CompleteGames = sqlite3_column_int(m_stmt, 11);
+		pitcherstatsResult.Starts = sqlite3_column_int(m_stmt, 12);
+		pitcherstatsResult.ERA = sqlite3_column_double(m_stmt, 13);
+		pitcherstatsResult.WHIP = sqlite3_column_double(m_stmt, 14);
+		pitcherstatsResult.PitcherID = sqlite3_column_int(m_stmt, 15);
+		pitcherstatsResult.TeamID = sqlite3_column_int(m_stmt, 16);
+		pitcherstatsResult.CreateTime = sqlite3_column_text(m_stmt, 17);
+		pitcherstatsResult.LastUpdateTime = sqlite3_column_text(m_stmt, 18);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return pitcherstatsResult;
 }
 
 int CBaseballDoc::TeamUpdate(m_TeamRecord TeamRecord)
