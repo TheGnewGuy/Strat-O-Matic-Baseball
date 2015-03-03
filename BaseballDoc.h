@@ -304,7 +304,7 @@ public:
 	int TeamUpdate(m_TeamRecord TeamRecord);
 	int LeagueUpdate(m_LeagueRecord LeagueRecord);
 	int ConfUpdate(m_ConferenceRecord ConferenceRecord);
-	int DivisionUpdate(m_DivisionRecord DIvisionRecord);
+	int DivisionUpdate(m_DivisionRecord DivisionRecord);
 	int BatterUpdate(m_BatterRecord BatterRecord);
 	int BatterStatsUpdate(m_BatterStatsRecord BatterStatsRecord);
 	int PitcherUpdate(m_PitcherRecord PitcherRecord);

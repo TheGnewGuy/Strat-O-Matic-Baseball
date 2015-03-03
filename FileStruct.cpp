@@ -4,6 +4,9 @@
 #include "stdafx.h"
 #include "Baseball.h"
 #include "FileStruct.h"
+#include "sqlite3.h"
+#include "BaseballDoc.h"
+#include "BaseballView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -114,6 +117,15 @@ BatterStruct::BatterStruct()
 	m_OBChanceBasic.Empty();
 	m_OBChanceLeft.Empty();
 	m_OBChanceRight.Empty();
+
+	// Get pointer to Doc
+	CMDIFrameWnd *pFrame = (CMDIFrameWnd*)AfxGetApp()->m_pMainWnd;
+	// Get the active MDI child window.
+	CMDIChildWnd *pChild = (CMDIChildWnd *)pFrame->GetActiveFrame();
+	// or CMDIChildWnd *pChild = pFrame->MDIGetActive();
+	// Get the active view attached to the active MDI child window.
+	CBaseballView *pView = (CBaseballView *)pChild->GetActiveView();
+	m_pDocVoid = pView->GetDocument();
 }
 
 BatterStruct::~BatterStruct()
@@ -384,15 +396,62 @@ int BatterStruct::BatterRead(CFile * myFile)
 	return 1;
 }
 
-BYTE BatterStruct::GetCountBatter(CString BatterFileName)
+//BYTE BatterStruct::GetCountBatter(CString BatterFileName)
+//{
+//	BYTE count;
+//	CFile myFile;
+//	myFile.Open( BatterFileName,CFile::modeRead);
+//	// Read Count
+//	myFile.Read(&count,sizeof(count));
+//	// Close file
+//	myFile.Close();
+//	return count;
+//}
+
+// The count of batters will come from the batterstats table since
+// there will be a stat record for each batter in a team.
+int BatterStruct::GetCountBatter(int TeamID)
 {
-	BYTE count;
-	CFile myFile;
-	myFile.Open( BatterFileName,CFile::modeRead);
-	// Read Count
-	myFile.Read(&count,sizeof(count));
-	// Close file
-	myFile.Close();
+	int count;
+	CString strCount;
+	char *sqlBatterStats;
+	int rc;
+	CHAR buffer[100];
+	CBaseballDoc* pDoc = (CBaseballDoc*)m_pDocVoid;
+
+	/* Create SQL statement */
+	sqlBatterStats = "SELECT "  \
+		"count(*)" \
+		" FROM BATTERSTATS " \
+		" WHERE TeamID = ?1 ";
+
+	rc = sqlite3_prepare_v2(pDoc->m_db, sqlBatterStats, strlen(sqlBatterStats), &pDoc->m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(pDoc->m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTER Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(pDoc->m_stmt, 1, TeamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(pDoc->m_db));
+		AfxMessageBox(buffer);
+	}
+
+	if (sqlite3_step(pDoc->m_stmt) == SQLITE_ROW)
+	{
+		count = sqlite3_column_int(pDoc->m_stmt, 0);
+		//strCount = sqlite3_column_text(pDoc->m_stmt, 0);
+	}
+
+	sqlite3_finalize(pDoc->m_stmt);
+
 	return count;
 }
 

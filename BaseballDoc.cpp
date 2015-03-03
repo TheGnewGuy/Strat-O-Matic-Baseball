@@ -906,7 +906,7 @@ void CBaseballDoc::ExportFile(CString strDir, CString strTeamName)
 	exportBatter.Write(strexportData,strexportData.GetLength());
 
 	// A Team was selected so export all of the players
-	count = structBatter.GetCountBatter(myFileName);
+//	count = structBatter.GetCountBatter(myFileName);
 	for (i=0; i<count; i++)
 	{
 		position = lTeamSection+(i*lPlayerSection);
@@ -1485,7 +1485,7 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	// Insert table below here
 
 	// A Team was selected so export all of the players
-	count = structBatter.GetCountBatter(myFileName);
+//	count = structBatter.GetCountBatter(myFileName);
 
 	afBA = (float *)calloc( count, sizeof( float ) );
 	memset( afBA, '\0', count*sizeof( float ) );
@@ -2096,7 +2096,7 @@ void CBaseballDoc::BuildPlayerArray(CStringArray* arrayFileNames, CString strLea
 	arrayFileNamesSize = arrayFileNames->GetSize();
 	for (iarraySize=0; iarraySize < arrayFileNamesSize; iarraySize++)
 	{
-		count = structBatter.GetCountBatter(arrayFileNames->GetAt(iarraySize));
+//		count = structBatter.GetCountBatter(arrayFileNames->GetAt(iarraySize));
 		totCount += count;
 		strPitcherFileName = arrayFileNames->GetAt(iarraySize);
 		strPitcherFileName.SetAt(10,'P');
@@ -3766,22 +3766,23 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 //	strLeague = GetLeagues(TRUE);
 	leagueID = GetLeagues(TRUE);
 
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-	}
-	else
-	{
-		strLeagueDir = "data";
-	}
+	//strLeagueName = strLeague.Left(30);
+	//if (strncmp(strLeagueName,"All",3))
+	//{
+	//	strLeagueFile = strLeague.Right(12);
+	//	strLeagueDir = strLeagueFile.Left(8);
+	//}
+	//else
+	//{
+	//	strLeagueDir = "data";
+	//}
 //	strTeam = GetTeams(strLeagueDir);
-	teamID = GetTeams(leagueID);
-	strTeamFile = strTeam.Right(12);
-	strTeamName = strTeam.Left(30);
-	myBattersSheet.m_FileName = strLeagueDir+"\\"+strTeamFile;
-	myBattersSheet.m_TeamName = strTeamName;
+	myBattersSheet.m_TeamID = GetTeams(leagueID);
+	m_TeamRecord teamRecord = GetTeam(myBattersSheet.m_TeamID);
+	//strTeamFile = strTeam.Right(12);
+	//strTeamName = teamRecord.TeamName;
+	//myBattersSheet.m_FileName = strLeagueDir+"\\"+strTeamFile;
+	myBattersSheet.m_TeamName = teamRecord.TeamName;
 
 	// Remove the APPLY button from the display
 	myBattersSheet.m_psh.dwFlags |= PSH_NOAPPLYNOW;
@@ -3858,6 +3859,9 @@ int CBaseballDoc::GetLeagues(BOOL baseFlag)
 	return leagueID;
 }
 
+// Create a list of teams based on teams in a given League.
+// Place team neames in dlgSelTeam.m_arrayTeams
+// return with the chosen team ID
 int CBaseballDoc::GetTeams(int leagueID)
 {
 	dlgSelTeam dlgSelTeam;
@@ -3872,19 +3876,7 @@ int CBaseballDoc::GetTeams(int leagueID)
 
 	/* Create SQL statement */
 	sqlTeam = "SELECT "  \
-		"TeamID," \
-		"TeamName," \
-		"TeamNameShort," \
-		"BallparkName," \
-		"HomeWins," \
-		"HomeLosses," \
-		"AwayWins," \
-		"AwayLosses," \
-		"LeagueID," \
-		"ConferenceID," \
-		"DivisionID," \
-		"TeamYear," \
-		"BaseTeam" \
+		"TeamName" \
 		" FROM TEAM " \
 		" WHERE LeagueID = ?1 " ;
 
@@ -3909,11 +3901,7 @@ int CBaseballDoc::GetTeams(int leagueID)
 
 	while (sqlite3_step(m_stmt) == SQLITE_ROW)
 	{
-		//TeamID = sqlite3_column_int(m_stmt, 0);
-		strTeamName = sqlite3_column_text(m_stmt, 1);
-		//TeamNameShort = sqlite3_column_text(m_stmt, 2);
-		//BallparkName = sqlite3_column_text(m_stmt, 3);
-		//HomeWins = sqlite3_column_int(m_stmt, 4);
+		strTeamName = sqlite3_column_text(m_stmt, 0);
 		dlgSelTeam.m_arrayTeams.Add(strTeamName);
 	}
 
@@ -3932,7 +3920,7 @@ int CBaseballDoc::GetTeams(int leagueID)
 
 	teamID = GetTeamID(strTeamName, leagueID);
 
-	return teamID;
+	return teamID;	// Return the ID of the selected team
 }
 
 void CBaseballDoc::OnPlayersAddEditPitchers() 
@@ -4520,10 +4508,59 @@ CBaseballDoc::m_BatterRecord CBaseballDoc::GetBatter(int BatterID)
 	/* Create SQL statement */
 	sqlBatter = "SELECT "  \
 		"BatterID," \
-		"DivisionName," \
-		"LeagueID," \
-		"ConferenceID," \
-		"BaseDivisions," \
+		"FirstName," \
+		"LastName," \
+		"Pitcher," \
+		"Catcher," \
+		"FirstBase," \
+		"SecondBase," \
+		"ShortStop," \
+		"ThirdBase," \
+		"LeftField," \
+		"CenterField," \
+		"RightField," \
+		"Bunting," \
+		"HitRun," \
+		"Running," \
+		"Stealing," \
+		"CatchArm," \
+		"OutArm," \
+		"PowerRight," \
+		"PowerLeft," \
+		"Pass," \
+		"TRate," \
+		"ER1," \
+		"ER2," \
+		"ER3," \
+		"ER4," \
+		"ER5," \
+		"ER6," \
+		"ER7," \
+		"ER8," \
+		"ER9," \
+		"BatterHits," \
+		"TeamID," \
+		"OBChanceHomeRun," \
+		"OBChanceTriple," \
+		"OBChanceDouble," \
+		"OBChanceSingle," \
+		"OBChanceWalk," \
+		"ChanceDoublePlay," \
+		"OBChanceHomeRunRight," \
+		"OBChanceTripleRight," \
+		"OBChanceDoubleRight," \
+		"OBChanceSingleRight," \
+		"OBChanceWalkRight," \
+		"ChanceDoublePlayRight," \
+		"OBChanceHomeRunLeft," \
+		"OBChanceTripleLeft," \
+		"OBChanceDoubleLeft," \
+		"OBChanceSingleLeft," \
+		"OBChanceWalkLeft," \
+		"ChanceDoublePlayLeft," \
+		"OBChanceBasic," \
+		"OBChanceLeft," \
+		"OBChanceRight," \
 		"CreateTime," \
 		"LastUpdateTime" \
 		" FROM BATTER " \

@@ -96,7 +96,8 @@ public:
 	CString m_OBChanceWalkLeft;
 	CString m_ChanceDoublePlayLeft;
 	int CopyBatterFile(CString inFileName, CString outFileName);
-	BYTE GetCountBatter(CString BatterFileName);
+	//BYTE GetCountBatter(CString BatterFileName);
+	int GetCountBatter(int TeamID);
 	BYTE m_bBatterHits;
 	CString m_OBChanceRight;
 	CString m_OBChanceLeft;
@@ -114,6 +115,8 @@ private:
 	int BatterWrite(CFile* myFile);
 protected:
 	// Generated message map functions
+public:
+	void *m_pDocVoid;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -454,6 +454,8 @@ protected:
 	afx_msg LRESULT OnOK(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT OnCancel(WPARAM wParam,LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+public:
+	int m_TeamID;
 };
 
 /////////////////////////////////////////////////////////////////////////////
