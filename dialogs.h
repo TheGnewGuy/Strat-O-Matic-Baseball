@@ -456,6 +456,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	int m_TeamID;
+	int m_BatterStatsID;
+	void *m_pDocVoid;
 };
 
 /////////////////////////////////////////////////////////////////////////////
