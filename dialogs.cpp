@@ -1209,6 +1209,15 @@ PropertySheetBatters::PropertySheetBatters(UINT nIDCaption, CWnd* pParentWnd, UI
 	m_newFlag = FALSE;
 	m_TeamID = 0;
 	m_BatterStatsID = 0;
+
+	// Get pointer to Doc
+	CMDIFrameWnd *pFrame = (CMDIFrameWnd*)AfxGetApp()->m_pMainWnd;
+	// Get the active MDI child window.
+	CMDIChildWnd *pChild = (CMDIChildWnd *)pFrame->GetActiveFrame();
+	// or CMDIChildWnd *pChild = pFrame->MDIGetActive();
+	// Get the active view attached to the active MDI child window.
+	CBaseballView *pView = (CBaseballView *)pChild->GetActiveView();
+	m_pDocVoid = pView->GetDocument();
 }
 
 PropertySheetBatters::PropertySheetBatters(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
@@ -1219,6 +1228,15 @@ PropertySheetBatters::PropertySheetBatters(LPCTSTR pszCaption, CWnd* pParentWnd,
 	m_TeamID = 0;
 
 	m_BatterStatsID = 0;
+
+	// Get pointer to Doc
+	CMDIFrameWnd *pFrame = (CMDIFrameWnd*)AfxGetApp()->m_pMainWnd;
+	// Get the active MDI child window.
+	CMDIChildWnd *pChild = (CMDIChildWnd *)pFrame->GetActiveFrame();
+	// or CMDIChildWnd *pChild = pFrame->MDIGetActive();
+	// Get the active view attached to the active MDI child window.
+	CBaseballView *pView = (CBaseballView *)pChild->GetActiveView();
+	m_pDocVoid = pView->GetDocument();
 
 }
 
@@ -1274,15 +1292,6 @@ BOOL PropertySheetBatters::OnInitDialog()
 	CenterWindow(GetDesktopWindow());
 
 	m_rgetcursel = -1;
-
-	// Get pointer to Doc
-	CMDIFrameWnd *pFrame = (CMDIFrameWnd*)AfxGetApp()->m_pMainWnd;
-	// Get the active MDI child window.
-	CMDIChildWnd *pChild = (CMDIChildWnd *)pFrame->GetActiveFrame();
-	// or CMDIChildWnd *pChild = pFrame->MDIGetActive();
-	// Get the active view attached to the active MDI child window.
-	CBaseballView *pView = (CBaseballView *)pChild->GetActiveView();
-	m_pDocVoid = pView->GetDocument();
 
 	return TRUE;
 }
@@ -1387,7 +1396,6 @@ LRESULT PropertySheetBatters::OnUpdate(WPARAM wParam,LPARAM lParam)
 {
 	BOOL rc_GetDlgItemInt;
 	char cTemp[31];
-	CString filler10("          ");
 	char buf[10];
 	CBaseballDoc::m_BatterStatsRecord batterStatsRecord;
 	CBaseballDoc::m_BatterRecord batterRecord;
@@ -1403,8 +1411,7 @@ LRESULT PropertySheetBatters::OnUpdate(WPARAM wParam,LPARAM lParam)
 	if (m_pPage1->m_hWnd != 0)
 	{
 		m_pPage1->GetDlgItemText( IDC_COMBO_PLAYERNAME1, cTemp, 30 );
-		cTemp[30]		= NULL;
-		m_structBatter.m_PlayerName		= cTemp+filler10+filler10+filler10+filler10;
+		m_structBatter.m_PlayerName = cTemp;
 		batterRecord.Pitcher = m_pPage1->GetDlgItemInt(IDC_PITCHER, &rc_GetDlgItemInt, FALSE);
 		batterRecord.Catcher = m_pPage1->GetDlgItemInt(IDC_CATCHER, &rc_GetDlgItemInt, FALSE);
 		batterRecord.FirstBase = m_pPage1->GetDlgItemInt(IDC_FIRSTBASE, &rc_GetDlgItemInt, FALSE);
@@ -1428,72 +1435,50 @@ LRESULT PropertySheetBatters::OnUpdate(WPARAM wParam,LPARAM lParam)
 	if (m_pPage2->m_hWnd != 0)
 	{
 		m_pPage2->GetDlgItemText( IDC_COMBO_PLAYERNAME1, cTemp, 30 );
-		cTemp[30]		= NULL;
-		m_structBatter.m_PlayerName		= cTemp+filler10+filler10+filler10+filler10;
-		m_pPage2->GetDlgItemText( IDC_CHANCEBASIC, cTemp, 6 );
-		cTemp[6]		= NULL;
+		m_structBatter.m_PlayerName = cTemp;
+		m_pPage2->GetDlgItemText(IDC_CHANCEBASIC, cTemp, 6);
 		batterRecord.OBChanceBasic = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCELEFT, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCERIGHT, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEHR, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceHomeRun = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLE, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceDouble = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCESINGLE, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceSingle = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCETRIPLE, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceTriple = (float)_ttof(cTemp);;
 		m_pPage2->GetDlgItemText( IDC_CHANCEWALK, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceWalk = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLEPLAY, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.ChanceDoublePlay = (float)_ttof(cTemp);
 
 		m_pPage2->GetDlgItemText( IDC_CHANCEHRR, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceHomeRunRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLER, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceDoubleRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCESINGLER, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceSingleRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCETRIPLER, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceTripleRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEWALKR, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceWalkRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLEPLAYR, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.ChanceDoublePlayRight = (float)_ttof(cTemp);
 
 		m_pPage2->GetDlgItemText( IDC_CHANCEHRL, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceHomeRunLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLEL, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceDoubleLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCESINGLEL, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceSingleLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCETRIPLEL, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceTripleLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEWALKL, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.OBChanceWalkLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLEPLAYL, cTemp, 6 );
-		cTemp[6]		= NULL;
 		batterRecord.ChanceDoublePlayLeft = (float)_ttof(cTemp);
 
 		m_pPage2->m_bChangedFlag		= FALSE;
@@ -1501,8 +1486,7 @@ LRESULT PropertySheetBatters::OnUpdate(WPARAM wParam,LPARAM lParam)
 	if (m_pPage3->m_hWnd != 0)
 	{
 		m_pPage3->GetDlgItemText( IDC_COMBO_PLAYERNAME1, cTemp, 30 );
-		cTemp[30]		= NULL;
-		m_structBatter.m_PlayerName		= cTemp+filler10+filler10+filler10+filler10;
+		m_structBatter.m_PlayerName = cTemp;
 		batterStatsRecord.AB = m_pPage3->GetDlgItemInt(IDC_AB1, &rc_GetDlgItemInt, FALSE);
 		batterStatsRecord.Runs = m_pPage3->GetDlgItemInt(IDC_RUNS1, &rc_GetDlgItemInt, FALSE);
 		batterStatsRecord.Hits = m_pPage3->GetDlgItemInt(IDC_HITS1, &rc_GetDlgItemInt, FALSE);
@@ -1535,8 +1519,7 @@ LRESULT PropertySheetBatters::OnUpdate(WPARAM wParam,LPARAM lParam)
 	if (m_pPage4->m_hWnd != 0)
 	{
 		m_pPage4->GetDlgItemText( IDC_COMBO_PLAYERNAME1, cTemp, 30 );
-		cTemp[30]		= NULL;
-		m_structBatter.m_PlayerName		= cTemp+filler10+filler10+filler10+filler10;
+		m_structBatter.m_PlayerName = cTemp;
 		batterRecord.Bunting = m_pPage4->m_comboBunting.GetCurSel();
 		batterRecord.Stealing = m_pPage4->m_comboStealing.GetCurSel();
 		batterRecord.Running = m_pPage4->m_comboRunning.GetCurSel();
@@ -1559,7 +1542,7 @@ LRESULT PropertySheetBatters::OnUpdate(WPARAM wParam,LPARAM lParam)
 	// Open file and update player
 	if (m_flagNew == TRUE)
 	{
-		m_structBatter.AddBatter(m_FileName);
+		//m_structBatter.AddBatter(m_FileName);
 		m_flagNew = FALSE;
 	}
 	else
@@ -1640,18 +1623,9 @@ void PropertySheetBatters::BuildPlayerNameComboBox(int iPage)
 	char *sqlBatterStats;
 	int rc;
 	CHAR buffer[100];
-	void *m_pDocVoid;
 	CString strFirstName;
 	CString strLastName;
 
-	// Get pointer to Doc
-	CMDIFrameWnd *pFrame = (CMDIFrameWnd*)AfxGetApp()->m_pMainWnd;
-	// Get the active MDI child window.
-	CMDIChildWnd *pChild = (CMDIChildWnd *)pFrame->GetActiveFrame();
-	// or CMDIChildWnd *pChild = pFrame->MDIGetActive();
-	// Get the active view attached to the active MDI child window.
-	CBaseballView *pView = (CBaseballView *)pChild->GetActiveView();
-	m_pDocVoid = pView->GetDocument();
 	CBaseballDoc* pDoc = (CBaseballDoc*)m_pDocVoid;
 
 	// If needed save Player Name
@@ -2175,6 +2149,8 @@ BEGIN_MESSAGE_MAP(PropertyPageBattersInfo, CPropertyPage)
 	ON_CBN_SELCHANGE(IDC_COMBO_STEALING, OnSelchangeComboStealing)
 	ON_CBN_SELCHANGE(IDC_COMBO_TRATE, OnSelchangeComboTRate)
 	//}}AFX_MSG_MAP
+	ON_EN_CHANGE(IDC_FIRSTNAME1, &PropertyPageBattersInfo::OnEditChangeFirstname)
+	ON_EN_CHANGE(IDC_LASTNAME1, &PropertyPageBattersInfo::OnEditChangeLastname)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2354,6 +2330,28 @@ void PropertyPageBattersInfo::OnEditChangeComboPlayerName()
 {
 	CBaseballDoc* pDoc = (CBaseballDoc*) m_pDocVoid;
 	pDoc->m_pPropertySheetBatters->SetPlayerNameCB(4);
+	m_bChangedFlag = TRUE;
+}
+
+void PropertyPageBattersInfo::OnEditChangeFirstname()
+{
+	// TODO:  If this is a RICHEDIT control, the control will not
+	// send this notification unless you override the CPropertyPage::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+
+	// TODO:  Add your control notification handler code here
+	m_bChangedFlag = TRUE;
+}
+
+void PropertyPageBattersInfo::OnEditChangeLastname()
+{
+	// TODO:  If this is a RICHEDIT control, the control will not
+	// send this notification unless you override the CPropertyPage::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+
+	// TODO:  Add your control notification handler code here
 	m_bChangedFlag = TRUE;
 }
 
@@ -3508,6 +3506,17 @@ PropertySheetPitchers::PropertySheetPitchers(UINT nIDCaption, CWnd* pParentWnd, 
 {
 	m_rgetcursel = -1;
 	m_newFlag = FALSE;
+
+	// Get pointer to Doc
+	CMDIFrameWnd *pFrame = (CMDIFrameWnd*)AfxGetApp()->m_pMainWnd;
+	// Get the active MDI child window.
+	CMDIChildWnd *pChild = (CMDIChildWnd *)pFrame->GetActiveFrame();
+	// or CMDIChildWnd *pChild = pFrame->MDIGetActive();
+	// Get the active view attached to the active MDI child window.
+	CBaseballView *pView = (CBaseballView *)pChild->GetActiveView();
+	m_pDocVoid = pView->GetDocument();
+	m_TeamID = 0;
+	m_PitcherStatsID = 0;
 }
 
 PropertySheetPitchers::PropertySheetPitchers(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
@@ -3515,6 +3524,19 @@ PropertySheetPitchers::PropertySheetPitchers(LPCTSTR pszCaption, CWnd* pParentWn
 {
 	m_rgetcursel = -1;
 	m_newFlag = FALSE;
+
+	// Get pointer to Doc
+	CMDIFrameWnd *pFrame = (CMDIFrameWnd*)AfxGetApp()->m_pMainWnd;
+	// Get the active MDI child window.
+	CMDIChildWnd *pChild = (CMDIChildWnd *)pFrame->GetActiveFrame();
+	// or CMDIChildWnd *pChild = pFrame->MDIGetActive();
+	// Get the active view attached to the active MDI child window.
+	CBaseballView *pView = (CBaseballView *)pChild->GetActiveView();
+	m_pDocVoid = pView->GetDocument();
+	m_TeamID = 0;
+
+	m_PitcherStatsID = 0;
+
 }
 
 PropertySheetPitchers::~PropertySheetPitchers()
@@ -3575,18 +3597,47 @@ BOOL PropertySheetPitchers::OnInitDialog()
 
 void PropertySheetPitchers::BuildPlayerNameComboBox(int iPage)
 {
-	BYTE count;
-	int i;
-	LONG lTeamSection = sizeof(BYTE);
-	LONG lPlayerSection = m_structPitcher.m_RecordSize;
 	CString	strPlayerName;	// Length of 30
+	char *sqlPitcherStats;
+	int rc;
+	CHAR buffer[100];
+	CString strFirstName;
+	CString strLastName;
 
+	CBaseballDoc* pDoc = (CBaseballDoc*)m_pDocVoid;
 
 	// If needed save Player Name
 	if (m_flagNew == TRUE)
 		strPlayerName = m_structPitcher.m_PitcherName;
-	// Get count of players in file
-	count = m_structPitcher.GetCountPitcher(m_FileName);
+
+	/* Create SQL statement */
+	sqlPitcherStats = "SELECT "  \
+		"FirstName," \
+		"LastName " \
+		" FROM PITCHERSTATS AS S " \
+		" JOIN PITCHER AS B " \
+		" ON S.PitcherID=B.PitcherID " \
+		" WHERE S.TeamID = ?1 ";
+
+	rc = sqlite3_prepare_v2(pDoc->m_db, sqlPitcherStats, strlen(sqlPitcherStats), &pDoc->m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(pDoc->m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS JOIN Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(pDoc->m_stmt, 1, m_TeamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(pDoc->m_db));
+		AfxMessageBox(buffer);
+	}
+
 	// Open file and build player ComboBox
 	switch (iPage)
 	{
@@ -3600,23 +3651,28 @@ void PropertySheetPitchers::BuildPlayerNameComboBox(int iPage)
 		m_pPage3->m_comboPlayerName.ResetContent();
 		break;
 	}
-	for (i=0; i<count; i++)
+
+	// Need to loop through each batter and extract their names
+	while (sqlite3_step(pDoc->m_stmt) == SQLITE_ROW)
 	{
-		m_lSeekPlayerFile = lTeamSection+(i*lPlayerSection);
-		m_structPitcher.GetPitcher(m_FileName ,m_lSeekPlayerFile);
+		strFirstName = sqlite3_column_text(pDoc->m_stmt, 0);
+		strLastName = sqlite3_column_text(pDoc->m_stmt, 1);
 		switch (iPage)
 		{
 		case 1:
-			m_pPage1->m_comboPlayerName.AddString(m_structPitcher.m_PitcherName);
+			m_pPage1->m_comboPlayerName.AddString(strFirstName + _T(" ") + strLastName);
 			break;
 		case 2:
-			m_pPage2->m_comboPlayerName.AddString(m_structPitcher.m_PitcherName);
+			m_pPage2->m_comboPlayerName.AddString(strFirstName + _T(" ") + strLastName);
 			break;
 		case 3:
-			m_pPage3->m_comboPlayerName.AddString(m_structPitcher.m_PitcherName);
+			m_pPage3->m_comboPlayerName.AddString(strFirstName + _T(" ") + strLastName);
 			break;
 		}
 	}
+
+	sqlite3_finalize(pDoc->m_stmt);
+
 	switch (iPage)
 	{
 	case 1:
@@ -3757,17 +3813,23 @@ void PropertySheetPitchers::SetPlayerNameCB(int iPage)
 
 void PropertySheetPitchers::OnCloseupComboPlayerName(int iPage)
 {
-	int i, rcompare;
-	BYTE count;
+	int rcompare;
 	CString csPlayer;
 	LONG lTeamSection = sizeof(BYTE);
 	LONG lPlayerSection = m_structPitcher.m_RecordSize;
 	char buf[10];
 	int changed;
 	int yesno;
-	double fIP;
-	double fTRG;
-	double fERA;
+	char *sqlPitcherStats;
+	int rc;
+	int rcSqlStep = 0;
+	CHAR buffer[100];
+	CString strFirstName;
+	CString strLastName;
+	CBaseballDoc::m_PitcherStatsRecord pitcherStatsRecord;
+	CBaseballDoc::m_PitcherRecord pitcherRecord;
+
+	CBaseballDoc* pDoc = (CBaseballDoc*)m_pDocVoid;
 
 	// Test for changed pages NOT SURE HOW TO HANDLE NEW PLAYERS
 	changed = FALSE;
@@ -3824,106 +3886,169 @@ void PropertySheetPitchers::OnCloseupComboPlayerName(int iPage)
 	}
 	if (m_rgetcursel != CB_ERR)
 	{
-		count = m_structPitcher.GetCountPitcher(m_FileName);
+
+		/* Create SQL statement */
+		sqlPitcherStats = "SELECT "  \
+			"S.PitcherStatsID, " \
+			"P.FirstName," \
+			"P.LastName " \
+			" FROM PITCHERSTATS AS S " \
+			" JOIN PITCHER AS P " \
+			" ON S.PitcherID=P.PitcherID " \
+			" WHERE S.TeamID = ?1 ";
+
+		rc = sqlite3_prepare_v2(pDoc->m_db, sqlPitcherStats, strlen(sqlPitcherStats), &pDoc->m_stmt, 0);
+		if (rc != SQLITE_OK)
+		{
+			sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(pDoc->m_db));
+			AfxMessageBox(buffer);
+		}
+		else
+		{
+			sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS JOIN Select OK:\n");
+			//AfxMessageBox(buffer);
+		}
+		// Bind the data to field '1' which is the first '?' in the INSERT statement
+		rc = sqlite3_bind_int(pDoc->m_stmt, 1, m_TeamID);
+		if (rc != SQLITE_OK)
+		{
+			sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(pDoc->m_db));
+			AfxMessageBox(buffer);
+		}
+
 		csPlayer.Empty();
 		rcompare = m_rString.Compare(csPlayer);
-		i = -1;
 		while (rcompare)
 		{
-			i++;
-			if (i >= count)
+			rcSqlStep = sqlite3_step(pDoc->m_stmt);
+			while (rcSqlStep == SQLITE_ROW)
+			{
+				m_PitcherStatsID = sqlite3_column_int(pDoc->m_stmt, 0);
+				strFirstName = sqlite3_column_text(pDoc->m_stmt, 1);
+				strLastName = sqlite3_column_text(pDoc->m_stmt, 2);
+				csPlayer = strFirstName + _T(" ") + strLastName;
+				rcompare = m_rString.Compare(csPlayer);
+				if (rcompare == 0) break;
+				rcSqlStep = sqlite3_step(pDoc->m_stmt);
+			}
+			if (rcSqlStep != SQLITE_ROW)
 			{
 				// Player compare failed so display message
 				AfxMessageBox("Player Compare Failed");
 				break;
 			}
-			// Read in the player Data
-			m_lSeekPlayerFile = lTeamSection+(i*lPlayerSection);
-			m_structPitcher.GetPitcher(m_FileName,m_lSeekPlayerFile);
-			csPlayer = m_structPitcher.m_PitcherName;
-			rcompare = m_rString.Compare(csPlayer);
 		}
 
+		sqlite3_finalize(pDoc->m_stmt);
+
 		// Read in the player Data
-		m_structPitcher.GetPitcher(m_FileName,m_lSeekPlayerFile);
+		pitcherStatsRecord = pDoc->GetPitcherStats(m_PitcherStatsID);
+		pitcherRecord = pDoc->GetPitcher(pitcherStatsRecord.PitcherID);
+
 		// Set the Dialog Items for page 1
 		if ((m_pPage1->m_hWnd != 0) && (m_pPage1->m_bChangedFlag == FALSE))
 		{
 			m_pPage1->m_comboPlayerName.SetCurSel(m_rgetcursel);
-			m_pPage1->SetDlgItemText( IDC_COMBO_PLAYERNAME1, m_structPitcher.m_PitcherName );
-			m_pPage1->SetDlgItemInt( IDC_STARTER1, m_structPitcher.m_Starter, FALSE );
-			m_pPage1->SetDlgItemInt( IDC_RELIEF1, m_structPitcher.m_Relief, FALSE );
-			m_pPage1->SetDlgItemInt( IDC_PITCHER, m_structPitcher.m_PitcherField, FALSE );
-			m_pPage1->SetDlgItemInt( IDC_WP, m_structPitcher.m_bWP, FALSE );
-			m_pPage1->SetDlgItemInt( IDC_ERP, m_structPitcher.m_bER1, FALSE );
-			m_pPage1->SetDlgItemInt( IDC_BALK, m_structPitcher.m_bBalk, FALSE );
-			m_pPage1->m_comboThrows.SetCurSel(m_structPitcher.m_Throws);
-			m_pPage1->m_comboHold.SetCurSel(m_structPitcher.m_Hold);
-			m_pPage1->m_comboBunting.SetCurSel(m_structPitcher.m_Bunting);
+			m_pPage1->SetDlgItemText(IDC_COMBO_PLAYERNAME1, pitcherRecord.FirstName + _T(" ") + pitcherRecord.LastName);
+			m_pPage1->SetDlgItemInt(IDC_STARTER1, pitcherRecord.Starter, FALSE);
+			m_pPage1->SetDlgItemInt(IDC_RELIEF1, pitcherRecord.Relief, FALSE);
+			m_pPage1->SetDlgItemInt(IDC_PITCHER, pitcherRecord.Pitcher, FALSE);
+			m_pPage1->SetDlgItemInt(IDC_WP, pitcherRecord.WP, FALSE);
+			m_pPage1->SetDlgItemInt(IDC_ERP, pitcherRecord.ER1, FALSE);
+			m_pPage1->SetDlgItemInt(IDC_BALK, pitcherRecord.Balk, FALSE);
+			m_pPage1->m_comboThrows.SetCurSel(pitcherRecord.Throws);
+			m_pPage1->m_comboHold.SetCurSel(pitcherRecord.Hold);
+			m_pPage1->m_comboBunting.SetCurSel(pitcherRecord.Bunting);
 			m_pPage1->m_bChangedFlag = FALSE;
 		}
 
 		if ((m_pPage2->m_hWnd != 0) && (m_pPage2->m_bChangedFlag == FALSE))
 		{
 			m_pPage2->m_comboPlayerName.SetCurSel(m_rgetcursel);
-			m_pPage2->SetDlgItemText( IDC_COMBO_PLAYERNAME1, m_structPitcher.m_PitcherName );
-			m_pPage2->SetDlgItemText( IDC_CHANCEBASIC, m_structPitcher.m_OBChanceBasic );
-			m_pPage2->SetDlgItemText( IDC_CHANCELEFT, m_structPitcher.m_OBChanceLeft );
-			m_pPage2->SetDlgItemText( IDC_CHANCERIGHT, m_structPitcher.m_OBChanceRight );
-			m_pPage2->SetDlgItemText( IDC_CHANCEHR, m_structPitcher.m_OBChanceHomeRun );
-			m_pPage2->SetDlgItemText( IDC_CHANCEDOUBLE, m_structPitcher.m_OBChanceDouble );
-			m_pPage2->SetDlgItemText( IDC_CHANCESINGLE, m_structPitcher.m_OBChanceSingle );
-			m_pPage2->SetDlgItemText( IDC_CHANCETRIPLE, m_structPitcher.m_OBChanceTriple );
-			m_pPage2->SetDlgItemText( IDC_CHANCEWALK, m_structPitcher.m_OBChanceWalk );
-			m_pPage2->SetDlgItemText( IDC_CHANCEDOUBLEPLAY, m_structPitcher.m_ChanceDoublePlay );
-			m_pPage2->SetDlgItemText( IDC_CHANCEHRL, m_structPitcher.m_OBChanceHomeRunLeft );
-			m_pPage2->SetDlgItemText( IDC_CHANCEDOUBLEL, m_structPitcher.m_OBChanceDoubleLeft );
-			m_pPage2->SetDlgItemText( IDC_CHANCESINGLEL, m_structPitcher.m_OBChanceSingleLeft );
-			m_pPage2->SetDlgItemText( IDC_CHANCETRIPLEL, m_structPitcher.m_OBChanceTripleLeft );
-			m_pPage2->SetDlgItemText( IDC_CHANCEWALKL, m_structPitcher.m_OBChanceWalkLeft );
-			m_pPage2->SetDlgItemText( IDC_CHANCEDOUBLEPLAYL, m_structPitcher.m_ChanceDoublePlayLeft );
-			m_pPage2->SetDlgItemText( IDC_CHANCEHRR, m_structPitcher.m_OBChanceHomeRunRight );
-			m_pPage2->SetDlgItemText( IDC_CHANCEDOUBLER, m_structPitcher.m_OBChanceDoubleRight );
-			m_pPage2->SetDlgItemText( IDC_CHANCESINGLER, m_structPitcher.m_OBChanceSingleRight );
-			m_pPage2->SetDlgItemText( IDC_CHANCETRIPLER, m_structPitcher.m_OBChanceTripleRight );
-			m_pPage2->SetDlgItemText( IDC_CHANCEWALKR, m_structPitcher.m_OBChanceWalkRight );
-			m_pPage2->SetDlgItemText( IDC_CHANCEDOUBLEPLAYR, m_structPitcher.m_ChanceDoublePlayRight );
+			m_pPage2->SetDlgItemText(IDC_COMBO_PLAYERNAME1, pitcherRecord.FirstName + _T(" ") + pitcherRecord.LastName);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceBasic);
+			m_pPage2->SetDlgItemText(IDC_CHANCEBASIC, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceLeft);
+			m_pPage2->SetDlgItemText(IDC_CHANCELEFT, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceRight);
+			m_pPage2->SetDlgItemText(IDC_CHANCERIGHT, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceHomeRun);
+			m_pPage2->SetDlgItemText(IDC_CHANCEHR, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceDouble);
+			m_pPage2->SetDlgItemText(IDC_CHANCEDOUBLE, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceSingle);
+			m_pPage2->SetDlgItemText(IDC_CHANCESINGLE, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceTriple);
+			m_pPage2->SetDlgItemText(IDC_CHANCETRIPLE, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceWalk);
+			m_pPage2->SetDlgItemText(IDC_CHANCEWALK, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.ChanceDoublePlay);
+			m_pPage2->SetDlgItemText(IDC_CHANCEDOUBLEPLAY, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceHomeRunLeft);
+			m_pPage2->SetDlgItemText(IDC_CHANCEHRL, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceDoubleLeft);
+			m_pPage2->SetDlgItemText(IDC_CHANCEDOUBLEL, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceSingleLeft);
+			m_pPage2->SetDlgItemText(IDC_CHANCESINGLEL, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceTripleLeft);
+			m_pPage2->SetDlgItemText(IDC_CHANCETRIPLEL, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceWalkLeft);
+			m_pPage2->SetDlgItemText(IDC_CHANCEWALKL, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.ChanceDoublePlayLeft);
+			m_pPage2->SetDlgItemText(IDC_CHANCEDOUBLEPLAYL, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceHomeRunRight);
+			m_pPage2->SetDlgItemText(IDC_CHANCEHRR, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceDoubleRight);
+			m_pPage2->SetDlgItemText(IDC_CHANCEDOUBLER, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceSingleRight);
+			m_pPage2->SetDlgItemText(IDC_CHANCESINGLER, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceTripleRight);
+			m_pPage2->SetDlgItemText(IDC_CHANCETRIPLER, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.OBChanceWalkRight);
+			m_pPage2->SetDlgItemText(IDC_CHANCEWALKR, buf);
+			sprintf_s(buf, "%2.2f", pitcherRecord.ChanceDoublePlayRight);
+			m_pPage2->SetDlgItemText(IDC_CHANCEDOUBLEPLAYR, buf);
 			m_pPage2->m_bChangedFlag = FALSE;
 		}
 
 		if ((m_pPage3->m_hWnd != 0) && (m_pPage3->m_bChangedFlag == FALSE))
 		{
 			m_pPage3->m_comboPlayerName.SetCurSel(m_rgetcursel);
-			m_pPage3->SetDlgItemText( IDC_COMBO_PLAYERNAME1, m_structPitcher.m_PitcherName );
-			m_pPage3->SetDlgItemText( IDC_IP1, m_structPitcher.m_IP );
-			m_pPage3->SetDlgItemInt( IDC_STARTS1, m_structPitcher.m_Starts, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_WINS1, m_structPitcher.m_Wins, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_WALK1, m_structPitcher.m_Walks, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_STRIKEOUT1, m_structPitcher.m_Strikeouts, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_SAVES1, m_structPitcher.m_Saves, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_LOSS1, m_structPitcher.m_Loss, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_HR1, m_structPitcher.m_HomeRuns, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_HITS1, m_structPitcher.m_Hits, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_ER1, m_structPitcher.m_ER, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_GAMES1, m_structPitcher.m_Games, FALSE );
-			m_pPage3->SetDlgItemInt( IDC_COMPLETEGAMES1, m_structPitcher.m_CompGames, FALSE );
+			m_pPage3->SetDlgItemText(IDC_COMBO_PLAYERNAME1, pitcherRecord.FirstName + _T(" ") + pitcherRecord.LastName);
+			sprintf_s(buf, "%3.2f", pitcherStatsRecord.InningsPitched);
+			m_pPage3->SetDlgItemText(IDC_IP1, buf);
+			m_pPage3->SetDlgItemInt(IDC_STARTS1, pitcherStatsRecord.Starts, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_WINS1, pitcherStatsRecord.Wins, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_WALK1, pitcherStatsRecord.Walks, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_STRIKEOUT1, pitcherStatsRecord.Strikeouts, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_SAVES1, pitcherStatsRecord.Saves, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_LOSS1, pitcherStatsRecord.Loss, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_HR1, pitcherStatsRecord.HomeRuns, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_HITS1, pitcherStatsRecord.Hits, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_ER1, pitcherStatsRecord.ER, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_GAMES1, pitcherStatsRecord.Games, FALSE);
+			m_pPage3->SetDlgItemInt(IDC_COMPLETEGAMES1, pitcherStatsRecord.CompleteGames, FALSE);
+			sprintf_s(buf, "%1.2f", pitcherStatsRecord.ERA);
+			m_pPage3->SetDlgItemText(IDC_ERA1, buf);
+			sprintf_s(buf, "%1.2f", pitcherStatsRecord.WHIP);
+			m_pPage3->SetDlgItemText(IDC_TRG1, buf);
 
-			fIP = atof(m_structPitcher.m_IP);
+			//fIP = atof(m_structPitcher.m_IP);
 
-			if (fIP == 0)
-			{
-				m_pPage3->SetDlgItemText( IDC_ERA1, _T("0") );
-				m_pPage3->SetDlgItemText( IDC_TRG1, _T("0") );
-			}
-			else
-			{
-				fERA = (double)(m_structPitcher.m_ER*9)/fIP;
-				sprintf_s(buf,"%1.2f",fERA);
-				m_pPage3->SetDlgItemText( IDC_ERA1, buf );
-				fTRG = (double)((m_structPitcher.m_Hits+m_structPitcher.m_Walks)*9)/fIP;
-				sprintf_s(buf,"%1.2f",fTRG);
-				m_pPage3->SetDlgItemText( IDC_TRG1, buf );
-			}
+			//if (fIP == 0)
+			//{
+			//	m_pPage3->SetDlgItemText( IDC_ERA1, _T("0") );
+			//	m_pPage3->SetDlgItemText( IDC_TRG1, _T("0") );
+			//}
+			//else
+			//{
+			//	fERA = (double)(m_structPitcher.m_ER*9)/fIP;
+			//	sprintf_s(buf,"%1.2f",fERA);
+			//	m_pPage3->SetDlgItemText( IDC_ERA1, buf );
+			//	fTRG = (double)((m_structPitcher.m_Hits+m_structPitcher.m_Walks)*9)/fIP;
+			//	sprintf_s(buf,"%1.2f",fTRG);
+			//	m_pPage3->SetDlgItemText( IDC_TRG1, buf );
+			//}
 
 			m_pPage3->m_bChangedFlag = FALSE;
 		}
@@ -3932,7 +4057,7 @@ void PropertySheetPitchers::OnCloseupComboPlayerName(int iPage)
 	else
 	{
 		// No player selected Edit Box being used, set seek to 0 as flag
-		m_lSeekPlayerFile = 0;
+		//m_lSeekPlayerFile = 0;
 	}
 }
 
@@ -3954,24 +4079,35 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 	char cTemp[31];
 	CString filler10("          ");
 	char buf[10];
-	double fIP;
+	//double fIP;
 	double fTRG;
 	double fERA;
+	CBaseballDoc::m_PitcherStatsRecord pitcherStatsRecord;
+	CBaseballDoc::m_PitcherRecord pitcherRecord;
+	CBaseballDoc::m_TeamRecord teamRecord;
+
+	CBaseballDoc* pDoc = (CBaseballDoc*)m_pDocVoid;
+
+	// Read in the player Data so data is present for update
+	pitcherStatsRecord = pDoc->GetPitcherStats(m_PitcherStatsID);
+	pitcherRecord = pDoc->GetPitcher(pitcherStatsRecord.PitcherID);
+	teamRecord = pDoc->GetTeam(m_TeamID);
+
 
 	if (m_pPage1->m_hWnd != 0)
 	{
 		m_pPage1->GetDlgItemText( IDC_COMBO_PLAYERNAME1, cTemp, 30 );
 		cTemp[30]		= NULL;
 		m_structPitcher.m_PitcherName	= cTemp+filler10+filler10+filler10+filler10;
-		m_structPitcher.m_PitcherField	= m_pPage1->GetDlgItemInt( IDC_PITCHER, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Starter	= m_pPage1->GetDlgItemInt( IDC_STARTER1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Relief	= m_pPage1->GetDlgItemInt( IDC_RELIEF1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_bWP		= m_pPage1->GetDlgItemInt( IDC_WP, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_bER1		= m_pPage1->GetDlgItemInt( IDC_ERP, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_bBalk		= m_pPage1->GetDlgItemInt( IDC_BALK, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Throws	= m_pPage1->m_comboThrows.GetCurSel();
-		m_structPitcher.m_Hold		= m_pPage1->m_comboHold.GetCurSel();
-		m_structPitcher.m_Bunting	= m_pPage1->m_comboBunting.GetCurSel();
+		pitcherRecord.Pitcher = m_pPage1->GetDlgItemInt(IDC_PITCHER, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.Starter = m_pPage1->GetDlgItemInt(IDC_STARTER1, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.Relief = m_pPage1->GetDlgItemInt(IDC_RELIEF1, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.WP = m_pPage1->GetDlgItemInt(IDC_WP, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.ER1 = m_pPage1->GetDlgItemInt(IDC_ERP, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.Balk = m_pPage1->GetDlgItemInt(IDC_BALK, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.Throws = m_pPage1->m_comboThrows.GetCurSel();
+		pitcherRecord.Hold = m_pPage1->m_comboHold.GetCurSel();
+		pitcherRecord.Bunting = m_pPage1->m_comboBunting.GetCurSel();
 		m_pPage1->m_bChangedFlag	= FALSE;
 	}
 	if (m_pPage2->m_hWnd != 0)
@@ -3980,71 +4116,50 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 		cTemp[30]		= NULL;
 		m_structPitcher.m_PitcherName		= cTemp+filler10+filler10+filler10+filler10;
 		m_pPage2->GetDlgItemText( IDC_CHANCEBASIC, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceBasic		= cTemp+filler10;
+		pitcherRecord.OBChanceBasic = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCELEFT, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceLeft		= cTemp+filler10;
+		pitcherRecord.OBChanceLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCERIGHT, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceRight		= cTemp+filler10;
+		pitcherRecord.OBChanceRight = (float)_ttof(cTemp);
 
 		m_pPage2->GetDlgItemText( IDC_CHANCEHR, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceHomeRun	= cTemp+filler10;
+		pitcherRecord.OBChanceHomeRun = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLE, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceDouble	= cTemp+filler10;
+		pitcherRecord.OBChanceDouble = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCESINGLE, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceSingle	= cTemp+filler10;
+		pitcherRecord.OBChanceSingle = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCETRIPLE, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceTriple	= cTemp+filler10;
+		pitcherRecord.OBChanceTriple = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEWALK, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceWalk		= cTemp+filler10;
+		pitcherRecord.OBChanceWalk = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLEPLAY, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_ChanceDoublePlay	= cTemp+filler10;
+		pitcherRecord.ChanceDoublePlay = (float)_ttof(cTemp);
 
 		m_pPage2->GetDlgItemText( IDC_CHANCEHRL, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceHomeRunLeft	= cTemp+filler10;
+		pitcherRecord.OBChanceHomeRunLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLEL, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceDoubleLeft	= cTemp+filler10;
+		pitcherRecord.OBChanceDoubleLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCESINGLEL, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceSingleLeft	= cTemp+filler10;
+		pitcherRecord.OBChanceSingleLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCETRIPLEL, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceTripleLeft	= cTemp+filler10;
+		pitcherRecord.OBChanceTripleLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEWALKL, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceWalkLeft		= cTemp+filler10;
+		pitcherRecord.OBChanceWalkLeft = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLEPLAYL, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_ChanceDoublePlayLeft	= cTemp+filler10;
+		pitcherRecord.ChanceDoublePlayLeft = (float)_ttof(cTemp);
 
 		m_pPage2->GetDlgItemText( IDC_CHANCEHRR, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceHomeRunRight	= cTemp+filler10;
+		pitcherRecord.OBChanceHomeRunRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLER, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceDoubleRight	= cTemp+filler10;
+		pitcherRecord.OBChanceDoubleRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCESINGLER, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceSingleRight	= cTemp+filler10;
+		pitcherRecord.OBChanceSingleRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCETRIPLER, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceTripleRight	= cTemp+filler10;
+		pitcherRecord.OBChanceTripleRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEWALKR, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_OBChanceWalkRight		= cTemp+filler10;
+		pitcherRecord.OBChanceWalkRight = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCEDOUBLEPLAYR, cTemp, 6 );
-		cTemp[6]		= NULL;
-		m_structPitcher.m_ChanceDoublePlayRight	= cTemp+filler10;
+		pitcherRecord.ChanceDoublePlayRight = (float)_ttof(cTemp);
 
 		m_pPage2->m_bChangedFlag		= FALSE;
 	}
@@ -4054,57 +4169,73 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 		cTemp[30]		= NULL;
 		m_structPitcher.m_PitcherName		= cTemp+filler10+filler10+filler10+filler10;
 		m_pPage3->GetDlgItemText( IDC_IP1, cTemp, 7 );
-		cTemp[7]		= NULL;
-		m_structPitcher.m_IP		= cTemp;
-		m_structPitcher.m_Starts	= m_pPage3->GetDlgItemInt( IDC_STARTS1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Wins		= m_pPage3->GetDlgItemInt( IDC_WINS1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Walks		= m_pPage3->GetDlgItemInt( IDC_WALK1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Strikeouts	= m_pPage3->GetDlgItemInt( IDC_STRIKEOUT1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Saves		= m_pPage3->GetDlgItemInt( IDC_SAVES1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Loss		= m_pPage3->GetDlgItemInt( IDC_LOSS1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_HomeRuns	= m_pPage3->GetDlgItemInt( IDC_HR1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Hits		= m_pPage3->GetDlgItemInt( IDC_HITS1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_ER		= m_pPage3->GetDlgItemInt( IDC_ER1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_Games		= m_pPage3->GetDlgItemInt( IDC_GAMES1, &rc_GetDlgItemInt, FALSE );
-		m_structPitcher.m_CompGames	= m_pPage3->GetDlgItemInt( IDC_COMPLETEGAMES1, &rc_GetDlgItemInt, FALSE );
-		m_pPage3->m_bChangedFlag	= FALSE;
+		pitcherStatsRecord.InningsPitched = (float)_ttof(cTemp);
+		pitcherStatsRecord.Starts = m_pPage3->GetDlgItemInt(IDC_STARTS1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Wins = m_pPage3->GetDlgItemInt(IDC_WINS1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Walks = m_pPage3->GetDlgItemInt(IDC_WALK1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Strikeouts = m_pPage3->GetDlgItemInt(IDC_STRIKEOUT1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Saves = m_pPage3->GetDlgItemInt(IDC_SAVES1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Loss = m_pPage3->GetDlgItemInt(IDC_LOSS1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.HomeRuns = m_pPage3->GetDlgItemInt(IDC_HR1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Hits = m_pPage3->GetDlgItemInt(IDC_HITS1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.ER = m_pPage3->GetDlgItemInt(IDC_ER1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Games = m_pPage3->GetDlgItemInt(IDC_GAMES1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.CompleteGames = m_pPage3->GetDlgItemInt(IDC_COMPLETEGAMES1, &rc_GetDlgItemInt, FALSE);
+		if (pitcherStatsRecord.InningsPitched == 0)
+		{
+			pitcherStatsRecord.ERA = 0.0f;
+			pitcherStatsRecord.WHIP = 0.0f;
+		}
+		else
+		{
+			pitcherStatsRecord.ERA = (float)(pitcherStatsRecord.ER * 9) / pitcherStatsRecord.InningsPitched;
+			pitcherStatsRecord.WHIP = (float)((pitcherStatsRecord.Hits + pitcherStatsRecord.Walks) * 9) / pitcherStatsRecord.InningsPitched;
+		}
+		m_pPage3->m_bChangedFlag = FALSE;
 	}
+
 
 	// Open file and update player
 	if (m_flagNew == TRUE)
 	{
-		m_structPitcher.AddPitcher(m_FileName);
+		//m_structPitcher.AddPitcher(m_FileName);
 		m_flagNew = FALSE;
 	}
 	else
 	{
-		if (m_lSeekPlayerFile!=0)
+		// Only update the Batter record if this is a BASE team.
+		if (teamRecord.BaseTeam == 1)
 		{
+			pDoc->PitcherStatsUpdate(pitcherStatsRecord);
+			pDoc->PitcherUpdate(pitcherRecord);
+		}
+		else
+		{
+			// We still could be updating the BASE stats record.
+			pDoc->PitcherStatsUpdate(pitcherStatsRecord);
+		}
+
+		if (m_pPage3->m_hWnd != 0)
+		{
+			if (pitcherStatsRecord.InningsPitched == 0)
 			{
-				m_structPitcher.UpdatePitcher(m_FileName,m_lSeekPlayerFile);
+				m_pPage3->SetDlgItemText(IDC_ERA1, _T("0"));
+				m_pPage3->SetDlgItemText(IDC_TRG1, _T("0"));
+				m_pPage3->m_bChangedFlag = FALSE;
 			}
-
-			if (m_pPage3->m_hWnd != 0)
+			else
 			{
-				fIP = atof(m_structPitcher.m_IP);
-
-				if (fIP == 0)
-				{
-					m_pPage3->SetDlgItemText( IDC_ERA1, _T("0") );
-					m_pPage3->SetDlgItemText( IDC_TRG1, _T("0") );
-				}
-				else
-				{
-					fERA = (double)(m_structPitcher.m_ER*9)/fIP;
-					sprintf_s(buf,"%1.2f",fERA);
-					m_pPage3->SetDlgItemText( IDC_ERA1, buf );
-					fTRG = (double)((m_structPitcher.m_Hits+m_structPitcher.m_Walks)*9)/fIP;
-					sprintf_s(buf,"%1.2f",fTRG);
-					m_pPage3->SetDlgItemText( IDC_TRG1, buf );
-				}
+				fERA = (double)(pitcherStatsRecord.ER * 9) / pitcherStatsRecord.InningsPitched;
+				sprintf_s(buf, "%1.2f", fERA);
+				m_pPage3->SetDlgItemText(IDC_ERA1, buf);
+				fTRG = (double)((pitcherStatsRecord.Hits + pitcherStatsRecord.Walks) * 9) / pitcherStatsRecord.InningsPitched;
+				sprintf_s(buf, "%1.2f", fTRG);
+				m_pPage3->SetDlgItemText(IDC_TRG1, buf);
+				m_pPage3->m_bChangedFlag = FALSE;
 			}
 		}
 	}
+
 	// ReBuild combo table for player display
 	if (m_pPage1->m_hWnd != 0)
 	{
@@ -4435,3 +4566,4 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // PropertySheetLeagueOptions message handlers
+

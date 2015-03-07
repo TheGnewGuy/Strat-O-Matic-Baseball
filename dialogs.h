@@ -390,6 +390,9 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
+public:
+	afx_msg void OnEditChangeFirstname();
+	afx_msg void OnEditChangeLastname();
 };
 /////////////////////////////////////////////////////////////////////////////
 // PropertySheetBatters
@@ -908,6 +911,10 @@ protected:
 		// NOTE - the ClassWizard will add and remove member functions here.
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	void *m_pDocVoid;
+	int m_TeamID;
+	int m_PitcherStatsID;
 };
 
 /////////////////////////////////////////////////////////////////////////////

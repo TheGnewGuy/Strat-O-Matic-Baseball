@@ -3763,25 +3763,12 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 	myBattersSheet.AddPage(&myBatters3);
 	myBattersSheet.AddPage(&myBatters4);
 	// For testing force to a team name
-//	strLeague = GetLeagues(TRUE);
+
 	leagueID = GetLeagues(TRUE);
 
-	//strLeagueName = strLeague.Left(30);
-	//if (strncmp(strLeagueName,"All",3))
-	//{
-	//	strLeagueFile = strLeague.Right(12);
-	//	strLeagueDir = strLeagueFile.Left(8);
-	//}
-	//else
-	//{
-	//	strLeagueDir = "data";
-	//}
-//	strTeam = GetTeams(strLeagueDir);
 	myBattersSheet.m_TeamID = GetTeams(leagueID);
 	m_TeamRecord teamRecord = GetTeam(myBattersSheet.m_TeamID);
-	//strTeamFile = strTeam.Right(12);
-	//strTeamName = teamRecord.TeamName;
-	//myBattersSheet.m_FileName = strLeagueDir+"\\"+strTeamFile;
+
 	myBattersSheet.m_TeamName = teamRecord.TeamName;
 
 	// Remove the APPLY button from the display
@@ -3949,27 +3936,13 @@ void CBaseballDoc::OnPlayersAddEditPitchers()
 	myPitchersSheet.AddPage(&myPitchers1);
 	myPitchersSheet.AddPage(&myPitchers2);
 	myPitchersSheet.AddPage(&myPitchers3);
-	// For testing force to a team name
-//	strLeague = GetLeagues(TRUE);
+
 	leagueID = GetLeagues(TRUE);
 
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-	}
-	else
-	{
-		strLeagueDir = "data";
-	}
-//	strTeam = GetTeams(strLeagueDir);
-	teamID = GetTeams(leagueID);
-	strTeamFile = "TP";
-	strTeamFile += strTeam.Right(10);
-	strTeamName = strTeam.Left(30);
-	myPitchersSheet.m_FileName = strLeagueDir+"\\"+strTeamFile;
-	myPitchersSheet.m_TeamName = strTeamName;
+	myPitchersSheet.m_TeamID = GetTeams(leagueID);
+	m_TeamRecord teamRecord = GetTeam(myPitchersSheet.m_TeamID);
+
+	myPitchersSheet.m_TeamName = teamRecord.TeamName;
 
 	// Remove the APPLY button from the display
 	myPitchersSheet.m_psh.dwFlags |= PSH_NOAPPLYNOW;
@@ -4745,11 +4718,40 @@ CBaseballDoc::m_PitcherRecord CBaseballDoc::GetPitcher(int PitcherID)
 
 	/* Create SQL statement */
 	sqlPitcher = "SELECT "  \
-		"BatterID," \
-		"DivisionName," \
-		"LeagueID," \
-		"ConferenceID," \
-		"BaseDivisions," \
+		"PitcherID," \
+		"FirstName," \
+		"LastName," \
+		"OBChanceHomeRun," \
+		"OBChanceTriple," \
+		"OBChanceDouble," \
+		"OBChanceSingle," \
+		"OBChanceWalk," \
+		"ChanceDoublePlay," \
+		"OBChanceHomeRunRight," \
+		"OBChanceTripleRight," \
+		"OBChanceDoubleRight," \
+		"OBChanceSingleRight," \
+		"OBChanceWalkRight," \
+		"ChanceDoublePlayRight," \
+		"OBChanceHomeRunLeft," \
+		"OBChanceTripleLeft," \
+		"OBChanceDoubleLeft," \
+		"OBChanceSingleLeft," \
+		"OBChanceWalkLeft," \
+		"ChanceDoublePlayLeft," \
+		"OBChanceBasic," \
+		"OBChanceLeft," \
+		"OBChanceRight," \
+		"Starter," \
+		"Relief," \
+		"Throws," \
+		"Bunting," \
+		"Hold," \
+		"WP," \
+		"Balk," \
+		"Pitcher," \
+		"ER1," \
+		"TeamID," \
 		"CreateTime," \
 		"LastUpdateTime" \
 		" FROM PITCHER " \
@@ -6136,7 +6138,7 @@ int CBaseballDoc::PitcherStatsUpdate(m_PitcherStatsRecord PitcherStatsRecord)
 		"PitcherID = ?15," \
 		"TeamID = ?16," \
 		"LastUpdateTime = datetime('NOW','localtime')" \
-		" WHERE BatterStatsID = ?17 ";
+		" WHERE PitcherStatsID = ?17 ";
 
 	rc = sqlite3_prepare_v2(m_db, sqlPitcher, strlen(sqlPitcher), &m_stmt, 0);
 	if (rc != SQLITE_OK)
