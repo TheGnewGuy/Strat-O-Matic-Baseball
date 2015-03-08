@@ -212,8 +212,8 @@
 #define IDC_COMBOVLINKCOLOR             1171
 #define IDC_COMBOBGCOLOR                1172
 #define IDC_FIRSTNAME1                  1172
-#define IDC_EDIT2                       1173
 #define IDC_LASTNAME1                   1173
+#define IDC_EDIT2                       1175
 #define ID_FORMS_SCORESHEETFORM         32771
 #define ID_FORMS_STATISTCSFORM          32772
 #define ID_FORMS_SCORESHEETFORMXTRA     32773
@@ -251,7 +251,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        167
 #define _APS_NEXT_COMMAND_VALUE         32808
-#define _APS_NEXT_CONTROL_VALUE         1174
+#define _APS_NEXT_CONTROL_VALUE         1176
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

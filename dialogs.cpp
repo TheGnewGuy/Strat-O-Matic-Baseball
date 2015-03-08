@@ -2529,6 +2529,8 @@ BEGIN_MESSAGE_MAP(PropertyPagePitchersInfo, CPropertyPage)
 	ON_EN_CHANGE(IDC_WP, OnChangeWP)
 	ON_EN_CHANGE(IDC_BALK, OnChangeBalk)
 	//}}AFX_MSG_MAP
+	ON_EN_CHANGE(IDC_FIRSTNAME1, &PropertyPagePitchersInfo::OnChangeFirstName)
+	ON_EN_CHANGE(IDC_LASTNAME1, &PropertyPagePitchersInfo::OnChangeLastName)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2693,6 +2695,28 @@ void PropertyPagePitchersInfo::OnEditChangeComboPlayerName()
 {
 	CBaseballDoc* pDoc = (CBaseballDoc*) m_pDocVoid;
 	pDoc->m_pPropertySheetPitchers->SetPlayerNameCB(1);
+	m_bChangedFlag = TRUE;
+}
+
+void PropertyPagePitchersInfo::OnChangeFirstName()
+{
+	// TODO:  If this is a RICHEDIT control, the control will not
+	// send this notification unless you override the CPropertyPage::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+
+	// TODO:  Add your control notification handler code here
+	m_bChangedFlag = TRUE;
+}
+
+void PropertyPagePitchersInfo::OnChangeLastName()
+{
+	// TODO:  If this is a RICHEDIT control, the control will not
+	// send this notification unless you override the CPropertyPage::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+
+	// TODO:  Add your control notification handler code here
 	m_bChangedFlag = TRUE;
 }
 
@@ -3950,6 +3974,8 @@ void PropertySheetPitchers::OnCloseupComboPlayerName(int iPage)
 		{
 			m_pPage1->m_comboPlayerName.SetCurSel(m_rgetcursel);
 			m_pPage1->SetDlgItemText(IDC_COMBO_PLAYERNAME1, pitcherRecord.FirstName + _T(" ") + pitcherRecord.LastName);
+			m_pPage1->SetDlgItemText(IDC_FIRSTNAME1, pitcherRecord.FirstName);
+			m_pPage1->SetDlgItemText(IDC_LASTNAME1, pitcherRecord.LastName);
 			m_pPage1->SetDlgItemInt(IDC_STARTER1, pitcherRecord.Starter, FALSE);
 			m_pPage1->SetDlgItemInt(IDC_RELIEF1, pitcherRecord.Relief, FALSE);
 			m_pPage1->SetDlgItemInt(IDC_PITCHER, pitcherRecord.Pitcher, FALSE);
@@ -4097,8 +4123,11 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 	if (m_pPage1->m_hWnd != 0)
 	{
 		m_pPage1->GetDlgItemText( IDC_COMBO_PLAYERNAME1, cTemp, 30 );
-		cTemp[30]		= NULL;
-		m_structPitcher.m_PitcherName	= cTemp+filler10+filler10+filler10+filler10;
+		m_structPitcher.m_PitcherName	= cTemp;
+		m_pPage1->GetDlgItemText(IDC_FIRSTNAME1, cTemp, 30);
+		pitcherRecord.FirstName = cTemp;
+		m_pPage1->GetDlgItemText(IDC_LASTNAME1, cTemp, 30);
+		pitcherRecord.LastName = cTemp;
 		pitcherRecord.Pitcher = m_pPage1->GetDlgItemInt(IDC_PITCHER, &rc_GetDlgItemInt, FALSE);
 		pitcherRecord.Starter = m_pPage1->GetDlgItemInt(IDC_STARTER1, &rc_GetDlgItemInt, FALSE);
 		pitcherRecord.Relief = m_pPage1->GetDlgItemInt(IDC_RELIEF1, &rc_GetDlgItemInt, FALSE);
@@ -4113,8 +4142,7 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 	if (m_pPage2->m_hWnd != 0)
 	{
 		m_pPage2->GetDlgItemText( IDC_COMBO_PLAYERNAME1, cTemp, 30 );
-		cTemp[30]		= NULL;
-		m_structPitcher.m_PitcherName		= cTemp+filler10+filler10+filler10+filler10;
+		m_structPitcher.m_PitcherName		= cTemp;
 		m_pPage2->GetDlgItemText( IDC_CHANCEBASIC, cTemp, 6 );
 		pitcherRecord.OBChanceBasic = (float)_ttof(cTemp);
 		m_pPage2->GetDlgItemText( IDC_CHANCELEFT, cTemp, 6 );
@@ -4166,9 +4194,8 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 	if (m_pPage3->m_hWnd != 0)
 	{
 		m_pPage3->GetDlgItemText( IDC_COMBO_PLAYERNAME1, cTemp, 30 );
-		cTemp[30]		= NULL;
-		m_structPitcher.m_PitcherName		= cTemp+filler10+filler10+filler10+filler10;
-		m_pPage3->GetDlgItemText( IDC_IP1, cTemp, 7 );
+		m_structPitcher.m_PitcherName		= cTemp;
+		m_pPage3->GetDlgItemText(IDC_IP1, cTemp, 7);
 		pitcherStatsRecord.InningsPitched = (float)_ttof(cTemp);
 		pitcherStatsRecord.Starts = m_pPage3->GetDlgItemInt(IDC_STARTS1, &rc_GetDlgItemInt, FALSE);
 		pitcherStatsRecord.Wins = m_pPage3->GetDlgItemInt(IDC_WINS1, &rc_GetDlgItemInt, FALSE);
@@ -4566,4 +4593,3 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // PropertySheetLeagueOptions message handlers
-
