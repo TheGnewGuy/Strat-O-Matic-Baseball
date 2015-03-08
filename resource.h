@@ -38,6 +38,7 @@
 #define IDD_TEAMHTMLOPTIONS             165
 #define IDD_BATTERSCHANCE               166
 #define IDD_BATTERSSTATS                167
+#define IDR_TOOLBAR1                    167
 #define IDD_BATTERSINFO                 168
 #define IDD_PITCHERSINFO                170
 #define IDD_PITCHERSSTATS               171
@@ -213,7 +214,6 @@
 #define IDC_COMBOBGCOLOR                1172
 #define IDC_FIRSTNAME1                  1172
 #define IDC_LASTNAME1                   1173
-#define IDC_EDIT2                       1175
 #define ID_FORMS_SCORESHEETFORM         32771
 #define ID_FORMS_STATISTCSFORM          32772
 #define ID_FORMS_SCORESHEETFORMXTRA     32773
@@ -243,14 +243,21 @@
 #define ID_PLAYERS_ADDEDITBATTERS       32805
 #define ID_PLAYERS_ADDEDITPITCHERS      32806
 #define ID_LEAGUES_LEAGUEOPTIONSHTML    32807
+#define ID_BUTTON32813                  32813
+#define ID_BUTTON32814                  32814
+#define ID_BUTTON32815                  32815
+#define ID_BUTTON32816                  32816
+#define ID_BUTTON32817                  32817
+#define ID_BUTTON32818                  32818
+#define ID_BUTTON32812                  32819
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        167
-#define _APS_NEXT_COMMAND_VALUE         32808
+#define _APS_NEXT_RESOURCE_VALUE        169
+#define _APS_NEXT_COMMAND_VALUE         32820
 #define _APS_NEXT_CONTROL_VALUE         1176
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
