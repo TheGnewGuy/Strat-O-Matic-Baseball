@@ -776,7 +776,6 @@ void CBaseballDoc::OnFileExportLeagueTeamsAll()
 	SetCursor(hCursorNormal);
 }
 
-//void CBaseballDoc::Export(CString strLeagueDir)
 void CBaseballDoc::Export(int leagueID)
 {
 	int teamID = 0;
@@ -786,7 +785,6 @@ void CBaseballDoc::Export(int leagueID)
 	ExportFile(teamID);
 }
 
-//void CBaseballDoc::ExportFile(CString strDir, CString strTeamName)
 void CBaseballDoc::ExportFile(int teamID)
 {
 	CFile exportBatter;
@@ -1071,7 +1069,7 @@ void CBaseballDoc::ExportFile(int teamID)
 	rcSqlStep = sqlite3_step(localStmt);
 	while (rcSqlStep == SQLITE_ROW)
 	{
-		// Get ID of batter
+		// Get ID of pitcher
 		pitcherStatsID = sqlite3_column_int(localStmt, 0);
 
 		// Read in the player Data
@@ -1165,222 +1163,88 @@ void CBaseballDoc::ExportFile(int teamID)
 
 void CBaseballDoc::OnFileExportHTMLLeagueTeams() 
 {
-	CString strLeague;
 	int leagueID = 0;
-	CString strLeagueName;
-	CString strLeagueFile;
-	CString strLeagueDir;
 
-//	strLeague = GetLeagues(TRUE);
 	leagueID = GetLeagues(TRUE);
 
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-	}
-	else
-	{
-		// This is the base directory
-		strLeagueDir = "data";
-	}
-	ExportHTML(strLeagueDir);
+	ExportHTML(leagueID);
 }
 
 void CBaseballDoc::OnFileExportHtmlLeagueTeamsAll() 
 {
-	CFileFind myFileFind;
-	CStringArray arrayFileNames;
-	CFile myInFile;
-	BYTE count;
-	char temp[41];
-	CString strTemp;
-	CString strTeamName;
-	BOOL bWorking;
-	int i,sortflag;
 	HCURSOR hCursorWait;
 	HCURSOR hCursorNormal;
 
-	CString strLeague;
 	int leagueID = 0;
-	CString strLeagueName;
-	CString strLeagueFile;
-	CString strLeagueDir;
+	int teamID = 0;
+	char *sqlTeam;
+	int rc = 0;
+	int rcSqlStep = 0;
+	CHAR buffer[100];
+	sqlite3_stmt *localStmt;
 
-//	strLeague = GetLeagues(TRUE);
+	hCursorWait = AfxGetApp()->LoadStandardCursor(IDC_WAIT);
+
+	hCursorNormal = SetCursor(hCursorWait);
+	ShowCursor(TRUE);
+
 	leagueID = GetLeagues(TRUE);
 
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
+	/* Create SQL statement */
+	sqlTeam = "SELECT "  \
+		"TeamID" \
+		" FROM TEAM " \
+		" WHERE LeagueID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlTeam, strlen(sqlTeam), &localStmt, 0);
+	if (rc != SQLITE_OK)
 	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
 	}
 	else
 	{
-		// This is the base directory
-		strLeagueDir = "data";
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
 	}
-
-	// Start of findfile code for teams
-	arrayFileNames.RemoveAll();
-	bWorking = myFileFind.FindFile(strLeagueDir+"\\TB*.dat",0);
-	if (bWorking)
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmt, 1, leagueID);
+	if (rc != SQLITE_OK)
 	{
-		while (bWorking)
-		{
-			bWorking = myFileFind.FindNextFile();
-			arrayFileNames.Add(myFileFind.GetFileName());
-		}
-		myFileFind.Close();
-
-		// Since the FindNextFile does not return the files in any order
-		// we must sort the file names
-		sortflag = 1;
-		while (sortflag)
-		{
-			sortflag = 0;
-			for (i=0; i<(arrayFileNames.GetSize()-1);i++)
-			{
-				if (arrayFileNames[i].Compare(arrayFileNames[i+1]) == 1)
-				{
-					strTemp = arrayFileNames[i];
-					arrayFileNames[i] = arrayFileNames[i+1];
-					arrayFileNames[i+1] = strTemp;
-					sortflag = 1;
-				}
-			}
-		}
-
-		hCursorWait = AfxGetApp()->LoadStandardCursor(IDC_WAIT);
-		for (i=0; i<arrayFileNames.GetSize(); i++)
-		{
-			myInFile.Open(strLeagueDir+"\\"+arrayFileNames[i],CFile::modeRead);
-			myInFile.Read(&count,sizeof(count));
-			myInFile.Read(temp,40);
-			myInFile.Close();
-			temp[40] = NULL;
-			strTeamName = temp;
-			strTeamName = strTeamName+"\t"+arrayFileNames[i];
-			hCursorNormal = SetCursor(hCursorWait);
-			ShowCursor(TRUE);
-			ExportHTMLFile(strLeagueDir, strTeamName);
-			ShowCursor(FALSE);
-			SetCursor(hCursorNormal);
-		}
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
 	}
-	else
+
+	rcSqlStep = sqlite3_step(localStmt);
+	while (rcSqlStep == SQLITE_ROW)
 	{
-		// No teams found so display message
-		AfxMessageBox("Could not find any Team files. Please create a team");
+		teamID = sqlite3_column_int(localStmt, 0);
+		ExportHTMLFile(teamID);
+		// Get next Team
+		rcSqlStep = sqlite3_step(localStmt);
 	}
+
+	sqlite3_finalize(localStmt);
+
+	ShowCursor(FALSE);
+	SetCursor(hCursorNormal);
 }
 
-void CBaseballDoc::ExportHTML(CString strDir)
+void CBaseballDoc::ExportHTML(int leagueID)
 {
-	BOOL bWorking;
-	char temp[41];
-	BYTE count;
-	CString strTeamName;
-	CString strTemp;
-	CFile myInFile;
-	BatterStruct structBatter;
-	PitcherStruct structPitcher;
-	dlgSelTeam dlgSelTeam;
-	CFileFind myFileFind;
-	CStringArray arrayFileNames;
-	int sortflag;
-	int i;
-	CWnd* pmyCWnd;
+	int teamID = 0;
 
-	bWorking = myFileFind.FindFile(strDir+"\\TB*.dat",0);
-	if (bWorking)
-	{
-		while (bWorking)
-		{
-			bWorking = myFileFind.FindNextFile();
-			arrayFileNames.Add(myFileFind.GetFileName());
-		}
-		myFileFind.Close();
+	teamID = GetTeams(leagueID);
 
-		// Since the FindNextFile does not return the files in any order
-		// we must sort the file names
-		sortflag = 1;
-		while (sortflag)
-		{
-			sortflag = 0;
-			for (i=0; i<(arrayFileNames.GetSize()-1);i++)
-			{
-				if (arrayFileNames[i].Compare(arrayFileNames[i+1]) == 1)
-				{
-					strTemp = arrayFileNames[i];
-					arrayFileNames[i] = arrayFileNames[i+1];
-					arrayFileNames[i+1] = strTemp;
-					sortflag = 1;
-				}
-			}
-		}
-
-		for (i=0; i<arrayFileNames.GetSize(); i++)
-		{
-			myInFile.Open(strDir+"\\"+arrayFileNames[i],CFile::modeRead);
-			myInFile.Read(&count,sizeof(count));
-			myInFile.Read(temp,40);
-			myInFile.Close();
-			temp[40] = NULL;
-			strTeamName = temp;
-			strTeamName = strTeamName+"\t"+arrayFileNames[i];
-			dlgSelTeam.m_arrayTeams.Add(strTeamName);
-		}
-
-
-		if (dlgSelTeam.DoModal() == IDOK)
-		{
-			strTeamName = dlgSelTeam.m_arrayTeams[0];
-			ExportHTMLFile(strDir, strTeamName);
-		}
-	}
-	else
-	{
-		// No teams found so display message
-		pmyCWnd = AfxGetMainWnd();
-		pmyCWnd->MessageBox("Could not find any Team files. Please create a team",
-			"Teams not found!",MB_OK|MB_ICONEXCLAMATION);
-	}
+	ExportHTMLFile(teamID);
 }
 
-void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
+void CBaseballDoc::ExportHTMLFile(int teamID)
 {
-	BYTE count;
 	char HTMLData[200];
 	CString HTMLFileName;
 	CString strHTMLData;
-	CString myFileName;
-	CString strTemp;
-	CString strHTML;
-	CString strTempHTML;
 	CFile HTMLPlayer;
-	BatterStruct structBatter;
-	PitcherStruct structPitcher;
-	LONG lTeamSection = 74;
-	LONG lCountSection = 1;
-	LONG lPlayerSection = structBatter.m_RecordSize;
-	LONG lPitcherSection = structPitcher.m_RecordSize;
-	LONG position;
-	dlgSelTeam dlgSelTeam;
-	CFileFind myFileFind;
-	CStringArray arrayFileNames;
-	int i,j;
-	float fBattingAverage, fSLG, fOnBasePercentage;
-	double fIP;
-	double fERA;
-	double fTRG;
-	int *aiCount,tiCount;
-	int *aiAB,tiAB;
-	float *afBA,tfBA;
-	double *adERA,tdERA;
-	double *adIP,tdIP;
 	char datebuf[9],timebuf[9];
 	CString strIndex;
 	CString strBackgroundPicture;
@@ -1388,37 +1252,50 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	CString strVLinkColor;
 	CString strBGColor;
 	CString strTextColor;
+	m_TeamRecord teamRecord;
+	m_BatterStatsRecord batterStatsRecord;
+	m_BatterRecord batterRecord;
+	m_PitcherStatsRecord pitcherStatsRecord;
+	m_PitcherRecord pitcherRecord;
 
-	Registry myReg(strDir + REGTEAMS);
+	//Registry myReg(strDir + REGTEAMS);
 
-	strLinkColor	= myReg.GetRegistryOptionLinkColor();
-	strVLinkColor	= myReg.GetRegistryOptionVLinkColor();
-	strBGColor		= myReg.GetRegistryOptionBGColor();
-	strTextColor	= myReg.GetRegistryOptionTextColor();
-	strIndex		= myReg.GetRegistryOptionIndex();
-	strBackgroundPicture = myReg.GetRegistryOptionBackgroundPicture();
+	//strLinkColor	= myReg.GetRegistryOptionLinkColor();
+	//strVLinkColor	= myReg.GetRegistryOptionVLinkColor();
+	//strBGColor		= myReg.GetRegistryOptionBGColor();
+	//strTextColor	= myReg.GetRegistryOptionTextColor();
+	//strIndex		= myReg.GetRegistryOptionIndex();
+	//strBackgroundPicture = myReg.GetRegistryOptionBackgroundPicture();
+	strLinkColor	= "Blue";
+	strVLinkColor	= "Purple";
+	strBGColor = "White";
+	strTextColor = "Black";
+	strIndex = "index.htm";
+	strBackgroundPicture = "images/background.jpg";
+
+	teamRecord = GetTeam(teamID);
+	sqlite3_stmt *localStmt;
+	char *sqlBatterStats;
+	char *sqlPitcherStats;
+	int rc;
+	int rcSqlStep = 0;
+	CHAR buffer[100];
+	int batterStatsID = 0;
+	int pitcherStatsID = 0;
 
 	// Process Batter file
-	strTemp = "XB" + strTeamName.Left(20);
-	strTempHTML = strTeamName.Left(20);
-	strHTML.Empty();
-	for (i=0; i<20; i++)
-	{
-		if (strTempHTML.GetAt(i) != ' ')
-			strHTML += strTempHTML.GetAt(i);
-	}
-	HTMLFileName = strDir+"\\" + strHTML+".htm"; // dir\team.htm
-	myFileName = strDir+"\\TB"+strTeamName.Right(10);
+	HTMLFileName = CStringA(m_dir) + teamRecord.TeamName + _T(".htm"); // dir\TeamName.htm
+
 	HTMLPlayer.Open(HTMLFileName,CFile::modeCreate | CFile::modeWrite);
 	sprintf_s(HTMLData,"<HTML>\n<HEAD>\n<TITLE>%s</TITLE>\n</HEAD>\n",
-		strTeamName.Left(40));
+		teamRecord.TeamName);
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 	sprintf_s(HTMLData,"<BODY TEXT=%s LINK=%s VLINK=%s BGCOLOR=%s BACKGROUND=\"%s\">\n",
 		strTextColor,strLinkColor,strVLinkColor,strBGColor,strBackgroundPicture);
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<H2>%s</H2>\n",strTeamName.Left(40));
+	sprintf_s(HTMLData, "<H2>%s</H2>\n", teamRecord.TeamName);
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 	sprintf_s(HTMLData,"<A href=\"%s\">Back</A><BR><BR>\n",strIndex);
@@ -1427,10 +1304,10 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	sprintf_s(HTMLData,"<TABLE BORDER>\n<TR>\n");
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<TD ALIGN = LEFT><B>Batter</B></TD>");
+	sprintf_s(HTMLData, "<TD ALIGN = LEFT><B>Batter Name</B></TD>");
 	strHTMLData = HTMLData;
-	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<TD ALIGN = CENTER><B>AB</B></TD>");
+	HTMLPlayer.Write(strHTMLData, strHTMLData.GetLength());
+	sprintf_s(HTMLData, "<TD ALIGN = CENTER><B>AB</B></TD>");
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 	sprintf_s(HTMLData,"<TD ALIGN = CENTER><B>R</B></TD>");
@@ -1481,155 +1358,113 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	// Insert table below here
 
 	// A Team was selected so export all of the players
-//	count = structBatter.GetCountBatter(myFileName);
 
-	afBA = (float *)calloc( count, sizeof( float ) );
-	memset( afBA, '\0', count*sizeof( float ) );
-	aiAB = (int *)calloc( count, sizeof( int ) );
-	memset( aiAB, '\0', count*sizeof( int ) );
-	aiCount = (int *)calloc( count, sizeof( int ) );
-	memset( aiCount, '\0', count*sizeof( int ) );
-	// Fill arrays for count, era and ip
-	for (i=0; i<count; i++)
+	/* Create SQL statement */
+	sqlBatterStats = "SELECT "  \
+		"BatterStatsID " \
+		" from BATTERSTATS "
+		" WHERE TeamID = ?1 " \
+		" ORDER BY AVG DESC, AB DESC ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlBatterStats, strlen(sqlBatterStats), &localStmt, 0);
+	if (rc != SQLITE_OK)
 	{
-		position = lTeamSection+(i*lPlayerSection);
-		structBatter.GetBatter(myFileName, position);
-		strHTMLData.Empty();
-		aiCount[i] = i;		
-	
-		aiAB[i] = structBatter.m_AB;
-		if (aiAB[i] == 0)
-		{
-			afBA[i] = 0.0f;
-		}
-		else
-		{
-			afBA[i] = (float)structBatter.m_Hits/aiAB[i];
-		}
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
 	}
-	// Sort at bats then batting average
-	for (i=0; i<count; i++)
+	else
 	{
-		for (j=0; j<count-1; j++)
-		{
-			if ( aiAB[j] < aiAB[j+1])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-				tiAB = aiAB[j];
-				aiAB[j] = aiAB[j+1];
-				aiAB[j+1] = tiAB;
-				tfBA = afBA[j];
-				afBA[j] = afBA[j+1];
-				afBA[j+1] = tfBA;
-			}
-		}
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
 	}
-	for (i=0; i<count; i++)
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmt, 1, teamID);
+	if (rc != SQLITE_OK)
 	{
-		for (j=0; j<count-1; j++)
-		{
-			if ( afBA[j] < afBA[j+1])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-				tiAB = aiAB[j];
-				aiAB[j] = aiAB[j+1];
-				aiAB[j+1] = tiAB;
-				tfBA = afBA[j];
-				afBA[j] = afBA[j+1];
-				afBA[j+1] = tfBA;
-			}
-		}
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
 	}
 
-	for (i=0; i<count; i++)
+	rcSqlStep = sqlite3_step(localStmt);
+	while (rcSqlStep == SQLITE_ROW)
 	{
-		position = lTeamSection+(aiCount[i]*lPlayerSection);
-		structBatter.GetBatter(myFileName, position);
-		strHTMLData.Empty();
-		if (structBatter.m_AB == 0)
-		{
-			fBattingAverage = 0.0f;
-			fSLG = 0.0f;
-			fOnBasePercentage = 0.0f;
-		}
-		else
-		{
-			fBattingAverage = (float)structBatter.m_Hits/structBatter.m_AB;
-			fSLG = (float)((structBatter.m_Hits-(structBatter.m_2B+structBatter.m_3B+structBatter.m_HomeRuns))+(2*structBatter.m_2B)+(3*structBatter.m_3B)+(4*structBatter.m_HomeRuns))/(structBatter.m_AB);
-			fOnBasePercentage = (float)(structBatter.m_Hits+structBatter.m_Walk+structBatter.m_ReachedOnError+structBatter.m_Sacrifice+structBatter.m_StolenBase)/(structBatter.m_AB+structBatter.m_Walk+structBatter.m_ReachedOnError+structBatter.m_Sacrifice+structBatter.m_StolenBase);
-		}
+		// Get ID of batter
+		batterStatsID = sqlite3_column_int(localStmt, 0);
+
+		// Read in the player Data
+		batterStatsRecord = GetBatterStats(batterStatsID);
+		batterRecord = GetBatter(batterStatsRecord.BatterID);
 
 		sprintf_s(HTMLData,"<TR>");
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-		sprintf_s(HTMLData,"<TD>%s</TD>",
-			structBatter.m_PlayerName);
+		sprintf_s(HTMLData,"<TD>%s, %s</TD>",
+			batterRecord.LastName, batterRecord.FirstName);
+		strHTMLData = HTMLData;
+		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
+		sprintf_s(HTMLData, "<TD>%i</TD>",
+			batterStatsRecord.AB);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_AB);
+			batterStatsRecord.Runs);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_Runs);
+			batterStatsRecord.Hits);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_Hits);
+			batterStatsRecord.RBI);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_RBI);
+			batterStatsRecord.Doubles);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_2B);
+			batterStatsRecord.Triples);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_3B);
+			batterStatsRecord.HomeRuns);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_HomeRuns);
+			batterStatsRecord.Walk);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_Walk);
+			batterStatsRecord.Stirkeout);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_StrikeOut);
-		strHTMLData = HTMLData;
-		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structBatter.m_ReachedOnError);
+			batterStatsRecord.ReachedOnError);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD><TD>%i</TD>",
-			structBatter.m_CS,
-			structBatter.m_StolenBase);
+			batterStatsRecord.CS,
+			batterStatsRecord.StolenBase);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%1.3f</TD>",
-			fBattingAverage);
+			batterStatsRecord.AVG);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%1.3f</TD>",
-			fSLG);
+			batterStatsRecord.SLG);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%1.3f</TD>",
-			fOnBasePercentage);
+			batterStatsRecord.OBP);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"</TR>\n");
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
+
+		// Get next Batter
+		rcSqlStep = sqlite3_step(localStmt);
 	}
 	sprintf_s(HTMLData,"</TABLE>");
 	strHTMLData = HTMLData;
@@ -1637,13 +1472,9 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	sprintf_s(HTMLData,"<BR><BR><TABLE BORDER>");
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-	free(afBA);
-	free(aiAB);
-	free(aiCount);
+	sqlite3_finalize(localStmt);
 
 	// Process Pitcher file
-	strTemp = "XP" + strTeamName.Left(20);
-	myFileName = strDir+"\\TP"+strTeamName.Right(10);
 	sprintf_s(HTMLData,"<TR>");
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
@@ -1683,7 +1514,7 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	sprintf_s(HTMLData,"<TD ALIGN = CENTER><B>ERA</B></TD>");
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<TD ALIGN = CENTER><B>TRG</B></TD>");
+	sprintf_s(HTMLData,"<TD ALIGN = CENTER><B>WHIP</B></TD>");
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 	sprintf_s(HTMLData,"</TR>\n");
@@ -1691,145 +1522,105 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 
 	// A Team was selected so export a players
-	count = structPitcher.GetCountPitcher(myFileName);
 
-	adERA = (double *)calloc( count, sizeof( double ) );
-	memset( adERA, '\0', count*sizeof( double ) );
-	adIP = (double *)calloc( count, sizeof( double ) );
-	memset( adIP, '\0', count*sizeof( double ) );
-	aiCount = (int *)calloc( count, sizeof( int ) );
-	memset( aiCount, '\0', count*sizeof( int ) );
-	// Fill arrays for count, era and ip
-	for (i=0; i<count; i++)
+	/* Create SQL statement */
+	sqlPitcherStats = "SELECT "  \
+		"PitcherStatsID " \
+		" from PITCHERSTATS "
+		" WHERE TeamID = ?1 " \
+		" ORDER BY ERA ASC, InningsPitched DESC ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlPitcherStats, strlen(sqlPitcherStats), &localStmt, 0);
+	if (rc != SQLITE_OK)
 	{
-		position = lCountSection+(i*lPitcherSection);
-		structPitcher.GetPitcher(myFileName, position);
-		strHTMLData.Empty();
-		aiCount[i] = i;		
-		adIP[i] = atof(structPitcher.m_IP);
-		if (adIP[i] == 0)
-		{
-			adERA[i] = 0;
-		}
-		else
-		{
-			adERA[i] = (double)(structPitcher.m_ER*9)/adIP[i];
-		}
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
 	}
-	// Sort innings pitched and ERA
-	for (i=0; i<count; i++)
+	else
 	{
-		for (j=0; j<count-1; j++)
-		{
-			if ( adIP[j] > adIP[j+1])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-				tdERA = adERA[j];
-				adERA[j] = adERA[j+1];
-				adERA[j+1] = tdERA;
-				tdIP = adIP[j];
-				adIP[j] = adIP[j+1];
-				adIP[j+1] = tdIP;
-			}
-		}
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
 	}
-	for (i=0; i<count; i++)
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmt, 1, teamID);
+	if (rc != SQLITE_OK)
 	{
-		for (j=0; j<count-1; j++)
-		{
-			if ( adERA[j] > adERA[j+1])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-				tdERA = adERA[j];
-				adERA[j] = adERA[j+1];
-				adERA[j+1] = tdERA;
-				tdIP = adIP[j];
-				adIP[j] = adIP[j+1];
-				adIP[j+1] = tdIP;
-			}
-		}
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
 	}
 
-	for (i=0; i<count; i++)
+	rcSqlStep = sqlite3_step(localStmt);
+	while (rcSqlStep == SQLITE_ROW)
 	{
-		position = lCountSection+(aiCount[i]*lPitcherSection);
-		structPitcher.GetPitcher(myFileName, position);
-		strHTMLData.Empty();
-	
-		fIP = atof(structPitcher.m_IP);
+		// Get ID of pitcher
+		pitcherStatsID = sqlite3_column_int(localStmt, 0);
 
-		if (fIP == 0)
-		{
-			fERA = 0;
-			fTRG = 0;
-		}
-		else
-		{
-			fERA = (double)(structPitcher.m_ER*9)/fIP;
-			fTRG = (double)((structPitcher.m_Hits+structPitcher.m_Walks)*9)/fIP;
-		}
-		
-		sprintf_s(HTMLData,"<TR><TD>%s</TD>",
-			structPitcher.m_PitcherName);
+		// Read in the player Data
+		pitcherStatsRecord = GetPitcherStats(pitcherStatsID);
+		pitcherRecord = GetPitcher(pitcherStatsRecord.PitcherID);
+
+		// Process pitchers
+		sprintf_s(HTMLData,"<TR><TD>%s, %s</TD>",
+			pitcherRecord.LastName, pitcherRecord.FirstName);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%1.2f</TD>",
-			fIP);
+			pitcherStatsRecord.InningsPitched);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structPitcher.m_ER);
+			pitcherStatsRecord.ER);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structPitcher.m_Hits);
+			pitcherStatsRecord.Hits);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structPitcher.m_Walks);
+			pitcherStatsRecord.Walks);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structPitcher.m_Strikeouts);
+			pitcherStatsRecord.Strikeouts);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structPitcher.m_HomeRuns);
+			pitcherStatsRecord.HomeRuns);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structPitcher.m_Starts);
+			pitcherStatsRecord.Starts);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structPitcher.m_Wins);
+			pitcherStatsRecord.Wins);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structPitcher.m_Loss);
+			pitcherStatsRecord.Loss);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%i</TD>",
-			structPitcher.m_Saves);
+			pitcherStatsRecord.Saves);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%1.2f</TD>",
-			fERA);
+			pitcherStatsRecord.ERA);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%1.2f</TD>",
-			fTRG);
+			pitcherStatsRecord.WHIP);
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"</TR>\n");
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
+
+		// Get next Pitcher
+		rcSqlStep = sqlite3_step(localStmt);
 	}
 	// Insert table above here
+
 	sprintf_s(HTMLData,"</TABLE>\n");
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
@@ -1843,9 +1634,8 @@ void CBaseballDoc::ExportHTMLFile(CString strDir, CString strTeamName)
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 	HTMLPlayer.Close();
-	free(adERA);
-	free(adIP);
-	free(aiCount);
+
+	sqlite3_finalize(localStmt);
 }
 
 void CBaseballDoc::OnTeamsEditLeagueTeams() 
@@ -6264,3 +6054,4 @@ int CBaseballDoc::PitcherStatsUpdate(m_PitcherStatsRecord PitcherStatsRecord)
 
 	return 0;
 }
+

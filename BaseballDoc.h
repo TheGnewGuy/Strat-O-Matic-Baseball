@@ -45,8 +45,10 @@ public:
 	void HTMLLeagueStats(CString strLeagueName);
 //	void EditTeams(CString strDir);
 	void EditTeams(int leagueID);
-	void ExportHTML(CString strDir);
-	void ExportHTMLFile(CString strDir, CString strTeamName);
+//	void ExportHTML(CString strDir);
+	void ExportHTML(int leagueID);
+//	void ExportHTMLFile(CString strDir, CString strTeamName);
+	void ExportHTMLFile(int teamID);
 	BOOL GetNormalView();
 	void SetAllFormsFalse();
 	BOOL GetStatisticsForm();
