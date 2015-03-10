@@ -706,162 +706,99 @@ void CBaseballDoc::OnFileExportLeagueTeams()
 	CString strLeagueFile;
 	CString strLeagueDir;
 
-//	strLeague = GetLeagues(TRUE);
 	leagueID = GetLeagues(TRUE);
-
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-	}
-	else
-	{
-		// This is the base directory
-		strLeagueDir = "data";
-	}
 
 	hCursorWait = AfxGetApp()->LoadStandardCursor(IDC_WAIT);
 	hCursorNormal = SetCursor(hCursorWait);
 	ShowCursor(TRUE);
-	Export(strLeagueDir);
+	Export(leagueID);
 	ShowCursor(FALSE);
 	SetCursor(hCursorNormal);
 }
 
 void CBaseballDoc::OnFileExportLeagueTeamsAll() 
 {
-	DlgSelLeague dlgSelLeague;
-	dlgSelTeam dlgSelTeam;
-	CFileFind myFileFind;
-	CStringArray arrayFileNames;
-	CFile myInFile;
-	BYTE count;
-	char temp[41];
-	CString strTemp;
-	CString strTeamName;
-	BOOL bWorking;
-	CWnd* pmyCWnd;
-	int i,sortflag;
 	HCURSOR hCursorWait;
 	HCURSOR hCursorNormal;
 
-	CString strLeague;
 	int leagueID = 0;
-	CString strLeagueName;
-	CString strLeagueFile;
-	CString strLeagueDir;
-
-//	strLeague = GetLeagues(TRUE);
-	leagueID = GetLeagues(TRUE);
-
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-	}
-	else
-	{
-		// This is the base directory
-		strLeagueDir = "data";
-	}
+	int teamID = 0;
+	char *sqlTeam;
+	int rc = 0;
+	int rcSqlStep = 0;
+	CHAR buffer[100];
+	sqlite3_stmt *localStmt;
 
 	hCursorWait = AfxGetApp()->LoadStandardCursor(IDC_WAIT);
 
-	arrayFileNames.RemoveAll();
-	bWorking = myFileFind.FindFile(strLeagueDir+"\\TB*.dat",0);
-	if (bWorking)
+	hCursorNormal = SetCursor(hCursorWait);
+	ShowCursor(TRUE);
+
+	leagueID = GetLeagues(TRUE);
+
+	/* Create SQL statement */
+	sqlTeam = "SELECT "  \
+		"TeamID" \
+		" FROM TEAM " \
+		" WHERE LeagueID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlTeam, strlen(sqlTeam), &localStmt, 0);
+	if (rc != SQLITE_OK)
 	{
-		while (bWorking)
-		{
-			bWorking = myFileFind.FindNextFile();
-			arrayFileNames.Add(myFileFind.GetFileName());
-		}
-		myFileFind.Close();
-
-		// Since the FindNextFile does not return the files in any order
-		// we must sort the file names
-		sortflag = 1;
-		while (sortflag)
-		{
-			sortflag = 0;
-			for (i=0; i<(arrayFileNames.GetSize()-1);i++)
-			{
-				if (arrayFileNames[i].Compare(arrayFileNames[i+1]) == 1)
-				{
-					strTemp = arrayFileNames[i];
-					arrayFileNames[i] = arrayFileNames[i+1];
-					arrayFileNames[i+1] = strTemp;
-					sortflag = 1;
-				}
-			}
-		}
-
-		for (i=0; i<arrayFileNames.GetSize(); i++)
-		{
-			myInFile.Open(strLeagueDir+"\\"+arrayFileNames[i],CFile::modeRead);
-			myInFile.Read(&count,sizeof(count));
-			myInFile.Read(temp,40);
-			myInFile.Close();
-			temp[40] = NULL;
-			strTeamName = temp;
-			strTeamName = strTeamName+"\t"+arrayFileNames[i];
-			hCursorNormal = SetCursor(hCursorWait);
-			ShowCursor(TRUE);
-			ExportFile(strLeagueDir, strTeamName);
-			ShowCursor(FALSE);
-			SetCursor(hCursorNormal);
-		}
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
 	}
 	else
 	{
-		// No teams found so display message
-		pmyCWnd = AfxGetMainWnd();
-		pmyCWnd->MessageBox("Could not find any Team files. Please create a team",
-			"Teams not found!",MB_OK|MB_ICONEXCLAMATION);
+		sprintf_s(buffer, sizeof(buffer), "Prepare for TEAM Select OK:\n");
+		//AfxMessageBox(buffer);
 	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmt, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rcSqlStep = sqlite3_step(localStmt);
+	while (rcSqlStep == SQLITE_ROW)
+	{
+		teamID = sqlite3_column_int(localStmt, 0);
+		ExportFile(teamID);
+		// Get next Team
+		rcSqlStep = sqlite3_step(localStmt);
+	}
+
+	sqlite3_finalize(localStmt);
+	
+	ShowCursor(FALSE);
+	SetCursor(hCursorNormal);
 }
 
-void CBaseballDoc::Export(CString strLeagueDir)
+//void CBaseballDoc::Export(CString strLeagueDir)
+void CBaseballDoc::Export(int leagueID)
 {
-	CString strTeam;
-	CString strTeamFile;
-	CString strTeamName;
+	int teamID = 0;
 
-//	strTeam = GetTeams(strLeagueDir);
-	strTeamFile = strTeam.Right(12);
-	strTeamName = strTeam.Left(30);
+	teamID = GetTeams(leagueID);
 
-	ExportFile(strLeagueDir, strTeam);
+	ExportFile(teamID);
 }
 
-void CBaseballDoc::ExportFile(CString strDir, CString strTeamName)
+//void CBaseballDoc::ExportFile(CString strDir, CString strTeamName)
+void CBaseballDoc::ExportFile(int teamID)
 {
-	BatterStruct structBatter;
-	PitcherStruct structPitcher;
-	BYTE count;
 	CFile exportBatter;
 	CFile exportPitcher;
 	CString exportFileName;
 	char exportData[200];
 	CString strexportData;
-	float fBattingAverage, fSLG, fOnBasePercentage;
-	int i;
-	CString strTemp;
-	CString myFileName;
-	LONG lTeamSection = 74;
-	LONG lCountSection = 1;
-	LONG lPlayerSection = structBatter.m_RecordSize;
-	LONG lPitcherSection = structPitcher.m_RecordSize;
-	LONG position;
-	double fIP;
-	double fERA;
-	double fTRG;
 	char Bunting[5] = {'A','B','C','D','E'};
 	char HitRun[4] = {'A','B','C','D'};
-	char Stealing[7] = {'3','2','A','B','C','D','E'};
-	char BatterHits[3] = {'L','R','S'};
+//	char Stealing[7] = {'3','2','A','B','C','D','E'};
+	CStringA Stealing[7] = { "AAA", "AA", "A", "B", "C", "D", "E" };
+	char BatterHits[3] = { 'L', 'R', 'S' };
 	char Power[2] = {'N','W'};
 	int Running[15] = {5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
 	int TRate[21] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
@@ -869,302 +806,361 @@ void CBaseballDoc::ExportFile(CString strDir, CString strTeamName)
 	int OutArm[12] = {-6,-5,-4,-3,-2,-1,0,1,2,3,4,5};
 	int CatchArm[10] = {-4,-3,-2,-1,0,1,2,3,4,5};
 	int PHold[16] = {9,8,7,6,5,4,3,2,1,0,-1,-2,-3,-4,-5,-6};
+	m_TeamRecord teamRecord;
+	m_BatterStatsRecord batterStatsRecord;
+	m_BatterRecord batterRecord;
+	m_PitcherStatsRecord pitcherStatsRecord;
+	m_PitcherRecord pitcherRecord;
 
-	count = 0;
+	sqlite3_stmt *localStmt;
+	char *sqlBatterStats;
+	char *sqlPitcherStats;
+	int rc;
+	int rcSqlStep = 0;
+	CHAR buffer[100];
+	int batterStatsID = 0;
+	int pitcherStatsID = 0;
+
+	teamRecord = GetTeam(teamID);
 
 	// Process Batter file
-	strTemp = "XB" + strTeamName.Left(20);
-	exportFileName = strDir+"\\" + strTemp+".txt"; // dir\XB000001.txt
-	myFileName = strDir+"\\TB"+strTeamName.Right(10);
+	//strTemp = "XB" + strTeamName.Left(20);
+	exportFileName = CStringA(m_dir) + _T("XB") + teamRecord.TeamName + _T(".txt"); // XBTeamName.txt
+	//myFileName = strDir+"\\TB"+strTeamName.Right(10);
 	exportBatter.Open(exportFileName,CFile::modeCreate | CFile::modeWrite);
-	sprintf_s(exportData,"Team Name,Batter Name,,AB,Runs,Hits,RBI,2B,3B,HR,W,K,RE,");
+	sprintf_s(exportData,_T("Team Name,LastName,FirstName,AB,Runs,Hits,RBI,2B,3B,HR,W,K,RE,"));
 	strexportData = exportData;
 	exportBatter.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"SF,SB,CS,Bunting,Stealing,Running,Hit Run,LRS,P,C,");
+	sprintf_s(exportData,_T("SF,SB,CS,Bunting,Stealing,Running,Hit Run,LRS,P,C,"));
 	strexportData = exportData;
 	exportBatter.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"1B,2B,SS,3B,LF,CF,RF,ChB,ChL,ChR,");
+	sprintf_s(exportData,_T("1B,2B,SS,3B,LF,CF,RF,ChB,ChL,ChR,"));
 	strexportData = exportData;
 	exportBatter.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"AVG,SLG,OBP,Games,HBP,");
+	sprintf_s(exportData,_T("AVG,SLG,OBP,Games,HBP,"));
 	strexportData = exportData;
 	exportBatter.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Ch1B,Ch2B,Ch3B,ChHR,ChW,ChDP,");
+	sprintf_s(exportData,_T("Ch1B,Ch2B,Ch3B,ChHR,ChW,ChDP,"));
 	strexportData = exportData;
 	exportBatter.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Ch1BL,Ch2BL,Ch3BL,ChHRL,ChWL,ChDPL,");
+	sprintf_s(exportData,_T("Ch1BL,Ch2BL,Ch3BL,ChHRL,ChWL,ChDPL,"));
 	strexportData = exportData;
 	exportBatter.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Ch1BR,Ch2BR,Ch3BR,ChHRR,ChWR,ChDPR,");
+	sprintf_s(exportData,_T("Ch1BR,Ch2BR,Ch3BR,ChHRR,ChWR,ChDPR,"));
 	strexportData = exportData;
 	exportBatter.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"ER1,ER2,ER3,ER4,ER5,ER6,ER7,ER8,ER9,");
+	sprintf_s(exportData,_T("ER1,ER2,ER3,ER4,ER5,ER6,ER7,ER8,ER9,"));
 	strexportData = exportData;
 	exportBatter.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"T Rating,Passball,Power Left,Power Right,Outfield Arm,Catcher Arm\n");
+	sprintf_s(exportData,_T("T Rating,Passball,Power Left,Power Right,Outfield Arm,Catcher Arm\n"));
 	strexportData = exportData;
 	exportBatter.Write(strexportData,strexportData.GetLength());
 
 	// A Team was selected so export all of the players
-//	count = structBatter.GetCountBatter(myFileName);
-	for (i=0; i<count; i++)
+
+	/* Create SQL statement */
+	sqlBatterStats = "SELECT "  \
+		"BatterStatsID " \
+		" from BATTERSTATS "
+		" WHERE TeamID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlBatterStats, strlen(sqlBatterStats), &localStmt, 0);
+	if (rc != SQLITE_OK)
 	{
-		position = lTeamSection+(i*lPlayerSection);
-		structBatter.GetBatter(myFileName, position);
-		strexportData.Empty();
-		if (structBatter.m_AB == 0)
-		{
-			fBattingAverage = 0.0f;
-			fSLG = 0.0f;
-			fOnBasePercentage = 0.0f;
-		}
-		else
-		{
-			fBattingAverage = (float)structBatter.m_Hits/structBatter.m_AB;
-			fSLG = (float)((structBatter.m_Hits-(structBatter.m_2B+structBatter.m_3B+structBatter.m_HomeRuns))+(2*structBatter.m_2B)+(3*structBatter.m_3B)+(4*structBatter.m_HomeRuns))/(structBatter.m_AB);
-			fOnBasePercentage = (float)(structBatter.m_Hits+structBatter.m_Walk+structBatter.m_ReachedOnError+structBatter.m_Sacrifice+structBatter.m_StolenBase)/(structBatter.m_AB+structBatter.m_Walk+structBatter.m_ReachedOnError+structBatter.m_Sacrifice+structBatter.m_StolenBase);
-		}
-		
-		sprintf_s(exportData,"%s,%s,",
-			strTeamName.Left(40),
-			structBatter.m_PlayerName);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,",
-			structBatter.m_AB,
-			structBatter.m_Runs,
-			structBatter.m_Hits,
-			structBatter.m_RBI,
-			structBatter.m_2B,
-			structBatter.m_3B,
-			structBatter.m_HomeRuns,
-			structBatter.m_Walk,
-			structBatter.m_StrikeOut,
-			structBatter.m_ReachedOnError);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%i,%i,%i,%c,%c,%i,%c,%c,%i,%i,",
-			structBatter.m_Sacrifice,
-			structBatter.m_StolenBase,
-			structBatter.m_CS,
-			Bunting[structBatter.m_bBunting],
-			Stealing[structBatter.m_bStealing],
-			Running[structBatter.m_bRunning],
-			HitRun[structBatter.m_bHitRun],
-			BatterHits[structBatter.m_bBatterHits],
-			structBatter.m_Pitcher,
-			structBatter.m_Catcher);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%i,%i,%i,%i,%i,%i,%i,%s,%s,%s,",
-			structBatter.m_FirstBase,
-			structBatter.m_SecondBase,
-			structBatter.m_ShortStop,
-			structBatter.m_ThirdBase,
-			structBatter.m_LeftField,
-			structBatter.m_CenterField,
-			structBatter.m_RightField,
-			structBatter.m_OBChanceBasic,
-			structBatter.m_OBChanceLeft,
-			structBatter.m_OBChanceRight);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%1.3f,%1.3f,%1.3f,",
-			fBattingAverage,
-			fSLG,
-			fOnBasePercentage);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%i,%i,",
-			structBatter.m_Games,
-			structBatter.m_HBP);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%s,%s,%s,%s,%s,%s,",
-			structBatter.m_OBChanceSingle,
-			structBatter.m_OBChanceDouble,
-			structBatter.m_OBChanceTriple,
-			structBatter.m_OBChanceHomeRun,
-			structBatter.m_OBChanceWalk,
-			structBatter.m_ChanceDoublePlay);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%s,%s,%s,%s,%s,%s,",
-			structBatter.m_OBChanceSingleLeft,
-			structBatter.m_OBChanceDoubleLeft,
-			structBatter.m_OBChanceTripleLeft,
-			structBatter.m_OBChanceHomeRunLeft,
-			structBatter.m_OBChanceWalkLeft,
-			structBatter.m_ChanceDoublePlayLeft);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%s,%s,%s,%s,%s,%s,",
-			structBatter.m_OBChanceSingleRight,
-			structBatter.m_OBChanceDoubleRight,
-			structBatter.m_OBChanceTripleRight,
-			structBatter.m_OBChanceHomeRunRight,
-			structBatter.m_OBChanceWalkRight,
-			structBatter.m_ChanceDoublePlayRight);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%i,%i,%i,%i,%i,%i,%i,%i,%i,",
-			structBatter.m_bER1,
-			structBatter.m_bER2,
-			structBatter.m_bER3,
-			structBatter.m_bER4,
-			structBatter.m_bER5,
-			structBatter.m_bER6,
-			structBatter.m_bER7,
-			structBatter.m_bER8,
-			structBatter.m_bER9);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%i,%i,%c,%c,%i,%i\n",
-			TRate[structBatter.m_bTRate],
-			Pass[structBatter.m_bPass],
-			Power[structBatter.m_bPowerL],
-			Power[structBatter.m_bPowerR],
-			OutArm[structBatter.m_bOutArm],
-			CatchArm[structBatter.m_bCatchArm]);
-		strexportData = exportData;
-		exportBatter.Write(strexportData,strexportData.GetLength());
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
 	}
-	exportBatter.Close();
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmt, 1, teamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rcSqlStep = sqlite3_step(localStmt);
+	while (rcSqlStep == SQLITE_ROW)
+	{
+		// Get ID of batter
+		batterStatsID = sqlite3_column_int(localStmt, 0);
+
+		// Read in the player Data
+		batterStatsRecord = GetBatterStats(batterStatsID);
+		batterRecord = GetBatter(batterStatsRecord.BatterID);
+
+		// Process batters
+		sprintf_s(exportData, "%s,%s,%s,",
+			teamRecord.TeamName,
+			batterRecord.LastName,
+			batterRecord.FirstName);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,",
+			batterStatsRecord.AB,
+			batterStatsRecord.Runs,
+			batterStatsRecord.Hits,
+			batterStatsRecord.RBI,
+			batterStatsRecord.Doubles,
+			batterStatsRecord.Triples,
+			batterStatsRecord.HomeRuns,
+			batterStatsRecord.Walk,
+			batterStatsRecord.Stirkeout,
+			batterStatsRecord.ReachedOnError);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%i,%i,%i,%c,%s,%i,%c,%c,%i,%i,",
+			batterStatsRecord.Sacrifice,
+			batterStatsRecord.StolenBase,
+			batterStatsRecord.CS,
+			Bunting[batterRecord.Bunting],
+			Stealing[batterRecord.Stealing],
+			Running[batterRecord.Running],
+			HitRun[batterRecord.HitRun],
+			BatterHits[batterRecord.BatterHits],
+			batterRecord.Pitcher,
+			batterRecord.Catcher);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%i,%i,%i,%i,%i,%i,%i,%2.2f,%2.2f,%2.2f,",
+			batterRecord.FirstBase,
+			batterRecord.SecondBase,
+			batterRecord.ShortStop,
+			batterRecord.ThirdBase,
+			batterRecord.LeftField,
+			batterRecord.CenterField,
+			batterRecord.RightField,
+			batterRecord.OBChanceBasic,
+			batterRecord.OBChanceLeft,
+			batterRecord.OBChanceRight);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%1.3f,%1.3f,%1.3f,",
+			batterStatsRecord.AVG,
+			batterStatsRecord.SLG,
+			batterStatsRecord.OBP);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%i,%i,",
+			batterStatsRecord.Games,
+			batterStatsRecord.HBP);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,",
+			batterRecord.OBChanceSingle,
+			batterRecord.OBChanceDouble,
+			batterRecord.OBChanceTriple,
+			batterRecord.OBChanceHomeRun,
+			batterRecord.OBChanceWalk,
+			batterRecord.ChanceDoublePlay);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,",
+			batterRecord.OBChanceSingleLeft,
+			batterRecord.OBChanceDoubleLeft,
+			batterRecord.OBChanceTripleLeft,
+			batterRecord.OBChanceHomeRunLeft,
+			batterRecord.OBChanceWalkLeft,
+			batterRecord.ChanceDoublePlayLeft);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,",
+			batterRecord.OBChanceSingleRight,
+			batterRecord.OBChanceDoubleRight,
+			batterRecord.OBChanceTripleRight,
+			batterRecord.OBChanceHomeRunRight,
+			batterRecord.OBChanceWalkRight,
+			batterRecord.ChanceDoublePlayRight);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%i,%i,%i,%i,%i,%i,%i,%i,%i,",
+			batterRecord.ER1,
+			batterRecord.ER2,
+			batterRecord.ER3,
+			batterRecord.ER4,
+			batterRecord.ER5,
+			batterRecord.ER6,
+			batterRecord.ER7,
+			batterRecord.ER8,
+			batterRecord.ER9);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+		sprintf_s(exportData, "%i,%i,%c,%c,%i,%i\n",
+			TRate[batterRecord.TRate],
+			Pass[batterRecord.Pass],
+			Power[batterRecord.PowerLeft],
+			Power[batterRecord.PowerRight],
+			OutArm[batterRecord.OutArm],
+			CatchArm[batterRecord.CatchArm]);
+		strexportData = exportData;
+		exportBatter.Write(strexportData, strexportData.GetLength());
+
+		// Get next Batter
+		rcSqlStep = sqlite3_step(localStmt);
+	}
+	sqlite3_finalize(localStmt);
 
 	// Process Pitcher file
-	strTemp = "XP" + strTeamName.Left(20);
-	exportFileName = strDir+"\\" + strTemp+".txt"; // dir\XB000001.txt
-	myFileName = strDir+"\\TP"+strTeamName.Right(10);
+	//strTemp = "XP" + strTeamName.Left(20);
+	//exportFileName = strDir+"\\" + strTemp+".txt"; // dir\XB000001.txt
+	exportFileName = CStringA(m_dir) + _T("XP") + teamRecord.TeamName + _T(".txt"); // XPTeamName.txt
+	//myFileName = strDir+"\\TP"+strTeamName.Right(10);
 	exportPitcher.Open(exportFileName,CFile::modeCreate | CFile::modeWrite);
-	sprintf_s(exportData,"Team Name,Pitcher Name,,IP,ER,Hits,Walks,Strikeouts,");
+	sprintf_s(exportData,_T("Team Name,LastName,FirstName,IP,ER,Hits,Walks,Strikeouts,"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Homeruns,Hold,Wins,Loss,Saves,Starter,Relief,Throws,");
+	sprintf_s(exportData,_T("Homeruns,Hold,Wins,Loss,Saves,Starter,Relief,Throws,"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"ChB,ChL,ChR,");
+	sprintf_s(exportData,_T("ChB,ChL,ChR,"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"ERA,TRG,");
+	sprintf_s(exportData,_T("ERA,WHIP,"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Starts,");
+	sprintf_s(exportData,_T("Starts,"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Games,Completed Games,");
+	sprintf_s(exportData,_T("Games,Completed Games,"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Ch1B,Ch2B,Ch3B,ChHR,ChW,ChDP,");
+	sprintf_s(exportData,_T("Ch1B,Ch2B,Ch3B,ChHR,ChW,ChDP,"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Ch1BL,Ch2BL,Ch3BL,ChHRL,ChWL,ChDPL,");
+	sprintf_s(exportData,_T("Ch1BL,Ch2BL,Ch3BL,ChHRL,ChWL,ChDPL,"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Ch1BR,Ch2BR,Ch3BR,ChHRR,ChWR,ChDPR,");
+	sprintf_s(exportData,_T("Ch1BR,Ch2BR,Ch3BR,ChHRR,ChWR,ChDPR,"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
-	sprintf_s(exportData,"Wild Pitch,Balk,Fielding,ErrorRating,Bunting\n");
+	sprintf_s(exportData,_T("Wild Pitch,Balk,Fielding,ErrorRating,Bunting\n"));
 	strexportData = exportData;
 	exportPitcher.Write(strexportData,strexportData.GetLength());
 
 	// A Team was selected so export all of the players
-	count = structPitcher.GetCountPitcher(myFileName);
-	for (i=0; i<count; i++)
-	{
-		position = lCountSection+(i*lPitcherSection);
-		structPitcher.GetPitcher(myFileName, position);
-		strexportData.Empty();
-		
-		fIP = atof(structPitcher.m_IP);
 
-		if (fIP == 0)
-		{
-			fERA = 0;
-			fTRG = 0;
-		}
-		else
-		{
-			fERA = (double)(structPitcher.m_ER*9)/fIP;
-			fTRG = (double)((structPitcher.m_Hits+structPitcher.m_Walks)*9)/fIP;
-		}
-		
-		sprintf_s(exportData,"%s,%s,",
-			strTeamName.Left(40),
-			structPitcher.m_PitcherName);
+	/* Create SQL statement */
+	sqlPitcherStats = "SELECT "  \
+		"PitcherStatsID " \
+		" from PITCHERSTATS "
+		" WHERE TeamID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlPitcherStats, strlen(sqlPitcherStats), &localStmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmt, 1, teamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rcSqlStep = sqlite3_step(localStmt);
+	while (rcSqlStep == SQLITE_ROW)
+	{
+		// Get ID of batter
+		pitcherStatsID = sqlite3_column_int(localStmt, 0);
+
+		// Read in the player Data
+		pitcherStatsRecord = GetPitcherStats(pitcherStatsID);
+		pitcherRecord = GetPitcher(pitcherStatsRecord.PitcherID);
+
+		// Process pitchers
+		sprintf_s(exportData,"%s,%s,%s,",
+			teamRecord.TeamName,
+			pitcherRecord.LastName,
+			pitcherRecord.FirstName);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%1.2f,%i,%i,%i,%i,%i,%i,%i,%i,",
-			fIP,
-			structPitcher.m_ER,
-			structPitcher.m_Hits,
-			structPitcher.m_Walks,
-			structPitcher.m_Strikeouts,
-			structPitcher.m_HomeRuns,
-			PHold[structPitcher.m_Hold],
-			structPitcher.m_Wins,
-			structPitcher.m_Loss);
+		sprintf_s(exportData,"%3.2f,%i,%i,%i,%i,%i,%i,%i,%i,",
+			pitcherStatsRecord.InningsPitched,
+			pitcherStatsRecord.ER,
+			pitcherStatsRecord.Hits,
+			pitcherStatsRecord.Walks,
+			pitcherStatsRecord.Strikeouts,
+			pitcherStatsRecord.HomeRuns,
+			PHold[pitcherRecord.Hold],
+			pitcherStatsRecord.Wins,
+			pitcherStatsRecord.Loss);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%i,%i,%i,%c,%s,%s,%s,",
-			structPitcher.m_Saves,
-			structPitcher.m_Starter,
-			structPitcher.m_Relief,
-			BatterHits[structPitcher.m_Throws],
-			structPitcher.m_OBChanceBasic,
-			structPitcher.m_OBChanceLeft,
-			structPitcher.m_OBChanceRight);
+		sprintf_s(exportData,"%i,%i,%i,%c,%2.2f,%2.2f,%2.2f,",
+			pitcherStatsRecord.Saves,
+			pitcherRecord.Starter,
+			pitcherRecord.Relief,
+			BatterHits[pitcherRecord.Throws],
+			pitcherRecord.OBChanceBasic,
+			pitcherRecord.OBChanceLeft,
+			pitcherRecord.OBChanceRight);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
 		sprintf_s(exportData,"%1.2f,%1.2f,",
-			fERA,
-			fTRG);
+			pitcherStatsRecord.ERA,
+			pitcherStatsRecord.WHIP);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
 		sprintf_s(exportData,"%i,",
-			structPitcher.m_Starts);
+			pitcherStatsRecord.Starts);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
 		sprintf_s(exportData,"%i,%i,",
-			structPitcher.m_Games,structPitcher.m_CompGames);
+			pitcherStatsRecord.Games, 
+			pitcherStatsRecord.CompleteGames);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%s,%s,%s,%s,%s,%s,",
-			structPitcher.m_OBChanceSingle,
-			structPitcher.m_OBChanceDouble,
-			structPitcher.m_OBChanceTriple,
-			structPitcher.m_OBChanceHomeRun,
-			structPitcher.m_OBChanceWalk,
-			structPitcher.m_ChanceDoublePlay);
+		sprintf_s(exportData,"%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,",
+			pitcherRecord.OBChanceSingle,
+			pitcherRecord.OBChanceDouble,
+			pitcherRecord.OBChanceTriple,
+			pitcherRecord.OBChanceHomeRun,
+			pitcherRecord.OBChanceWalk,
+			pitcherRecord.ChanceDoublePlay);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%s,%s,%s,%s,%s,%s,",
-			structPitcher.m_OBChanceSingleLeft,
-			structPitcher.m_OBChanceDoubleLeft,
-			structPitcher.m_OBChanceTripleLeft,
-			structPitcher.m_OBChanceHomeRunLeft,
-			structPitcher.m_OBChanceWalkLeft,
-			structPitcher.m_ChanceDoublePlayLeft);
+		sprintf_s(exportData,"%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,",
+			pitcherRecord.OBChanceSingleLeft,
+			pitcherRecord.OBChanceDoubleLeft,
+			pitcherRecord.OBChanceTripleLeft,
+			pitcherRecord.OBChanceHomeRunLeft,
+			pitcherRecord.OBChanceWalkLeft,
+			pitcherRecord.ChanceDoublePlayLeft);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
-		sprintf_s(exportData,"%s,%s,%s,%s,%s,%s,",
-			structPitcher.m_OBChanceSingleRight,
-			structPitcher.m_OBChanceDoubleRight,
-			structPitcher.m_OBChanceTripleRight,
-			structPitcher.m_OBChanceHomeRunRight,
-			structPitcher.m_OBChanceWalkRight,
-			structPitcher.m_ChanceDoublePlayRight);
+		sprintf_s(exportData,"%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,%2.2f,",
+			pitcherRecord.OBChanceSingleRight,
+			pitcherRecord.OBChanceDoubleRight,
+			pitcherRecord.OBChanceTripleRight,
+			pitcherRecord.OBChanceHomeRunRight,
+			pitcherRecord.OBChanceWalkRight,
+			pitcherRecord.ChanceDoublePlayRight);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
 		sprintf_s(exportData,"%i,%i,%i,%i,%c\n",
-			structPitcher.m_bWP,
-			structPitcher.m_bBalk,
-			structPitcher.m_PitcherField,
-			structPitcher.m_bER1,
-			Bunting[structPitcher.m_Bunting]);
+			pitcherRecord.WP,
+			pitcherRecord.Balk,
+			pitcherRecord.Pitcher,
+			pitcherRecord.ER1,
+			Bunting[pitcherRecord.Bunting]);
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
+
+		// Get next Pitcher
+		rcSqlStep = sqlite3_step(localStmt);
 	}
-	exportPitcher.Close();
+	sqlite3_finalize(localStmt);
 }
 
 void CBaseballDoc::OnFileExportHTMLLeagueTeams() 
@@ -4002,6 +3998,7 @@ void CBaseballDoc::OnFileOpen()
 	case IDOK:
 		// Do something 
 		m_DBFileName = myfiledlg->GetPathName();
+		_splitpath_s(m_DBFileName, m_drive, _MAX_DRIVE, m_dir, _MAX_DIR, m_dbfname,	_MAX_FNAME, m_ext, _MAX_EXT);
 		OpenDatabase();
 		//AfxMessageBox(_T("OK pressed!"));
 		break;

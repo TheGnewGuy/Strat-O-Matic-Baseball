@@ -89,8 +89,10 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 private:
-	void Export(CString strDir);
-	void ExportFile(CString strDir, CString strTeamName);
+//	void Export(CString strDir);
+	void Export(int leagueID);
+//	void ExportFile(CString strDir, CString strTeamName);
+	void ExportFile(int teamID);
 	CString m_Conference4;
 	CString m_Conference3;
 	CString m_Conference2;
@@ -99,6 +101,10 @@ private:
 public:
 	CString m_DBFileName;
 	int m_dbOpen;
+	char m_drive[_MAX_DRIVE];
+	char m_dir[_MAX_DIR];
+	char m_dbfname[_MAX_FNAME];
+	char m_ext[_MAX_EXT];
 	sqlite3 *m_db;
 	sqlite3_stmt *m_stmt;
 	afx_msg void OnFileOpen();
