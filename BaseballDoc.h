@@ -42,8 +42,10 @@ public:
 	PropertySheetPitchers* m_pPropertySheetPitchers;
 	int m_StatCount;
 	void BuildPlayerArray(CStringArray* arrayFileNames, CString strLeagueName, CString strDivisionName, CString strConferenceName, int iDiv);
-	void HTMLLeagueStats(CString strLeagueName);
-//	void EditTeams(CString strDir);
+	void BuildPlayerArray(int leagueID, int conferenceID, int divisionID);
+	//	void HTMLLeagueStats(CString strLeagueName);
+	void HTMLLeagueStats(int leagueID);
+	//	void EditTeams(CString strDir);
 	void EditTeams(int leagueID);
 //	void ExportHTML(CString strDir);
 	void ExportHTML(int leagueID);

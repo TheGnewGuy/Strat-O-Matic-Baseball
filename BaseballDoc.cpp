@@ -1712,95 +1712,513 @@ void CBaseballDoc::EditTeams(int leagueID)
 
 void CBaseballDoc::OnStatisticsHTMLLeagueStats() 
 {
-	CString strLeague;
+	//CString strLeague;
 	int leagueID = 0;
-	CString strLeagueName;
-	CString strLeagueFile;
-	CString strLeagueDir;
+	//CString strLeagueName;
+	//CString strLeagueFile;
+	//CString strLeagueDir;
 
 //	strLeague = GetLeagues(FALSE);
 	leagueID = GetLeagues(FALSE);
 
-	strLeagueName = strLeague.Left(30);
-	if (strncmp(strLeagueName,"All",3))
-	{
-		strLeagueFile = strLeague.Right(12);
-		strLeagueDir = strLeagueFile.Left(8);
-		HTMLLeagueStats(strLeague);
-	}
-	else
-	{
-		// This is the base directory
-		AfxMessageBox("The Base directory can not be selected. Please Select a League Directory");
-	}
-
+	//strLeagueName = strLeague.Left(30);
+	//if (strncmp(strLeagueName,"All",3))
+	//{
+	//	strLeagueFile = strLeague.Right(12);
+	//	strLeagueDir = strLeagueFile.Left(8);
+	//	HTMLLeagueStats(strLeague);
+	//}
+	//else
+	//{
+	//	// This is the base directory
+	//	AfxMessageBox("The Base directory can not be selected. Please Select a League Directory");
+	//}
+	HTMLLeagueStats(leagueID);
 }
 
-void CBaseballDoc::HTMLLeagueStats(CString strLeague)
+//void CBaseballDoc::HTMLLeagueStats(CString strLeague)
+void CBaseballDoc::HTMLLeagueStats(int leagueID)
 {
 	// strLeague contains
 	// Left 30 League name
 	// Right 12 File name L0000001.dat
-	CString strLeagueDir;
-	CString strLeagueName;
-	CString strLeagueFile;
-	CString strTeamFileName;
-	CString strDivisionName;
-	CString strConferenceName;
-	CString strTemp;
-	CStringArray* arrayFileNames = new CStringArray;
-	CFile LeagueFile;
-	BYTE version;
-	BYTE NumDiv;
-	BYTE NumConf;
-	BYTE NumTeams;
-	short HomeWin,HomeLoss,AwayWin,AwayLoss;
-	char temp[41];
-	int iDiv,iConf,iTeam;
+//	CString strLeagueDir;
+//	CString strLeagueName;
+//	CString strLeagueFile;
+//	CString strTeamFileName;
+//	CString strDivisionName;
+//	CString strConferenceName;
+//	CString strTemp;
+//	CStringArray* arrayFileNames = new CStringArray;
+//	CFile LeagueFile;
+////	BYTE version;
+//	BYTE NumDiv;
+//	BYTE NumConf;
+//	BYTE NumTeams;
+//	short HomeWin,HomeLoss,AwayWin,AwayLoss;
+//	char temp[41];
+//	int iDiv,iConf,iTeam;
+	m_LeagueRecord leagueRecord;
+	m_ConferenceRecord conferenceRecord;
+	m_DivisionRecord divisionRecord;
+	int rcSqlStepConf = 0;
+	int rcSqlStepDiv = 0;
+	int rc = 0;
+	CHAR buffer[100];
+	CHAR *sqlConference;
+	CHAR *sqlDivision;
+	sqlite3_stmt *localStmtConf;
+	sqlite3_stmt *localStmtDivision;
+	int conferenceID = 0;
+	int divisionID = 0;
 
-	strLeagueName = strLeague.Left(30);
-	strLeagueFile = strLeague.Right(12);
-	strLeagueDir = strLeagueFile.Left(8);
-	LeagueFile.Open("data\\"+strLeagueFile,CFile::modeRead);
-	LeagueFile.Read(&version,sizeof(version));
-	LeagueFile.Read(&NumConf,sizeof(NumConf));
-	LeagueFile.Read(temp,30);		// League Name
-	temp[30] = NULL;
-	strLeagueName = temp;
+	leagueRecord = GetLeague(leagueID);
 
-	for (iConf=0; iConf<NumConf; iConf++)
+	/* Create SQL statement */
+	sqlConference = "SELECT "  \
+		"ConferenceID " \
+		" from CONFERENCES "
+		" WHERE LeagueID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlConference, strlen(sqlConference), &localStmtConf, 0);
+	if (rc != SQLITE_OK)
 	{
-		LeagueFile.Read(&NumDiv,sizeof(NumDiv));
-		LeagueFile.Read(temp,30);		// Conference Name
-		temp[30] = NULL;
-		strConferenceName = temp;
-		for (iDiv=0; iDiv<NumDiv; iDiv++)
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for CONFERENCES Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtConf, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rcSqlStepConf = sqlite3_step(localStmtConf);
+	while (rcSqlStepConf == SQLITE_ROW)
+	{
+		// Get ID of conference
+		conferenceID = sqlite3_column_int(localStmtConf, 0);
+
+		/* Create SQL statement */
+		sqlDivision = "SELECT "  \
+			"DivisionID " \
+			" from DIVISIONS "
+			" WHERE LeagueID = ?1 AND ConferenceID = ?2";
+
+		rc = sqlite3_prepare_v2(m_db, sqlDivision, strlen(sqlDivision), &localStmtDivision, 0);
+		if (rc != SQLITE_OK)
 		{
-			LeagueFile.Read(&NumTeams,sizeof(NumTeams));
-			LeagueFile.Read(temp,30);		// Division Name
-			temp[30] = NULL;
-			strDivisionName = temp;
-			arrayFileNames->RemoveAll();
-			for (iTeam=0; iTeam<NumTeams; iTeam++)
+			sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+			AfxMessageBox(buffer);
+		}
+		else
+		{
+			sprintf_s(buffer, sizeof(buffer), "Prepare for CONFERENCES Select OK:\n");
+			//AfxMessageBox(buffer);
+		}
+		// Bind the data to field '1' which is the first '?' in the INSERT statement
+		rc = sqlite3_bind_int(localStmtDivision, 1, leagueID);
+		if (rc != SQLITE_OK)
+		{
+			sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+			AfxMessageBox(buffer);
+		}
+		rc = sqlite3_bind_int(localStmtDivision, 2, conferenceID);
+		if (rc != SQLITE_OK)
+		{
+			sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+			AfxMessageBox(buffer);
+		}
+
+		rcSqlStepDiv = sqlite3_step(localStmtDivision);
+		if (rcSqlStepDiv == SQLITE_DONE)
+		{
+			// Process League data with default division
+			BuildPlayerArray(leagueID, conferenceID, 1);
+		}
+		else
+		{
+			while (rcSqlStepDiv == SQLITE_ROW)
 			{
-				LeagueFile.Read(temp,40);		// Team Name
-				LeagueFile.Read(temp,8);		// Team File
-				temp[8] = NULL;
-				strTemp = temp;
-				strTeamFileName = strLeagueDir + "\\" + strTemp + ".dat";
-				arrayFileNames->Add(strTeamFileName);
-				LeagueFile.Read(temp,3);		// Short Team Name Name
-				LeagueFile.Read(temp,20);		// Ballpark (Field should be 30 not used)
-				LeagueFile.Read(&HomeWin,sizeof(HomeWin));		// Home Wins
-				LeagueFile.Read(&HomeLoss,sizeof(HomeLoss));	// Home Loss
-				LeagueFile.Read(&AwayWin,sizeof(AwayWin));		// Away Wins
-				LeagueFile.Read(&AwayLoss,sizeof(AwayLoss));	// Away Loss
+				// Get ID of division
+				divisionID = sqlite3_column_int(localStmtDivision, 0);
+
+				// Process League data
+				BuildPlayerArray(leagueID, conferenceID, divisionID);
+
+				// Get next Division
+				rcSqlStepDiv = sqlite3_step(localStmtDivision);
 			}
-			BuildPlayerArray(arrayFileNames,strLeagueName,strDivisionName,strConferenceName,iDiv);
+		}
+		sqlite3_finalize(localStmtDivision);
+
+		// Get next Conference
+		rcSqlStepConf = sqlite3_step(localStmtConf);
+	}
+	sqlite3_finalize(localStmtConf);
+
+	//strLeagueName = strLeague.Left(30);
+	//strLeagueFile = strLeague.Right(12);
+	//strLeagueDir = strLeagueFile.Left(8);
+	//LeagueFile.Open("data\\"+strLeagueFile,CFile::modeRead);
+	//LeagueFile.Read(&version,sizeof(version));
+	//LeagueFile.Read(&NumConf,sizeof(NumConf));
+	//LeagueFile.Read(temp,30);		// League Name
+	//temp[30] = NULL;
+	//strLeagueName = temp;
+
+	//for (iConf=0; iConf<NumConf; iConf++)
+	//{
+	//	LeagueFile.Read(&NumDiv,sizeof(NumDiv));
+	//	LeagueFile.Read(temp,30);		// Conference Name
+	//	temp[30] = NULL;
+	//	strConferenceName = temp;
+	//	for (iDiv=0; iDiv<NumDiv; iDiv++)
+	//	{
+	//		LeagueFile.Read(&NumTeams,sizeof(NumTeams));
+	//		LeagueFile.Read(temp,30);		// Division Name
+	//		temp[30] = NULL;
+	//		strDivisionName = temp;
+	//		arrayFileNames->RemoveAll();
+	//		for (iTeam=0; iTeam<NumTeams; iTeam++)
+	//		{
+	//			LeagueFile.Read(temp,40);		// Team Name
+	//			LeagueFile.Read(temp,8);		// Team File
+	//			temp[8] = NULL;
+	//			strTemp = temp;
+	//			strTeamFileName = strLeagueDir + "\\" + strTemp + ".dat";
+	//			arrayFileNames->Add(strTeamFileName);
+	//			LeagueFile.Read(temp,3);		// Short Team Name Name
+	//			LeagueFile.Read(temp,20);		// Ballpark (Field should be 30 not used)
+	//			LeagueFile.Read(&HomeWin,sizeof(HomeWin));		// Home Wins
+	//			LeagueFile.Read(&HomeLoss,sizeof(HomeLoss));	// Home Loss
+	//			LeagueFile.Read(&AwayWin,sizeof(AwayWin));		// Away Wins
+	//			LeagueFile.Read(&AwayLoss,sizeof(AwayLoss));	// Away Loss
+	//		}
+	//		BuildPlayerArray(arrayFileNames,strLeagueName,strDivisionName,strConferenceName,iDiv);
+	//	}
+	//}
+	//LeagueFile.Close();
+	//delete arrayFileNames;
+}
+
+void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int divisionID)
+{
+	CFile HTMLFile;
+	char HTMLData[200];
+	CString strHTMLData;
+	char datebuf[9], timebuf[9];
+	CString strIndex;
+	CString strBackgroundPicture;
+	CString strLinkColor;
+	CString strVLinkColor;
+	CString strBGColor;
+	CString strTextColor;
+
+	m_LeagueRecord leagueRecord;
+	m_ConferenceRecord conferenceRecord;
+	m_DivisionRecord divisionRecord;
+	m_TeamRecord teamRecord;
+	int rcSqlStepTeam = 0;
+	int rc = 0;
+	CHAR buffer[100];
+	CHAR *sqlTeam;
+	sqlite3_stmt *localStmtTeam;
+	int teamID = 0;
+	int sumAB = 0;
+	int sumRuns = 0;
+	int sumHits = 0;
+	int sumRBI = 0;
+	int sumDouble = 0;
+	int sumTriple = 0;
+	int sumHomeRun = 0;
+	int sumWalk = 0;
+	int sumROE = 0;
+	int sumSacrifice = 0;
+	int sumStollen = 0;
+	int sumCS = 0;
+	int totalAB = 0;
+	int totalRuns = 0;
+	int totalHits = 0;
+	int totalRBI = 0;
+	int totalDouble = 0;
+	int totalTriple = 0;
+	int totalHomeRun = 0;
+	int totalWalk = 0;
+	int totalROE = 0;
+	int totalSacrifice = 0;
+	int totalStollen = 0;
+	int totalCS = 0;
+	CString strAVG;
+	float fBA;
+	float fSLG;
+	float fOBP;
+
+	leagueRecord = GetLeague(leagueID);
+	conferenceRecord = GetConference(conferenceID);
+	divisionRecord = GetDivision(divisionID);
+
+	strLinkColor = "Blue";
+	strVLinkColor = "Purple";
+	strBGColor = "White";
+	strTextColor = "Black";
+	strIndex = "index.htm";
+	strBackgroundPicture = "images/background.jpg";
+
+	// Division of 1 and or Conference of 1 are pointers to DEFAULT
+	if (divisionID == 1)
+	{
+		if (conferenceID == 1)
+		{
+			// Create file name only with League name
+			HTMLFile.Open(CStringA(m_dir) + leagueRecord.LeagueName + _T(".htm"), CFile::modeWrite | CFile::modeCreate);
+		}
+		else
+		{
+			// Create file name with League name and Conference name
+			HTMLFile.Open(CStringA(m_dir) + leagueRecord.LeagueName + _T(" ") + conferenceRecord.ConferenceName + 
+				_T(".htm"), CFile::modeWrite | CFile::modeCreate);
 		}
 	}
-	LeagueFile.Close();
-	delete arrayFileNames;
+	else
+	{
+		if (conferenceID == 1)
+		{
+			// Create file name with League name and Division name
+			HTMLFile.Open(CStringA(m_dir) + leagueRecord.LeagueName + _T(" ") + divisionRecord.DivisionName + 
+				_T(".htm"), CFile::modeWrite | CFile::modeCreate);
+		}
+		else
+		{
+			// Create file name with League name, Conference name, and Division name
+			HTMLFile.Open(CStringA(m_dir) + leagueRecord.LeagueName + _T(" ") + conferenceRecord.ConferenceName + 
+				_T(" ") + divisionRecord.DivisionName + _T(".htm"), CFile::modeWrite | CFile::modeCreate);
+		}
+	}
+	sprintf_s(HTMLData, "<HTML>\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	sprintf_s(HTMLData, "<HEAD>\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	sprintf_s(HTMLData, "<TITLE>%s</TITLE>\n", leagueRecord.LeagueName);
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	sprintf_s(HTMLData, "</HEAD>\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	sprintf_s(HTMLData, "<BODY TEXT=%s LINK=%s VLINK=%s BGCOLOR=%s BACKGROUND=\"%s\">\n",
+		strTextColor, strLinkColor, strVLinkColor, strBGColor, strBackgroundPicture);
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	sprintf_s(HTMLData, "<A href=\"%s\">Back</A><BR><BR>\n", strIndex);
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	sprintf_s(HTMLData, "<H2>League: %s</H2>\n", leagueRecord.LeagueName);
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	if (conferenceID != 1)
+	{
+		sprintf_s(HTMLData, "Conference: <B>%s</B><BR>\n", conferenceRecord.ConferenceName);
+		strHTMLData = HTMLData;
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+	if (divisionID != 1)
+	{
+		sprintf_s(HTMLData, "Division: <B>%s</B><BR>\n", divisionRecord.DivisionName);
+		strHTMLData = HTMLData;
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+
+	sprintf_s(HTMLData, "<PRE><B>\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	sprintf_s(HTMLData, "BATTING\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	sprintf_s(HTMLData, "    TEAM             AVG   SLG   OBP     AB    R     H  RBI   2B   3B  HR   SB   CS\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	/* Create SQL statement */
+	sqlTeam = "SELECT "  \
+		"T.TeamID, " \
+		"sum(B.AB) AS sumAB, " \
+		"sum(B.Runs), " \
+		"sum(B.Hits) as sumHits, " \
+		"sum(B.RBI), " \
+		"sum(B.Doubles)," \
+		"sum(B.Triples), " \
+		"sum(B.HomeRuns), " \
+		"sum(B.Walk), " \
+		"sum(B.ReachedOnError), " \
+		"sum(B.Sacrifice), " \
+		"sum(B.StolenBase), " \
+		"sum(B.CS) " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as B " \
+		"ON T.TeamID = B.TeamID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"GROUP BY T.TeamID " \
+		"ORDER BY (CAST(sumAB AS FLOAT) / sumHits) ASC";
+
+	rc = sqlite3_prepare_v2(m_db, sqlTeam, strlen(sqlTeam), &localStmtTeam, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtTeam, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtTeam, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtTeam, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rcSqlStepTeam = sqlite3_step(localStmtTeam);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		// Get ID of team
+		teamID = sqlite3_column_int(localStmtTeam, 0);
+		sumAB = sqlite3_column_int(localStmtTeam, 1);
+		sumRuns = sqlite3_column_int(localStmtTeam, 2);
+		sumHits = sqlite3_column_int(localStmtTeam, 3);
+		sumRBI = sqlite3_column_int(localStmtTeam, 4);
+		sumDouble = sqlite3_column_int(localStmtTeam, 5);
+		sumTriple = sqlite3_column_int(localStmtTeam, 6);
+		sumHomeRun = sqlite3_column_int(localStmtTeam, 7);
+		sumWalk = sqlite3_column_int(localStmtTeam, 8);
+		sumROE = sqlite3_column_int(localStmtTeam, 9);
+		sumSacrifice = sqlite3_column_int(localStmtTeam, 10);
+		sumStollen = sqlite3_column_int(localStmtTeam, 11);
+		sumCS = sqlite3_column_int(localStmtTeam, 12);
+		totalAB += sumAB;
+		totalRuns += sumRuns;
+		totalHits += sumHits;
+		totalRBI += sumRBI;
+		totalDouble += sumDouble;
+		totalTriple += sumTriple;
+		totalHomeRun += sumHomeRun;
+		totalWalk += sumWalk;
+		totalROE += sumROE;
+		totalSacrifice += sumSacrifice;
+		totalStollen += sumStollen;
+		totalCS += sumCS;
+
+		fBA = (float)sumHits / sumAB;
+		fSLG = (float)((sumHits - (sumDouble + sumTriple + sumHomeRun)) + (2 * sumDouble) + (3 * sumTriple) + (4 * sumHomeRun)) / (sumAB);
+		fOBP = (float)(sumHits + sumWalk + sumROE + sumSacrifice + sumStollen) / (sumAB + sumWalk + sumROE + sumSacrifice + sumStollen);
+
+		teamRecord = GetTeam(teamID);
+
+		sprintf_s(HTMLData, "%s %-15.15s %1.3f %1.3f %1.3f %5i %4i %5i %4i %4i %4i %3i %4i %4i\n",
+			teamRecord.TeamNameShort, teamRecord.TeamName, fBA, fSLG, fOBP, sumAB, sumRuns, sumHits, sumRBI,
+			sumDouble, sumTriple, sumHomeRun, sumStollen, sumCS);
+		strHTMLData = HTMLData;
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+		// Get next team
+		rcSqlStepTeam = sqlite3_step(localStmtTeam);
+	}
+
+	sprintf_s(HTMLData, "--- --------------- ----- ----- ----- ----- ---- ----- ---- ---- ---- --- ---- ----\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	fBA = (float)totalHits / totalAB;
+	fSLG = (float)((totalHits - (totalDouble + totalTriple + totalHomeRun)) + (2 * totalDouble) + (3 * totalTriple) + (4 * totalHomeRun)) / (totalAB);
+	fOBP = (float)(totalHits + totalWalk + totalROE + totalSacrifice + totalStollen) / (totalAB + totalWalk + totalROE + totalSacrifice + totalStollen);
+	sprintf_s(HTMLData, "LEAGUE TOTALS       %1.3f %1.3f %1.3f %5i %4i %5i %4i %4i %4i %3i %4i %4i\n",
+		fBA, fSLG, fOBP, totalAB, totalRuns, totalHits, totalRBI,
+		totalDouble, totalTriple, totalHomeRun, totalStollen, totalCS);
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	sprintf_s(HTMLData, "\nPITCHING\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	sprintf_s(HTMLData, "    TEAM             ERA  WHIP  Wins  Loss     IP  Hits   ER  HR Walks    K\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	//for (i = 0; i<arrayFileNamesSize - 1; i++)
+	//{
+	//	for (j = 0; j<arrayFileNamesSize - 1; j++)
+	//	{
+	//		if (adTERA[aiTCount[j]] > adTERA[aiTCount[j + 1]])
+	//		{
+	//			tiCount = aiTCount[j];
+	//			aiTCount[j] = aiTCount[j + 1];
+	//			aiTCount[j + 1] = tiCount;
+	//		}
+	//	}
+	//}
+	//for (iarraySize = 0; iarraySize < arrayFileNamesSize; iarraySize++)
+	//{
+	//	strTemp = cstrTeamPData.GetAt(aiTCount[iarraySize]);
+	//	HTMLFile.Write(strTemp, strTemp.GetLength());
+	//}
+	sprintf_s(HTMLData, "--- --------------- ----- ----   ---   --- ------ ----- ---- ---  ---- ----\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	//sprintf_s(HTMLData, "%5.2f", dTERA);
+	//strTemp = HTMLData;
+	//strERA = strTemp;
+	//sprintf_s(HTMLData, "%4.1f", dTTRG);
+	//strTemp = HTMLData;
+	//strTRG = strTemp.Right(4);
+	//sprintf_s(HTMLData, "%6.1f", dTIP);
+	//strTemp = HTMLData;
+	//strIP = strTemp;
+	//sprintf_s(HTMLData, "LEAGUE TOTALS       %5s %4s   %3i   %3i %6s %5i %4i %3i  %4i %4i\n\n",
+	//	strERA, strTRG, iTPWins, iTPLoss, strIP, iTPHits, iTPER, iTPHR, iTPWalks, iTPK);
+	//strHTMLData = HTMLData;
+	//HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+
+
+
+	sprintf_s(HTMLData, "</B></PRE>\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	// Write the Last Updated line n the HTML file
+	_strtime_s(timebuf);
+	_strdate_s(datebuf);
+	sprintf_s(HTMLData, "<BR>Last Updated on %s at %s<BR>\n", datebuf, timebuf);
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	sprintf_s(HTMLData, "</BODY></HTML>\n");
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	HTMLFile.Close();
+
 }
 
 void CBaseballDoc::BuildPlayerArray(CStringArray* arrayFileNames, CString strLeagueName, CString strDivisionName, CString strConferenceName, int iDiv)
