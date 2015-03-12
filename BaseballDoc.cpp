@@ -1934,22 +1934,39 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	int sumAB = 0;
 	int sumRuns = 0;
 	int sumHits = 0;
+	int sumPHits = 0;
 	int sumRBI = 0;
 	int sumDouble = 0;
 	int sumTriple = 0;
 	int sumHomeRun = 0;
+	int sumPHomeRun = 0;
 	int sumWalk = 0;
 	int sumROE = 0;
 	int sumSacrifice = 0;
 	int sumStollen = 0;
 	int sumCS = 0;
+	int sumWins = 0;
+	int sumLoss = 0;
+	float sumInningsPitched = 0.0;
+	int sumER = 0;
+	int sumWalks = 0;
+	int sumStrikeouts = 0;
+	int totalWins = 0;
+	int totalLoss = 0;
+	float totalInningsPitched = 0.0;
+	int totalER = 0;
+	int totalWalks = 0;
+	int totalStrikeouts = 0;
+
 	int totalAB = 0;
 	int totalRuns = 0;
 	int totalHits = 0;
+	int totalPHits = 0;
 	int totalRBI = 0;
 	int totalDouble = 0;
 	int totalTriple = 0;
 	int totalHomeRun = 0;
+	int totalPHomeRun = 0;
 	int totalWalk = 0;
 	int totalROE = 0;
 	int totalSacrifice = 0;
@@ -1959,6 +1976,8 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	float fBA;
 	float fSLG;
 	float fOBP;
+	float fERA;
+	float fWHIP;
 
 	leagueRecord = GetLeague(leagueID);
 	conferenceRecord = GetConference(conferenceID);
@@ -2162,42 +2181,106 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	sprintf_s(HTMLData, "\nPITCHING\n");
 	strHTMLData = HTMLData;
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
-	sprintf_s(HTMLData, "    TEAM             ERA  WHIP  Wins  Loss     IP  Hits   ER  HR Walks    K\n");
+	sprintf_s(HTMLData, "    TEAM             ERA   WHIP  Wins  Loss      IP  Hits   ER  HR Walks    K\n");
 	strHTMLData = HTMLData;
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
-	//for (i = 0; i<arrayFileNamesSize - 1; i++)
-	//{
-	//	for (j = 0; j<arrayFileNamesSize - 1; j++)
-	//	{
-	//		if (adTERA[aiTCount[j]] > adTERA[aiTCount[j + 1]])
-	//		{
-	//			tiCount = aiTCount[j];
-	//			aiTCount[j] = aiTCount[j + 1];
-	//			aiTCount[j + 1] = tiCount;
-	//		}
-	//	}
-	//}
-	//for (iarraySize = 0; iarraySize < arrayFileNamesSize; iarraySize++)
-	//{
-	//	strTemp = cstrTeamPData.GetAt(aiTCount[iarraySize]);
-	//	HTMLFile.Write(strTemp, strTemp.GetLength());
-	//}
-	sprintf_s(HTMLData, "--- --------------- ----- ----   ---   --- ------ ----- ---- ---  ---- ----\n");
+
+	/* Create SQL statement */
+	sqlTeam = "SELECT "  \
+		"T.TeamID, " \
+		"sum(P.Wins), " \
+		"sum(P.Loss), " \
+		"sum(CAST(P.InningsPitched AS FLOAT)) AS sumIP, " \
+		"sum(P.ER) AS sumER, " \
+		"sum(P.Hits)," \
+		"sum(P.HomeRuns), " \
+		"sum(P.Walks), " \
+		"sum(P.Strikeouts) " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as P " \
+		"ON T.TeamID = P.TeamID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"GROUP BY T.TeamID " \
+		"ORDER BY ((CAST(sumER AS FLOAT) * 9) / CAST(sumIP AS FLOAT)) ASC";
+
+	rc = sqlite3_prepare_v2(m_db, sqlTeam, strlen(sqlTeam), &localStmtTeam, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtTeam, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtTeam, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtTeam, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rcSqlStepTeam = sqlite3_step(localStmtTeam);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		// Get ID of team
+		teamID = sqlite3_column_int(localStmtTeam, 0);
+		sumWins = sqlite3_column_int(localStmtTeam, 1);
+		sumLoss = sqlite3_column_int(localStmtTeam, 2);
+		sumInningsPitched = (float)sqlite3_column_double(localStmtTeam, 3);
+		sumER = sqlite3_column_int(localStmtTeam, 4);
+		sumPHits = sqlite3_column_int(localStmtTeam, 5);
+		sumPHomeRun = sqlite3_column_int(localStmtTeam, 6);
+		sumWalks = sqlite3_column_int(localStmtTeam, 7);
+		sumStrikeouts = sqlite3_column_int(localStmtTeam, 8);
+		totalWins += sumWins;
+		totalLoss += sumLoss;
+		totalInningsPitched += sumInningsPitched;
+		totalER += sumER;
+		totalPHits += sumPHits;
+		totalPHomeRun += sumPHomeRun;
+		totalWalks += sumWalks;
+		totalStrikeouts += sumStrikeouts;
+
+		fERA = ((float)sumER * 9) / sumInningsPitched;
+		fWHIP = (float)((sumPHits + sumWalks) * 9) / sumInningsPitched;
+
+		teamRecord = GetTeam(teamID);
+
+		sprintf_s(HTMLData, "%s %-15.15s %5.2f  %4.1f   %3i   %3i  %6.1f %5i %4i %3i  %4i %4i\n",
+			teamRecord.TeamNameShort, teamRecord.TeamName, fERA, fWHIP, sumWins, sumLoss, sumInningsPitched, sumPHits,
+			sumER, sumPHomeRun, sumWalks, sumStrikeouts);
+		strHTMLData = HTMLData;
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+		// Get next team
+		rcSqlStepTeam = sqlite3_step(localStmtTeam);
+	}
+
+	sprintf_s(HTMLData, "--- --------------- -----  ----  ----  ---- -------  ---- ---- ---   ---  ---\n");
 	strHTMLData = HTMLData;
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
-	//sprintf_s(HTMLData, "%5.2f", dTERA);
-	//strTemp = HTMLData;
-	//strERA = strTemp;
-	//sprintf_s(HTMLData, "%4.1f", dTTRG);
-	//strTemp = HTMLData;
-	//strTRG = strTemp.Right(4);
-	//sprintf_s(HTMLData, "%6.1f", dTIP);
-	//strTemp = HTMLData;
-	//strIP = strTemp;
-	//sprintf_s(HTMLData, "LEAGUE TOTALS       %5s %4s   %3i   %3i %6s %5i %4i %3i  %4i %4i\n\n",
-	//	strERA, strTRG, iTPWins, iTPLoss, strIP, iTPHits, iTPER, iTPHR, iTPWalks, iTPK);
-	//strHTMLData = HTMLData;
-	//HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	fERA = ((float)totalER * 9) / totalInningsPitched;
+	fWHIP = (float)((totalHits + totalWalks) * 9) / totalInningsPitched;
+	sprintf_s(HTMLData, "LEAGUE TOTALS       %5.2f  %4.1f   %3i   %3i  %6.1f %5i %4i %3i  %4i %4i\n\n",
+		fERA, fWHIP, totalWins, totalLoss, totalInningsPitched, totalHits, totalER, totalHomeRun, totalWalks, totalStrikeouts);
+	strHTMLData = HTMLData;
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 
 
 
