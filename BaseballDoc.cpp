@@ -1712,52 +1712,15 @@ void CBaseballDoc::EditTeams(int leagueID)
 
 void CBaseballDoc::OnStatisticsHTMLLeagueStats() 
 {
-	//CString strLeague;
 	int leagueID = 0;
-	//CString strLeagueName;
-	//CString strLeagueFile;
-	//CString strLeagueDir;
 
-//	strLeague = GetLeagues(FALSE);
 	leagueID = GetLeagues(FALSE);
 
-	//strLeagueName = strLeague.Left(30);
-	//if (strncmp(strLeagueName,"All",3))
-	//{
-	//	strLeagueFile = strLeague.Right(12);
-	//	strLeagueDir = strLeagueFile.Left(8);
-	//	HTMLLeagueStats(strLeague);
-	//}
-	//else
-	//{
-	//	// This is the base directory
-	//	AfxMessageBox("The Base directory can not be selected. Please Select a League Directory");
-	//}
 	HTMLLeagueStats(leagueID);
 }
 
-//void CBaseballDoc::HTMLLeagueStats(CString strLeague)
 void CBaseballDoc::HTMLLeagueStats(int leagueID)
 {
-	// strLeague contains
-	// Left 30 League name
-	// Right 12 File name L0000001.dat
-//	CString strLeagueDir;
-//	CString strLeagueName;
-//	CString strLeagueFile;
-//	CString strTeamFileName;
-//	CString strDivisionName;
-//	CString strConferenceName;
-//	CString strTemp;
-//	CStringArray* arrayFileNames = new CStringArray;
-//	CFile LeagueFile;
-////	BYTE version;
-//	BYTE NumDiv;
-//	BYTE NumConf;
-//	BYTE NumTeams;
-//	short HomeWin,HomeLoss,AwayWin,AwayLoss;
-//	char temp[41];
-//	int iDiv,iConf,iTeam;
 	m_LeagueRecord leagueRecord;
 	m_ConferenceRecord conferenceRecord;
 	m_DivisionRecord divisionRecord;
@@ -1862,50 +1825,6 @@ void CBaseballDoc::HTMLLeagueStats(int leagueID)
 		rcSqlStepConf = sqlite3_step(localStmtConf);
 	}
 	sqlite3_finalize(localStmtConf);
-
-	//strLeagueName = strLeague.Left(30);
-	//strLeagueFile = strLeague.Right(12);
-	//strLeagueDir = strLeagueFile.Left(8);
-	//LeagueFile.Open("data\\"+strLeagueFile,CFile::modeRead);
-	//LeagueFile.Read(&version,sizeof(version));
-	//LeagueFile.Read(&NumConf,sizeof(NumConf));
-	//LeagueFile.Read(temp,30);		// League Name
-	//temp[30] = NULL;
-	//strLeagueName = temp;
-
-	//for (iConf=0; iConf<NumConf; iConf++)
-	//{
-	//	LeagueFile.Read(&NumDiv,sizeof(NumDiv));
-	//	LeagueFile.Read(temp,30);		// Conference Name
-	//	temp[30] = NULL;
-	//	strConferenceName = temp;
-	//	for (iDiv=0; iDiv<NumDiv; iDiv++)
-	//	{
-	//		LeagueFile.Read(&NumTeams,sizeof(NumTeams));
-	//		LeagueFile.Read(temp,30);		// Division Name
-	//		temp[30] = NULL;
-	//		strDivisionName = temp;
-	//		arrayFileNames->RemoveAll();
-	//		for (iTeam=0; iTeam<NumTeams; iTeam++)
-	//		{
-	//			LeagueFile.Read(temp,40);		// Team Name
-	//			LeagueFile.Read(temp,8);		// Team File
-	//			temp[8] = NULL;
-	//			strTemp = temp;
-	//			strTeamFileName = strLeagueDir + "\\" + strTemp + ".dat";
-	//			arrayFileNames->Add(strTeamFileName);
-	//			LeagueFile.Read(temp,3);		// Short Team Name Name
-	//			LeagueFile.Read(temp,20);		// Ballpark (Field should be 30 not used)
-	//			LeagueFile.Read(&HomeWin,sizeof(HomeWin));		// Home Wins
-	//			LeagueFile.Read(&HomeLoss,sizeof(HomeLoss));	// Home Loss
-	//			LeagueFile.Read(&AwayWin,sizeof(AwayWin));		// Away Wins
-	//			LeagueFile.Read(&AwayLoss,sizeof(AwayLoss));	// Away Loss
-	//		}
-	//		BuildPlayerArray(arrayFileNames,strLeagueName,strDivisionName,strConferenceName,iDiv);
-	//	}
-	//}
-	//LeagueFile.Close();
-	//delete arrayFileNames;
 }
 
 void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int divisionID)
@@ -1913,6 +1832,9 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	CFile HTMLFile;
 	char HTMLData[200];
 	CString strHTMLData;
+	CStringArray strArrayHTMLData1;
+	CStringArray strArrayHTMLData2;
+	CStringArray strArrayHTMLData3;
 	char datebuf[9], timebuf[9];
 	CString strIndex;
 	CString strBackgroundPicture;
@@ -1929,7 +1851,9 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	int rc = 0;
 	CHAR buffer[100];
 	CHAR *sqlTeam;
+	CHAR *sqlSelect;
 	sqlite3_stmt *localStmtTeam;
+	sqlite3_stmt *localStmtSelect;
 	int teamID = 0;
 	int sumAB = 0;
 	int sumRuns = 0;
@@ -1978,6 +1902,32 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	float fOBP;
 	float fERA;
 	float fWHIP;
+	CString teamNameShort;
+	CString firstName;
+	CString lastName;
+	CString playerName;
+	int homeRuns = 0;
+	int atBats = 0;
+	int runs = 0;
+	int hits = 0;
+	int rbi = 0;
+	float avg;
+	float slg;
+	float obp;
+	int doubles;
+	int triples;
+	int stolenBase = 0;
+	int cs = 0;
+	int strikeouts = 0;
+	int walks = 0;
+	int er = 0;
+	float era;
+	float ip;
+	float whip;
+	int wins = 0;
+	int loss = 0;
+	int starts = 0;
+	int saves = 0;
 
 	leagueRecord = GetLeague(leagueID);
 	conferenceRecord = GetConference(conferenceID);
@@ -2164,6 +2114,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 		// Get next team
 		rcSqlStepTeam = sqlite3_step(localStmtTeam);
 	}
+	sqlite3_finalize(localStmtTeam);
 
 	sprintf_s(HTMLData, "--- --------------- ----- ----- ----- ----- ---- ----- ---- ---- ---- --- ---- ----\n");
 	strHTMLData = HTMLData;
@@ -2270,6 +2221,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 		// Get next team
 		rcSqlStepTeam = sqlite3_step(localStmtTeam);
 	}
+	sqlite3_finalize(localStmtTeam);
 
 	sprintf_s(HTMLData, "--- --------------- -----  ----  ----  ---- -------  ---- ---- ---   ---  ---\n");
 	strHTMLData = HTMLData;
@@ -2282,8 +2234,1758 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	strHTMLData = HTMLData;
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.AB " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.AB DESC, BS.AVG DESC LIMIT 10";
 
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
 
+	strArrayHTMLData1.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		atBats = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, atBats);
+		strArrayHTMLData1.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.Runs " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.Runs DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData2.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		runs = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, runs);
+		strArrayHTMLData2.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.Hits " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.Hits DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData3.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		hits = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
+			teamNameShort, playerName, hits);
+		strArrayHTMLData3.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	strHTMLData = _T("At Bats                    Runs                       Hits\n");
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	for (int i = 0; i < strArrayHTMLData3.GetSize(); i++)
+	{
+		strHTMLData = strArrayHTMLData1[i] + strArrayHTMLData2[i] + strArrayHTMLData3[i];
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.RBI " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.RBI DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData1.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		rbi = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, rbi);
+		strArrayHTMLData1.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.AVG " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.AVG DESC, BS.AB DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData2.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		avg = (float)sqlite3_column_double(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %1.3f  ",
+			teamNameShort, playerName, avg);
+		strArrayHTMLData2.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.SLG " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.SLG DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData3.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		slg = (float)sqlite3_column_double(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %1.3f\n",
+			teamNameShort, playerName, slg);
+		strArrayHTMLData3.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	strHTMLData = _T("\nRBI's                      Batting Averages            Slugging Percentages\n");
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	for (int i = 0; i < strArrayHTMLData3.GetSize(); i++)
+	{
+		strHTMLData = strArrayHTMLData1[i] + strArrayHTMLData2[i] + strArrayHTMLData3[i];
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.OBP " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.OBP DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData1.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		obp = (float)sqlite3_column_double(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %1.3f ",
+			teamNameShort, playerName, obp);
+		strArrayHTMLData1.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.Doubles " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.Doubles DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData2.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		doubles = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, doubles);
+		strArrayHTMLData2.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.Triples " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.Triples DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData3.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		triples = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
+			teamNameShort, playerName, triples);
+		strArrayHTMLData3.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	strHTMLData = _T("\nOn Base Percentage         Doubles                    Triples\n");
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	for (int i = 0; i < strArrayHTMLData3.GetSize(); i++)
+	{
+		strHTMLData = strArrayHTMLData1[i] + strArrayHTMLData2[i] + strArrayHTMLData3[i];
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.HomeRuns " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.HomeRuns DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData1.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		// Get ID of team
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		homeRuns = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, homeRuns);
+		strArrayHTMLData1.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.StolenBase " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.StolenBase DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData2.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		stolenBase = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, stolenBase);
+		strArrayHTMLData2.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.CS " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.CS DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData3.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		cs = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
+			teamNameShort, playerName, cs);
+		strArrayHTMLData3.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	strHTMLData = _T("\nHome Runs                  Stolen Basses              Caught Stealing\n");
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	for (int i = 0; i < strArrayHTMLData3.GetSize(); i++)
+	{
+		strHTMLData = strArrayHTMLData1[i] + strArrayHTMLData2[i] + strArrayHTMLData3[i];
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.Stirkeout " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.Stirkeout DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData1.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		// Get ID of team
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		strikeouts = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, strikeouts);
+		strArrayHTMLData1.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"B.FirstName, " \
+		"B.LastName, " \
+		"BS.Walk " \
+		"FROM TEAM AS T " \
+		"JOIN BATTERSTATS as BS " \
+		"ON T.TeamID = BS.TeamID " \
+		"JOIN BATTER as B " \
+		"ON BS.BatterID = B.BatterID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY BS.Walk DESC, BS.AVG DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData2.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		walks = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
+			teamNameShort, playerName, walks);
+		strArrayHTMLData2.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	strHTMLData = _T("\nStrike Outs                Walks\n");
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	for (int i = 0; i < strArrayHTMLData3.GetSize(); i++)
+	{
+		strHTMLData = strArrayHTMLData1[i] + strArrayHTMLData2[i];
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.ER " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.ER DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData1.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		er = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, er);
+		strArrayHTMLData1.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.ERA " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 AND PS.ERA > 0 " \
+		"ORDER BY PS.ERA ASC, PS.InningsPitched DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData2.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		era = (float)sqlite3_column_double(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %5.2f ",
+			teamNameShort, playerName, era);
+		strArrayHTMLData2.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+	if (strArrayHTMLData2.IsEmpty())
+		for (int i = 0; i < 10; i++)
+			strArrayHTMLData2.Add("All Pitchers have 0 ERA");
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.InningsPitched " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.InningsPitched DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData3.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		ip = (float)sqlite3_column_double(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %6.1f\n",
+			teamNameShort, playerName, ip);
+		strArrayHTMLData3.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	strHTMLData = _T("\nEarned Runs                Earned Run Average         Innings Pitched\n");
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	for (int i = 0; i < strArrayHTMLData1.GetSize(); i++)
+	{
+		strHTMLData = strArrayHTMLData1[i] + strArrayHTMLData2[i] + strArrayHTMLData3[i];
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.Hits " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.Hits DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData1.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		hits = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, hits);
+		strArrayHTMLData1.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.WHIP " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 AND PS.WHIP > 0 " \
+		"ORDER BY PS.WHIP ASC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData2.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		whip = (float)sqlite3_column_double(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %5.2f ",
+			teamNameShort, playerName, whip);
+		strArrayHTMLData2.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+	if (strArrayHTMLData2.IsEmpty())
+		for (int i = 0; i < 10; i++)
+			strArrayHTMLData2.Add("All Pitchers have 0 WHIP");
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.Walks " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.Walks DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData3.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		walks = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
+			teamNameShort, playerName, walks);
+		strArrayHTMLData3.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	strHTMLData = _T("\nHits Allowed               WHIP                       Walks Allowed\n");
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	for (int i = 0; i < strArrayHTMLData1.GetSize(); i++)
+	{
+		strHTMLData = strArrayHTMLData1[i] + strArrayHTMLData2[i] + strArrayHTMLData3[i];
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.Strikeouts " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.Strikeouts DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData1.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		strikeouts = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, strikeouts);
+		strArrayHTMLData1.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.Wins " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.Wins DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData2.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		wins = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i ",
+			teamNameShort, playerName, wins);
+		strArrayHTMLData2.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.Loss " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.Loss DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData3.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		loss = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
+			teamNameShort, playerName, loss);
+		strArrayHTMLData3.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	strHTMLData = _T("\nStrikeouts                 Wins                       Loss\n");
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	for (int i = 0; i < strArrayHTMLData1.GetSize(); i++)
+	{
+		strHTMLData = strArrayHTMLData1[i] + strArrayHTMLData2[i] + strArrayHTMLData3[i];
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.Starts " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.Starts DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData1.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		starts = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
+			teamNameShort, playerName, starts);
+		strArrayHTMLData1.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.Saves " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.Saves DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData2.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		saves = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i ",
+			teamNameShort, playerName, saves);
+		strArrayHTMLData2.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	/* Create SQL statement */
+	sqlSelect = "SELECT "  \
+		"T.TeamNameShort, " \
+		"P.FirstName, " \
+		"P.LastName, " \
+		"PS.HomeRuns " \
+		"FROM TEAM AS T " \
+		"JOIN PITCHERSTATS as PS " \
+		"ON T.TeamID = PS.TeamID " \
+		"JOIN PITCHER as P " \
+		"ON PS.PitcherID = P.PitcherID " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
+		"ORDER BY PS.HomeRuns DESC, PS.ERA DESC LIMIT 10";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(localStmtSelect, 1, leagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind leagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 2, conferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind conferenceID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(localStmtSelect, 3, divisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind divisionID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	strArrayHTMLData3.RemoveAll();
+	rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	while (rcSqlStepTeam == SQLITE_ROW)
+	{
+		teamNameShort = sqlite3_column_text(localStmtSelect, 0);
+		firstName = sqlite3_column_text(localStmtSelect, 1);
+		lastName = sqlite3_column_text(localStmtSelect, 2);
+		homeRuns = sqlite3_column_int(localStmtSelect, 3);
+
+		playerName = firstName + _T(" ") + lastName;
+		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
+			teamNameShort, playerName, homeRuns);
+		strArrayHTMLData3.Add(HTMLData);
+
+		// Get next player
+		rcSqlStepTeam = sqlite3_step(localStmtSelect);
+	}
+	sqlite3_finalize(localStmtSelect);
+
+	strHTMLData = _T("\nStarts                     Saves                      HomeRuns Allowed\n");
+	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+
+	for (int i = 0; i < strArrayHTMLData1.GetSize(); i++)
+	{
+		strHTMLData = strArrayHTMLData1[i] + strArrayHTMLData2[i] + strArrayHTMLData3[i];
+		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
+	}
 
 	sprintf_s(HTMLData, "</B></PRE>\n");
 	strHTMLData = HTMLData;
@@ -2301,1723 +4003,6 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 
 	HTMLFile.Close();
-
-}
-
-void CBaseballDoc::BuildPlayerArray(CStringArray* arrayFileNames, CString strLeagueName, CString strDivisionName, CString strConferenceName, int iDiv)
-{
-	// An array of the file names is passed
-	// L0000002\TB000001.dat
-	int arrayFileNamesSize;
-	int iarraySize;
-	CFile TeamFile;
-	CFile PitcherFile;
-	CFile HTMLFile;
-	BYTE count;
-	CStringArray cstrPlayerName;
-	CStringArray cstrPitcherName;
-	CStringArray cstrShortTeamName;
-	CStringArray cstrShortTeamNameP;
-	CStringArray cstrTeamData;
-	CStringArray cstrTeamPData;
-	CStringArray cstr1,cstr2,cstr3;
-	CStringArray cstrTemp1,cstrTemp2,cstrTemp3;
-	CString strPitcherFileName;
-	CString strShortTeamName;
-	CString strTeamName;
-	CString strTemp;
-	CString strTeamData;
-	CString strAVG,strSLG,strOBP;
-	CString strERA,strTRG,strIP;
-	CString str20Blank("                    ");
-	char temp[41];
-	int commafind;
-	int *aiCount,tiCount,*aiPCount,*aiTCount;
-	int *aiAB,*aiRuns,*aiHits,*aiRBI,*ai2B,*ai3B,*aiHR,*aiStolenBase,*aiCS;
-	int *aiStrikeOut,*aiWalk;
-	int iAB,iRuns,iHits,iRBI,i2B,i3B,iHR,iStolenBase,iCS,iWalk,iROE,iSacrifice;
-	int iTAB,iTRuns,iTHits,iTRBI,iT2B,iT3B,iTHR,iTStolenBase,iTCS,iTWalk,iTROE,iTSacrifice;
-	int iPER,iPHits,iPWalks,iPK,iPWins,iPLoss,iPStarts,iPSaves,iPHR;
-	int iTPER,iTPHits,iTPWalks,iTPK,iTPWins,iTPLoss,iTPStarts,iTPSaves,iTPHR;
-	int *aiPER,*aiPHits,*aiPWalks,*aiPK,*aiPWins,*aiPLoss,*aiPStarts,*aiPSaves,*aiPHR;
-	float *afBA,*afSLG,*afOBP,*afTBA;
-	float fBA,fSLG,fOBP;
-	float fTBA,fTSLG,fTOBP;
-	float *adERA,*adIP,*adTRG,*adTERA;
-	double dERA,dIP,dTRG,dTemp;
-	double dTERA,dTIP,dTTRG;
-	int totCount = 0;
-	int totPCount = 0;
-	int i,ii,iii,j;
-	int getSize1,getSize2,getSize3,getSizeMax;
-	LONG position;
-	LONG lCountSection = 1;
-	LONG lTeamSection = 74;
-	BatterStruct structBatter;
-	PitcherStruct structPitcher;
-	LONG lPlayerSection = structBatter.m_RecordSize;
-	LONG lPitcherSection = structPitcher.m_RecordSize;
-	char HTMLData[200];
-	CString strHTMLData;
-	char datebuf[9],timebuf[9];
-	CString strIndex;
-	CString strBackgroundPicture;
-	CString strLinkColor;
-	CString strVLinkColor;
-	CString strBGColor;
-	CString strTextColor;
-	CString strDir;
-
-	strDir = arrayFileNames->GetAt(0).Left(8);
-	Registry myReg(strDir + REGLEAGUE);
-
-	strLinkColor	= myReg.GetRegistryOptionLinkColor();
-	strVLinkColor	= myReg.GetRegistryOptionVLinkColor();
-	strBGColor		= myReg.GetRegistryOptionBGColor();
-	strTextColor	= myReg.GetRegistryOptionTextColor();
-	strIndex		= myReg.GetRegistryOptionIndex();
-	strBackgroundPicture = myReg.GetRegistryOptionBackgroundPicture();
-
-	m_StatCount = HTML_DISP_LINES;	// Counter for number of lines to be displayed
-
-	arrayFileNamesSize = arrayFileNames->GetSize();
-	for (iarraySize=0; iarraySize < arrayFileNamesSize; iarraySize++)
-	{
-//		count = structBatter.GetCountBatter(arrayFileNames->GetAt(iarraySize));
-		totCount += count;
-		strPitcherFileName = arrayFileNames->GetAt(iarraySize);
-		strPitcherFileName.SetAt(10,'P');
-		count = structPitcher.GetCountPitcher(strPitcherFileName);
-		totPCount += count;
-	}
-	cstrPlayerName.RemoveAll();
-	aiCount = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiCount, '\0', totCount*sizeof( int ) );
-	aiPCount = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPCount, '\0', totPCount*sizeof( int ) );
-	aiTCount = (int *)calloc( arrayFileNamesSize, sizeof( int ) );
-	memset( aiTCount, '\0', arrayFileNamesSize*sizeof( int ) );
-	aiAB = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiAB, '\0', totCount*sizeof( int ) );
-	aiRuns = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiRuns, '\0', totCount*sizeof( int ) );
-	aiHits = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiHits, '\0', totCount*sizeof( int ) );
-	aiRBI = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiRBI, '\0', totCount*sizeof( int ) );
-	ai2B = (int *)calloc( totCount, sizeof( int ) );
-	memset( ai2B, '\0', totCount*sizeof( int ) );
-	ai3B = (int *)calloc( totCount, sizeof( int ) );
-	memset( ai3B, '\0', totCount*sizeof( int ) );
-	aiHR = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiHR, '\0', totCount*sizeof( int ) );
-	afBA = (float *)calloc( totCount, sizeof( float ) );
-	memset( afBA, '\0', totCount*sizeof( float ) );
-	afTBA = (float *)calloc( totCount, sizeof( float ) );
-	memset( afTBA, '\0', totCount*sizeof( float ) );
-	afSLG = (float *)calloc( totCount, sizeof( float ) );
-	memset( afSLG, '\0', totCount*sizeof( float ) );
-	afOBP = (float *)calloc( totCount, sizeof( float ) );
-	memset( afOBP, '\0', totCount*sizeof( float ) );
-	aiStolenBase = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiStolenBase, '\0', totCount*sizeof( int ) );
-	aiCS = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiCS, '\0', totCount*sizeof( int ) );
-	aiStrikeOut = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiStrikeOut, '\0', totCount*sizeof( int ) );
-	aiWalk = (int *)calloc( totCount, sizeof( int ) );
-	memset( aiWalk, '\0', totCount*sizeof( int ) );
-	adERA = (float *)calloc( totPCount, sizeof( float ) );
-	memset( adERA, '\0', totPCount*sizeof( float ) );
-	adTERA = (float *)calloc( totPCount, sizeof( float ) );
-	memset( adTERA, '\0', totPCount*sizeof( float ) );
-	adTRG = (float *)calloc( totPCount, sizeof( float ) );
-	memset( adTRG, '\0', totPCount*sizeof( float ) );
-	adIP = (float *)calloc( totPCount, sizeof( float ) );
-	memset( adIP, '\0', totPCount*sizeof( float ) );
-	aiPER = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPER, '\0', totPCount*sizeof( int ) );
-	aiPHits = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPHits, '\0', totPCount*sizeof( int ) );
-	aiPWalks = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPWalks, '\0', totPCount*sizeof( int ) );
-	aiPK = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPK, '\0', totPCount*sizeof( int ) );
-	aiPWins = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPWins, '\0', totPCount*sizeof( int ) );
-	aiPLoss = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPLoss, '\0', totPCount*sizeof( int ) );
-	aiPStarts = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPStarts, '\0', totPCount*sizeof( int ) );
-	aiPSaves = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPSaves, '\0', totPCount*sizeof( int ) );
-	aiPHR = (int *)calloc( totPCount, sizeof( int ) );
-	memset( aiPHR, '\0', totPCount*sizeof( int ) );
-
-	// Fill arrays for count
-	for (i=0; i<totCount; i++)
-		aiCount[i] = i;
-	for (i=0; i<totPCount; i++)
-		aiPCount[i] = i;
-	for (i=0; i<arrayFileNamesSize; i++)
-		aiTCount[i] = i;
-	iTAB=iTRuns=iTHits=iTRBI=iT2B=iT3B=iTHR=iTStolenBase=iTCS=iTWalk=iTROE=iTSacrifice=0;
-	fTBA=fTOBP=fTSLG=0.0f;
-	iTPER=iTPHits=iTPWalks=iTPK=iTPWins=iTPLoss=iTPStarts=iTPSaves=iTPHR=0;
-	dTIP=dTTRG=dTERA=0.0f;
-	ii = 0;
-	iii = 0;
-	// Process all teams in division
-	for (iarraySize=0; iarraySize < arrayFileNamesSize; iarraySize++)
-	{
-		// L0000002\TB000001.dat Player file
-		// Set up Pitcher File
-		strPitcherFileName = arrayFileNames->GetAt(iarraySize);
-		strPitcherFileName.SetAt(10,'P');
-		// Open Batter file
-		TeamFile.Open(arrayFileNames->GetAt(iarraySize), CFile::modeRead);
-		TeamFile.Read(&count,sizeof(count));
-		TeamFile.Read(temp,40);		// Team Name
-		temp[40] = NULL;
-		strTeamName = temp;
-		TeamFile.Read(temp,3);		// Short Team Name
-		temp[3] = NULL;
-		strShortTeamName = temp;
-		TeamFile.Close();
-		iAB=iRuns=iHits=iRBI=i2B=i3B=iHR=iStolenBase=iCS=iWalk=iROE=iSacrifice=0;
-		iPER=iPHits=iPWalks=iPK=iPWins=iPLoss=iPStarts=iPSaves=iPHR=0;
-		dIP=dTRG=dERA=0.0f;
-		// Process all batters in file
-		for (i=0; i<count; i++)
-		{
-			position = lTeamSection+(i*lPlayerSection);
-			structBatter.GetBatter(arrayFileNames->GetAt(iarraySize), position);
-			cstrShortTeamName.Add(strShortTeamName);
-			commafind = structBatter.m_PlayerName.Find(',');
-			strTemp.Empty();
-			strTemp	= structBatter.m_PlayerName.GetAt(commafind+2);
-			strTemp	+= ".";
-			strTemp	+= structBatter.m_PlayerName.Left(commafind);
-			strTemp	+= str20Blank;
-			strTemp	+= str20Blank;
-			cstrPlayerName.Add(strTemp);
-			aiAB[ii]	= structBatter.m_AB;
-			aiCS[ii]	= structBatter.m_CS;
-			aiHits[ii]	= structBatter.m_Hits;
-			ai2B[ii]	= structBatter.m_2B;
-			ai3B[ii]	= structBatter.m_3B;
-			aiHR[ii]	= structBatter.m_HomeRuns;
-			aiRBI[ii]	= structBatter.m_RBI;
-			aiRuns[ii]	= structBatter.m_Runs;
-			aiStolenBase[ii] = structBatter.m_StolenBase;
-			aiStrikeOut[ii]	= structBatter.m_StrikeOut;
-			aiWalk[ii]	= structBatter.m_Walk;
-			iAB			+= structBatter.m_AB;
-			iCS			+= structBatter.m_CS;
-			iHits		+= structBatter.m_Hits;
-			i2B			+= structBatter.m_2B;
-			i3B			+= structBatter.m_3B;
-			iHR			+= structBatter.m_HomeRuns;
-			iRBI		+= structBatter.m_RBI;
-			iROE		+= structBatter.m_ReachedOnError;
-			iRuns		+= structBatter.m_Runs;
-			iSacrifice	+= structBatter.m_Sacrifice;
-			iStolenBase	+= structBatter.m_StolenBase;
-			iWalk		+= structBatter.m_Walk;
-			if (structBatter.m_AB == 0)
-			{
-				afBA[ii]	= 0.0f;
-				afSLG[ii]	= 0.0f;
-				afOBP[ii]	= 0.0f;
-			}
-			else
-			{
-				afBA[ii]	= (float)structBatter.m_Hits/structBatter.m_AB;
-				afSLG[ii]	= (float)((structBatter.m_Hits-(structBatter.m_2B+structBatter.m_3B+structBatter.m_HomeRuns))+(2*structBatter.m_2B)+(3*structBatter.m_3B)+(4*structBatter.m_HomeRuns))/(structBatter.m_AB);
-				afOBP[ii]	= (float)(structBatter.m_Hits+structBatter.m_Walk+structBatter.m_ReachedOnError+structBatter.m_Sacrifice+structBatter.m_StolenBase)/(structBatter.m_AB+structBatter.m_Walk+structBatter.m_ReachedOnError+structBatter.m_Sacrifice+structBatter.m_StolenBase);
-				fBA		= (float)iHits/iAB;
-				fSLG	= (float)((iHits-(i2B+i3B+iHR))+(2*i2B)+(3*i3B)+(4*iHR))/(iAB);
-				fOBP	= (float)(iHits+iWalk+iROE+iSacrifice+iStolenBase)/(iAB+iWalk+iROE+iSacrifice+iStolenBase);
-			}
-			ii++;
-		}	// End of batter processing
-
-		// Open Pitcher file to get count
-		count = structPitcher.GetCountPitcher(strPitcherFileName);
-
-		// Fill arrays for count, era and ip
-		for (i=0; i<count; i++)
-		{
-			position = lCountSection+(i*lPitcherSection);
-			structPitcher.GetPitcher(strPitcherFileName, position);
-			strHTMLData.Empty();
-
-			commafind = structPitcher.m_PitcherName.Find(',');
-			strTemp.Empty();
-			strTemp = structPitcher.m_PitcherName.GetAt(commafind+2);
-			strTemp += ".";
-			strTemp += structPitcher.m_PitcherName.Left(commafind);
-			strTemp += str20Blank;
-			strTemp += str20Blank;
-			cstrPitcherName.Add(strTemp);
-			cstrShortTeamNameP.Add(strShortTeamName);
-			aiPER[iii]		= structPitcher.m_ER;
-			aiPHits[iii]	= structPitcher.m_Hits;
-			aiPHR[iii]		= structPitcher.m_HomeRuns;
-			adIP[iii]		= (float)atof(structPitcher.m_IP);
-			aiPLoss[iii]	= structPitcher.m_Loss;
-			aiPSaves[iii]	= structPitcher.m_Saves;
-			aiPStarts[iii]	= structPitcher.m_Starts;
-			aiPK[iii]		= structPitcher.m_Strikeouts;
-			aiPWalks[iii]	= structPitcher.m_Walks;
-			aiPWins[iii]	= structPitcher.m_Wins;
-			iPER	+=	structPitcher.m_ER;
-			iPHits	+=	structPitcher.m_Hits;
-			iPHR	+=	structPitcher.m_HomeRuns;
-			dTemp	=	atof(structPitcher.m_IP);
-			dIP		+=	dTemp;
-			iPLoss	+=	structPitcher.m_Loss;
-			iPSaves	+=	structPitcher.m_Saves;
-			iPStarts +=	structPitcher.m_Starts;
-			iPK		+=	structPitcher.m_Strikeouts;
-			iPWalks	+=	structPitcher.m_Walks;
-			iPWins	+=	structPitcher.m_Wins;
-
-			if (adIP[iii] == 0)
-			{
-				adERA[iii]	= 0.0f;
-				adTRG[iii]	= 0.0f;
-				dERA	+= 0.0f;
-				dTRG	+= 0.0f;
-			}
-			else
-			{
-				adERA[iii]	= (float)(structPitcher.m_ER*9)/adIP[iii];
-				adTRG[iii]	= (float)((structPitcher.m_Hits+structPitcher.m_Walks)*9)/adIP[iii];
-				dERA	= (double)(iPER*9)/dIP;
-				dTRG	= (double)((iPHits+iPWalks)*9)/dIP;
-			}
-			iii++;
-		}
-
-		adTERA[iarraySize]	= (float)dERA;	// Team ERA for latter sorting
-		afTBA[iarraySize]	= fBA;	// Team Batting Average for latter sorting
-		sprintf_s(HTMLData,"%1.3f",fBA);
-		strTemp = HTMLData;
-		strAVG  = strTemp.Right(4);
-		sprintf_s(HTMLData,"%1.3f",fSLG);
-		strTemp = HTMLData;
-		strSLG  = strTemp.Right(4);
-		sprintf_s(HTMLData,"%1.3f",fOBP);
-		strTemp = HTMLData;
-		strOBP  = strTemp.Right(4);
-		sprintf_s(HTMLData,"%s %.15s %s %s %s %5i %4i %5i %4i %4i %4i %3i %4i %4i\n",
-			strShortTeamName,strTeamName,strAVG,strSLG,strOBP,iAB,iRuns,iHits,iRBI,
-			i2B,i3B,iHR,iStolenBase,iCS);
-		strTeamData = HTMLData;
-		cstrTeamData.Add(strTeamData);
-		sprintf_s(HTMLData,"%5.2f",dERA);
-		strTemp = HTMLData;
-		strERA  = strTemp;
-		sprintf_s(HTMLData,"%4.1f",dTRG);
-		strTemp = HTMLData;
-		strTRG  = strTemp;
-		sprintf_s(HTMLData,"%6.1f",dIP);
-		strTemp = HTMLData;
-		strIP  = strTemp;
-		sprintf_s(HTMLData,"%s %.15s %5s %4s   %3i   %3i %6s %5i %4i %3i  %4i %4i\n",
-			strShortTeamName,strTeamName,strERA,strTRG,iPWins,iPLoss,strIP,iPHits,
-			iPER,iPHR,iPWalks,iPK);
-		strTeamData = HTMLData;
-		cstrTeamPData.Add(strTeamData);
-
-		iTAB		+= iAB;
-		iTRuns		+= iRuns;
-		iTHits		+= iHits;
-		iTRBI		+= iRBI;
-		iT2B		+= i2B;
-		iT3B		+= i3B;
-		iTHR		+= iHR;
-		iTStolenBase += iStolenBase;
-		iTCS		+= iCS;
-		iTWalk		+= iWalk;
-		iTSacrifice	+= iSacrifice;
-		iTROE		+= iROE;
-		if (iTAB == 0)
-		{
-			fTBA  = 0.0f;
-			fTSLG = 0.0f;
-			fTOBP = 0.0f;
-		}
-		else
-		{
-			fTBA  = (float)iTHits/iTAB;
-			fTSLG = (float)((iTHits-(iT2B+iT3B+iTHR))+(2*iT2B)+(3*iT3B)+(4*iTHR))/(iTAB);
-			fTOBP = (float)(iTHits+iTWalk+iTROE+iTSacrifice+iTStolenBase)/(iTAB+iTWalk+iTROE+iTSacrifice+iTStolenBase);
-		}
-
-		iTPER		+= iPER;
-		iTPHits		+= iPHits;
-		iTPHR		+= iPHR;
-		dTIP		+= dIP;
-		iTPLoss		+= iPLoss;
-		iTPSaves	+= iPSaves;
-		iTPStarts	+= iPStarts;
-		iTPK		+= iPK;
-		iTPWalks	+= iPWalks;
-		iTPWins		+= iPWins;
-		if (dTIP == 0)
-		{
-			dTERA = 0.0f;
-			dTTRG = 0.0f;
-		}
-		else
-		{
-			dTERA = (float)(iTPER*9)/dTIP;
-			dTTRG = (float)((iTPHits+iTPWalks)*9)/dTIP;
-		}
-	}	// End processing of all teams in division
-	// Open file and create headers
-	strLeagueName.TrimRight();
-	strConferenceName.TrimRight();
-	strDivisionName.TrimRight();
-	if (!strcmp("NULL",strDivisionName.Left(4)))
-	{
-		if (!strcmp("NULL",strConferenceName.Left(4)))
-		{
-			// Create file name only with League name
-			HTMLFile.Open(arrayFileNames->GetAt(0).Left(8)+"\\"+strLeagueName+".htm", CFile::modeWrite|CFile::modeCreate);
-		}
-		else
-		{
-			// Create file name with League name and Conference name
-			HTMLFile.Open(arrayFileNames->GetAt(0).Left(8)+"\\"+strLeagueName+strConferenceName+".htm", CFile::modeWrite|CFile::modeCreate);
-		}
-	}
-	else
-	{
-		if (!strcmp("NULL",strConferenceName.Left(4)))
-		{
-			// Create file name with League name and Division name
-			HTMLFile.Open(arrayFileNames->GetAt(0).Left(8)+"\\"+strLeagueName+strDivisionName+".htm", CFile::modeWrite|CFile::modeCreate);
-		}
-		else
-		{
-			// Create file name with League name, Conference name, and Division name
-			HTMLFile.Open(arrayFileNames->GetAt(0).Left(8)+"\\"+strLeagueName+strConferenceName+strDivisionName+".htm", CFile::modeWrite|CFile::modeCreate);
-		}
-	}
-	sprintf_s(HTMLData,"<HTML>\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<HEAD>\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<TITLE>%s</TITLE>\n", strLeagueName);
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"</HEAD>\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-
-	sprintf_s(HTMLData,"<BODY TEXT=%s LINK=%s VLINK=%s BGCOLOR=%s BACKGROUND=\"%s\">\n",
-		strTextColor,strLinkColor,strVLinkColor,strBGColor,strBackgroundPicture);
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<A href=\"%s\">Back</A><BR><BR>\n",strIndex);
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<H2>League: %s</H2>\n", strLeagueName);
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	if (strcmp("NULL",strConferenceName.Left(4)))
-	{
-		sprintf_s(HTMLData,"Conference: <B>%s</B><BR>\n", strConferenceName);
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	if (strcmp("NULL",strDivisionName.Left(4)))
-	{
-		sprintf_s(HTMLData,"Division: <B>%s</B><BR>\n", strDivisionName);
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	sprintf_s(HTMLData,"<PRE><B>\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"BATTING\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"    TEAM             AVG  SLG  OBP    AB    R     H  RBI   2B   3B  HR   SB   CS\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	for (i=0; i<arrayFileNamesSize-1; i++)
-	{
-		for (j=0; j<arrayFileNamesSize-1; j++)
-		{
-			if ( afTBA[aiTCount[j]] < afTBA[aiTCount[j+1]])
-			{
-				tiCount = aiTCount[j];
-				aiTCount[j] = aiTCount[j+1];
-				aiTCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (iarraySize=0; iarraySize < arrayFileNamesSize; iarraySize++)
-	{
-		strTemp = cstrTeamData.GetAt(aiTCount[iarraySize]);
-		HTMLFile.Write(strTemp,strTemp.GetLength());
-	}
-	sprintf_s(HTMLData,"--- --------------- ---- ---- ---- ----- ---- ----- ---- ---- ---- --- ---- ----\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"%1.3f",fTBA);
-	strTemp = HTMLData;
-	strAVG  = strTemp.Right(4);
-	sprintf_s(HTMLData,"%1.3f",fTSLG);
-	strTemp = HTMLData;
-	strSLG  = strTemp.Right(4);
-	sprintf_s(HTMLData,"%1.3f",fTOBP);
-	strTemp = HTMLData;
-	strOBP  = strTemp.Right(4);
-	sprintf_s(HTMLData,"LEAGUE TOTALS       %s %s %s %5i %4i %5i %4i %4i %4i %3i %4i %4i\n",
-			strAVG,strSLG,strOBP,iTAB,iTRuns,iTHits,iTRBI,
-			iT2B,iT3B,iTHR,iTStolenBase,iTCS);
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-
-	sprintf_s(HTMLData,"\nPITCHING\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"    TEAM             ERA   TRG  Wins  Loss     IP  Hits   ER  HR Walks    K\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	for (i=0; i<arrayFileNamesSize-1; i++)
-	{
-		for (j=0; j<arrayFileNamesSize-1; j++)
-		{
-			if ( adTERA[aiTCount[j]] > adTERA[aiTCount[j+1]])
-			{
-				tiCount = aiTCount[j];
-				aiTCount[j] = aiTCount[j+1];
-				aiTCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (iarraySize=0; iarraySize < arrayFileNamesSize; iarraySize++)
-	{
-		strTemp = cstrTeamPData.GetAt(aiTCount[iarraySize]);
-		HTMLFile.Write(strTemp,strTemp.GetLength());
-	}
-	sprintf_s(HTMLData,"--- --------------- ----- ----   ---   --- ------ ----- ---- ---  ---- ----\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"%5.2f",dTERA);
-	strTemp = HTMLData;
-	strERA  = strTemp;
-	sprintf_s(HTMLData,"%4.1f",dTTRG);
-	strTemp = HTMLData;
-	strTRG  = strTemp.Right(4);
-	sprintf_s(HTMLData,"%6.1f",dTIP);
-	strTemp = HTMLData;
-	strIP  = strTemp;
-	sprintf_s(HTMLData,"LEAGUE TOTALS       %5s %4s   %3i   %3i %6s %5i %4i %3i  %4i %4i\n\n",
-		strERA,strTRG,iTPWins,iTPLoss,strIP,iTPHits,iTPER,iTPHR,iTPWalks,iTPK);
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-	// Sort at bats
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( aiAB[aiCount[j]] < aiAB[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiAB[aiCount[i]] == aiAB[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiAB[aiCount[i]]);
-			cstr1.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s %5i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),aiAB[aiCount[i]]);
-			cstr1.Add(HTMLData);
-		}
-	}
-	// Sort runs
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( aiRuns[aiCount[j]] < aiRuns[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiRuns[aiCount[i]] == aiRuns[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiRuns[aiCount[i]]);
-			cstr2.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),aiRuns[aiCount[i]]);
-			cstr2.Add(HTMLData);
-		}
-	}
-	// Sort Hits
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( aiHits[aiCount[j]] < aiHits[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiHits[aiCount[i]] == aiHits[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiHits[aiCount[i]]);
-			cstr3.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s %5i\n", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),aiHits[aiCount[i]]);
-			cstr3.Add(HTMLData);
-		}
-	}
-//	                    00000000011111111112222222222333333333344444444445555555555666666666677777777778
-//	                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	sprintf_s(HTMLData,"\nAt Bats                    Runs                       Hits\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	getSize1 = cstr1.GetSize();
-	getSize2 = cstr2.GetSize();
-	getSize3 = cstr3.GetSize();
-	getSizeMax = getSize1;
-	if (getSizeMax < getSize2 )
-	{
-		getSizeMax = getSize2;
-	}
-	if (getSizeMax < getSize3 )
-	{
-		getSizeMax = getSize3;
-	}
-	if (getSize1 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize1;i++)
-			cstr1.Add(str20Blank+str20Blank);
-	}
-	if (getSize2 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize2;i++)
-			cstr2.Add(str20Blank+str20Blank);
-	}
-	if (getSize3 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize3;i++)
-			cstr3.Add(str20Blank+str20Blank);
-	}
-	for (i=0; i < getSizeMax;i++)
-	{
-		sprintf_s(HTMLData,"%.26s %.26s %.26s\n",cstr1.GetAt(i),cstr2.GetAt(i),cstr3.GetAt(i));
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-
-	// Sort RBI
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( aiRBI[aiCount[j]] < aiRBI[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiRBI[aiCount[i]] == aiRBI[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiRBI[aiCount[i]]);
-			cstr1.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),aiRBI[aiCount[i]]);
-			cstr1.Add(HTMLData);
-		}
-	}
-	// Sort Batting Averages
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( afBA[aiCount[j]] < afBA[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (afBA[aiCount[i]] == afBA[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH     %1.3f", afBA[aiCount[i]]);
-			cstr2.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s %1.3f", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),afBA[aiCount[i]]);
-			cstr2.Add(HTMLData);
-		}
-	}
-	// Sort Slugging Percentage
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( afSLG[aiCount[j]] < afSLG[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (afSLG[aiCount[i]] == afSLG[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH     %1.3f", afSLG[aiCount[i]]);
-			cstr3.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s %1.3f", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),afSLG[aiCount[i]]);
-			cstr3.Add(HTMLData);
-		}
-	}
-//	                    00000000011111111112222222222333333333344444444445555555555666666666677777777778
-//	                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	sprintf_s(HTMLData,"\nRBI's                      Batting Averages           Slugging Percentages\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	getSize1 = cstr1.GetSize();
-	getSize2 = cstr2.GetSize();
-	getSize3 = cstr3.GetSize();
-	getSizeMax = getSize1;
-	if (getSizeMax < getSize2 )
-	{
-		getSizeMax = getSize2;
-	}
-	if (getSizeMax < getSize3 )
-	{
-		getSizeMax = getSize3;
-	}
-	if (getSize1 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize1;i++)
-			cstr1.Add(str20Blank+str20Blank);
-	}
-	if (getSize2 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize2;i++)
-			cstr2.Add(str20Blank+str20Blank);
-	}
-	if (getSize3 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize3;i++)
-			cstr3.Add(str20Blank+str20Blank);
-	}
-	for (i=0; i < getSizeMax;i++)
-	{
-		sprintf_s(HTMLData,"%.26s %.26s %.26s\n",cstr1.GetAt(i),cstr2.GetAt(i),cstr3.GetAt(i));
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-
-	// Sort On Base Percentage
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( afOBP[aiCount[j]] < afOBP[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (afOBP[aiCount[i]] == afOBP[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH     %1.3f", afOBP[aiCount[i]]);
-			cstr1.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s %1.3f", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),afOBP[aiCount[i]]);
-			cstr1.Add(HTMLData);
-		}
-	}
-	// Sort Doubles
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( ai2B[aiCount[j]] < ai2B[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (ai2B[aiCount[i]] == ai2B[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", ai2B[aiCount[i]]);
-			cstr2.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),ai2B[aiCount[i]]);
-			cstr2.Add(HTMLData);
-		}
-	}
-	// Sort Triples
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( ai3B[aiCount[j]] < ai3B[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (ai3B[aiCount[i]] == ai3B[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", ai3B[aiCount[i]]);
-			cstr3.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),ai3B[aiCount[i]]);
-			cstr3.Add(HTMLData);
-		}
-	}
-//	                    00000000011111111112222222222333333333344444444445555555555666666666677777777778
-//	                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	sprintf_s(HTMLData,"\nOn Base Percentage         Doubles                    Triples\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	getSize1 = cstr1.GetSize();
-	getSize2 = cstr2.GetSize();
-	getSize3 = cstr3.GetSize();
-	getSizeMax = getSize1;
-	if (getSizeMax < getSize2 )
-	{
-		getSizeMax = getSize2;
-	}
-	if (getSizeMax < getSize3 )
-	{
-		getSizeMax = getSize3;
-	}
-	if (getSize1 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize1;i++)
-			cstr1.Add(str20Blank+str20Blank);
-	}
-	if (getSize2 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize2;i++)
-			cstr2.Add(str20Blank+str20Blank);
-	}
-	if (getSize3 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize3;i++)
-			cstr3.Add(str20Blank+str20Blank);
-	}
-	for (i=0; i < getSizeMax;i++)
-	{
-		sprintf_s(HTMLData,"%.26s %.26s %.26s\n",cstr1.GetAt(i),cstr2.GetAt(i),cstr3.GetAt(i));
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-
-	// Sort Home Runs
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( aiHR[aiCount[j]] < aiHR[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiHR[aiCount[i]] == aiHR[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiHR[aiCount[i]]);
-			cstr1.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s   %3i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),aiHR[aiCount[i]]);
-			cstr1.Add(HTMLData);
-		}
-	}
-	// Sort StolenBases
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( aiStolenBase[aiCount[j]] < aiStolenBase[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiStolenBase[aiCount[i]] == aiStolenBase[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiStolenBase[aiCount[i]]);
-			cstr2.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),aiStolenBase[aiCount[i]]);
-			cstr2.Add(HTMLData);
-		}
-	}
-	// Sort Caught Stealing
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( aiCS[aiCount[j]] < aiCS[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiCS[aiCount[i]] == aiCS[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiCS[aiCount[i]]);
-			cstr3.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),aiCS[aiCount[i]]);
-			cstr3.Add(HTMLData);
-		}
-	}
-//	                    00000000011111111112222222222333333333344444444445555555555666666666677777777778
-//	                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	sprintf_s(HTMLData,"\nHome Runs                  Stolen Basses              Caught Stealing\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	getSize1 = cstr1.GetSize();
-	getSize2 = cstr2.GetSize();
-	getSize3 = cstr3.GetSize();
-	getSizeMax = getSize1;
-	if (getSizeMax < getSize2 )
-	{
-		getSizeMax = getSize2;
-	}
-	if (getSizeMax < getSize3 )
-	{
-		getSizeMax = getSize3;
-	}
-	if (getSize1 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize1;i++)
-			cstr1.Add(str20Blank+str20Blank);
-	}
-	if (getSize2 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize2;i++)
-			cstr2.Add(str20Blank+str20Blank);
-	}
-	if (getSize3 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize3;i++)
-			cstr3.Add(str20Blank+str20Blank);
-	}
-	for (i=0; i < getSizeMax;i++)
-	{
-		sprintf_s(HTMLData,"%.26s %.26s %.26s\n",cstr1.GetAt(i),cstr2.GetAt(i),cstr3.GetAt(i));
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-
-	// Sort Strike Outs
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( aiStrikeOut[aiCount[j]] < aiStrikeOut[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiStrikeOut[aiCount[i]] == aiStrikeOut[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiStrikeOut[aiCount[i]]);
-			cstr1.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),aiStrikeOut[aiCount[i]]);
-			cstr1.Add(HTMLData);
-		}
-	}
-	// Sort Walks
-	for (i=0; i<totCount-1; i++)
-	{
-		for (j=0; j<totCount-1; j++)
-		{
-			if ( aiWalk[aiCount[j]] < aiWalk[aiCount[j+1]])
-			{
-				tiCount = aiCount[j];
-				aiCount[j] = aiCount[j+1];
-				aiCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiWalk[aiCount[i]] == aiWalk[aiCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiWalk[aiCount[i]]);
-			cstr2.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamName.GetAt(aiCount[i]), cstrPlayerName.GetAt(aiCount[i]),aiWalk[aiCount[i]]);
-			cstr2.Add(HTMLData);
-		}
-	}
-	// Earned Runs
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( aiPER[aiPCount[j]] < aiPER[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiPER[aiPCount[i]] == aiPER[aiPCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiPER[aiPCount[i]]);
-			cstr3.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),aiPER[aiPCount[i]]);
-			cstr3.Add(HTMLData);
-		}
-	}
-//	                    00000000011111111112222222222333333333344444444445555555555666666666677777777778
-//	                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	sprintf_s(HTMLData,"\nStrike Outs                Walks                      Earned Runs\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	getSize1 = cstr1.GetSize();
-	getSize2 = cstr2.GetSize();
-	getSize3 = cstr3.GetSize();
-	getSizeMax = getSize1;
-	if (getSizeMax < getSize2 )
-	{
-		getSizeMax = getSize2;
-	}
-	if (getSizeMax < getSize3 )
-	{
-		getSizeMax = getSize3;
-	}
-	if (getSize1 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize1;i++)
-			cstr1.Add(str20Blank+str20Blank);
-	}
-	if (getSize2 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize2;i++)
-			cstr2.Add(str20Blank+str20Blank);
-	}
-	if (getSize3 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize3;i++)
-			cstr3.Add(str20Blank+str20Blank);
-	}
-	for (i=0; i < getSizeMax;i++)
-	{
-		sprintf_s(HTMLData,"%.26s %.26s %.26s\n",cstr1.GetAt(i),cstr2.GetAt(i),cstr3.GetAt(i));
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-
-	// Earned Run Average
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( adIP[aiPCount[j]] < adIP[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( adERA[aiPCount[j]] > adERA[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	cstrTemp1.RemoveAll();
-	cstrTemp2.RemoveAll();
-	cstrTemp3.RemoveAll();
-	for (i=0; i<totPCount; i++)
-	{
-		if ( adERA[aiPCount[i]] != 0 )
-		{
-			cstrTemp1.Add(cstrShortTeamNameP.GetAt(aiPCount[i]));
-			cstrTemp2.Add(cstrPitcherName.GetAt(aiPCount[i]));
-			sprintf_s(HTMLData,"%5.2f",adERA[aiPCount[i]]);
-			cstrTemp3.Add(HTMLData);
-		}
-	}
-	// if ERA is all zeros, then fill array with zeros
-	if ( !cstrTemp3.GetSize() )
-	{
-		for (i=0; i<m_StatCount+1; i++)
-		{
-			sprintf_s(HTMLData,"%5.2f",adERA[aiPCount[i]]);
-			cstrTemp3.Add(HTMLData);
-		}
-	}
-
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (!strcmp(cstrTemp3.GetAt(i), cstrTemp3.GetAt(m_StatCount))) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH     %.5s", cstrTemp3.GetAt(i));
-			cstr1.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s %.5s", cstrTemp1.GetAt(i), cstrTemp2.GetAt(i),cstrTemp3.GetAt(i));
-			cstr1.Add(HTMLData);
-		}
-	}
-	// Innings Pitched
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( adIP[aiPCount[j]] < adIP[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (adIP[aiPCount[i]] == adIP[aiPCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4.1f", adIP[aiPCount[i]]);
-			cstr2.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4.1f", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),adIP[aiPCount[i]]);
-			cstr2.Add(HTMLData);
-		}
-	}
-	// Hits
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( aiPHits[aiPCount[j]] < aiPHits[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiPHits[aiPCount[i]] == aiPHits[aiPCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiPHits[aiPCount[i]]);
-			cstr3.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),aiPHits[aiPCount[i]]);
-			cstr3.Add(HTMLData);
-		}
-	}
-//	                    00000000011111111112222222222333333333344444444445555555555666666666677777777778
-//	                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	sprintf_s(HTMLData,"\nEarned Run Average         Innings Pitched            Hits Allowed\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	getSize1 = cstr1.GetSize();
-	getSize2 = cstr2.GetSize();
-	getSize3 = cstr3.GetSize();
-	getSizeMax = getSize1;
-	if (getSizeMax < getSize2 )
-	{
-		getSizeMax = getSize2;
-	}
-	if (getSizeMax < getSize3 )
-	{
-		getSizeMax = getSize3;
-	}
-	if (getSize1 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize1;i++)
-			cstr1.Add(str20Blank+str20Blank);
-	}
-	if (getSize2 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize2;i++)
-			cstr2.Add(str20Blank+str20Blank);
-	}
-	if (getSize3 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize3;i++)
-			cstr3.Add(str20Blank+str20Blank);
-	}
-	for (i=0; i < getSizeMax;i++)
-	{
-		sprintf_s(HTMLData,"%.26s %.26s %.26s\n",cstr1.GetAt(i),cstr2.GetAt(i),cstr3.GetAt(i));
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-
-	// TRG
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( adTRG[aiPCount[j]] > adTRG[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	cstrTemp1.RemoveAll();
-	cstrTemp2.RemoveAll();
-	cstrTemp3.RemoveAll();
-	for (i=0; i<totPCount; i++)
-	{
-		if ( adTRG[aiPCount[i]] != 0)
-		{
-			cstrTemp1.Add(cstrShortTeamNameP.GetAt(aiPCount[i]));
-			cstrTemp2.Add(cstrPitcherName.GetAt(aiPCount[i]));
-			sprintf_s(HTMLData,"%4.1f",adTRG[aiPCount[i]]);
-			cstrTemp3.Add(HTMLData);
-		}
-	}
-	// if TRG is all zeros, then fill array with zeros
-	if ( !cstrTemp3.GetSize() )
-	{
-		for (i=0; i<m_StatCount+1; i++)
-		{
-			sprintf_s(HTMLData,"%5.2f",adERA[aiPCount[i]]);
-			cstrTemp3.Add(HTMLData);
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (!strcmp(cstrTemp3.GetAt(i), cstrTemp3.GetAt(m_StatCount))) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %.4s", cstrTemp3.GetAt(i));
-			cstr1.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %.4s", cstrTemp1.GetAt(i), cstrTemp2.GetAt(i),cstrTemp3.GetAt(i));
-			cstr1.Add(HTMLData);
-		}
-	}
-	// Walks
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( aiPWalks[aiPCount[j]] < aiPWalks[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiPWalks[aiPCount[i]] == aiPWalks[aiPCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiPWalks[aiPCount[i]]);
-			cstr2.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),aiPWalks[aiPCount[i]]);
-			cstr2.Add(HTMLData);
-		}
-	}
-	// Strikeouts
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( aiPK[aiPCount[j]] < aiPK[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiPK[aiPCount[i]] == aiPK[aiPCount[6]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiPK[aiPCount[i]]);
-			cstr3.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),aiPK[aiPCount[i]]);
-			cstr3.Add(HTMLData);
-		}
-	}
-//	                    00000000011111111112222222222333333333344444444445555555555666666666677777777778
-//	                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	sprintf_s(HTMLData,"\nTRG                        Walks Allowed              Strikeouts\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	getSize1 = cstr1.GetSize();
-	getSize2 = cstr2.GetSize();
-	getSize3 = cstr3.GetSize();
-	getSizeMax = getSize1;
-	if (getSizeMax < getSize2 )
-	{
-		getSizeMax = getSize2;
-	}
-	if (getSizeMax < getSize3 )
-	{
-		getSizeMax = getSize3;
-	}
-	if (getSize1 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize1;i++)
-			cstr1.Add(str20Blank+str20Blank);
-	}
-	if (getSize2 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize2;i++)
-			cstr2.Add(str20Blank+str20Blank);
-	}
-	if (getSize3 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize3;i++)
-			cstr3.Add(str20Blank+str20Blank);
-	}
-	for (i=0; i < getSizeMax;i++)
-	{
-		sprintf_s(HTMLData,"%.26s %.26s %.26s\n",cstr1.GetAt(i),cstr2.GetAt(i),cstr3.GetAt(i));
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-
-	// Wins
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( aiPWins[aiPCount[j]] < aiPWins[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiPWins[aiPCount[i]] == aiPWins[aiPCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiPWins[aiPCount[i]]);
-			cstr1.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),aiPWins[aiPCount[i]]);
-			cstr1.Add(HTMLData);
-		}
-	}
-	// Loss
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( aiPLoss[aiPCount[j]] < aiPLoss[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiPLoss[aiPCount[i]] == aiPLoss[aiPCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiPLoss[aiPCount[i]]);
-			cstr2.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),aiPLoss[aiPCount[i]]);
-			cstr2.Add(HTMLData);
-		}
-	}
-	// Starts
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( aiPStarts[aiPCount[j]] < aiPStarts[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiPStarts[aiPCount[i]] == aiPStarts[aiPCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiPStarts[aiPCount[i]]);
-			cstr3.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),aiPStarts[aiPCount[i]]);
-			cstr3.Add(HTMLData);
-		}
-	}
-//	                    00000000011111111112222222222333333333344444444445555555555666666666677777777778
-//	                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	sprintf_s(HTMLData,"\nWins                       Loss                       Starts\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	getSize1 = cstr1.GetSize();
-	getSize2 = cstr2.GetSize();
-	getSize3 = cstr3.GetSize();
-	getSizeMax = getSize1;
-	if (getSizeMax < getSize2 )
-	{
-		getSizeMax = getSize2;
-	}
-	if (getSizeMax < getSize3 )
-	{
-		getSizeMax = getSize3;
-	}
-	if (getSize1 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize1;i++)
-			cstr1.Add(str20Blank+str20Blank);
-	}
-	if (getSize2 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize2;i++)
-			cstr2.Add(str20Blank+str20Blank);
-	}
-	if (getSize3 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize3;i++)
-			cstr3.Add(str20Blank+str20Blank);
-	}
-	for (i=0; i < getSizeMax;i++)
-	{
-		sprintf_s(HTMLData,"%.26s %.26s %.26s\n",cstr1.GetAt(i),cstr2.GetAt(i),cstr3.GetAt(i));
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-
-	// Saves
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( aiPSaves[aiPCount[j]] < aiPSaves[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiPSaves[aiPCount[i]] == aiPSaves[aiPCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiPSaves[aiPCount[i]]);
-			cstr1.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),aiPSaves[aiPCount[i]]);
-			cstr1.Add(HTMLData);
-		}
-	}
-	// Homeruns
-	for (i=0; i<totPCount-1; i++)
-	{
-		for (j=0; j<totPCount-1; j++)
-		{
-			if ( aiPHR[aiPCount[j]] < aiPHR[aiPCount[j+1]])
-			{
-				tiCount = aiPCount[j];
-				aiPCount[j] = aiPCount[j+1];
-				aiPCount[j+1] = tiCount;
-			}
-		}
-	}
-	for (i=0; i<m_StatCount; i++)
-	{
-		if( (aiPHR[aiPCount[i]] == aiPHR[aiPCount[m_StatCount]]) )
-		{
-			sprintf_s(HTMLData,"OTHERS TIED WITH      %4i", aiPHR[aiPCount[i]]);
-			cstr2.Add(HTMLData);
-			break;
-		}
-		else
-		{
-			sprintf_s(HTMLData,"%s %.16s  %4i", cstrShortTeamNameP.GetAt(aiPCount[i]), cstrPitcherName.GetAt(aiPCount[i]),aiPHR[aiPCount[i]]);
-			cstr2.Add(HTMLData);
-		}
-	}
-//	                    00000000011111111112222222222333333333344444444445555555555666666666677777777778
-//	                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	sprintf_s(HTMLData,"\nSaves                      HomeRuns Allowed\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	getSize1 = cstr1.GetSize();
-	getSize2 = cstr2.GetSize();
-	getSize3 = cstr3.GetSize();
-	getSizeMax = getSize1;
-	if (getSizeMax < getSize2 )
-	{
-		getSizeMax = getSize2;
-	}
-	if (getSizeMax < getSize3 )
-	{
-		getSizeMax = getSize3;
-	}
-	if (getSize1 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize1;i++)
-			cstr1.Add(str20Blank+str20Blank);
-	}
-	if (getSize2 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize2;i++)
-			cstr2.Add(str20Blank+str20Blank);
-	}
-	if (getSize3 < getSizeMax )
-	{
-		for (i=0; i<getSizeMax-getSize3;i++)
-			cstr3.Add(str20Blank+str20Blank);
-	}
-	for (i=0; i < getSizeMax;i++)
-	{
-		sprintf_s(HTMLData,"%.26s %.26s %.26s\n",cstr1.GetAt(i),cstr2.GetAt(i),cstr3.GetAt(i));
-		strHTMLData = HTMLData;
-		HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	}
-	cstr1.RemoveAll();
-	cstr2.RemoveAll();
-	cstr3.RemoveAll();
-
-	sprintf_s(HTMLData,"\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"</B></PRE>\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-	
-    // Write the Last Updated line n the HTML file
-	_strtime_s( timebuf );    
-    _strdate_s( datebuf );    
-	sprintf_s(HTMLData,"<BR>Last Updated on %s at %s<BR>\n",datebuf,timebuf);
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-
-	sprintf_s(HTMLData,"</BODY></HTML>\n");
-	strHTMLData = HTMLData;
-	HTMLFile.Write(strHTMLData,strHTMLData.GetLength());
-
-	HTMLFile.Close();
-
-	// Free up all of the dynamic arrays
-	free(aiCount);
-	free(aiPCount);
-	free(aiTCount);
-	free(aiAB);
-	free(aiRuns);
-	free(aiHits);
-	free(aiRBI);
-	free(ai2B);
-	free(ai3B);
-	free(aiHR);
-	free(afBA);
-	free(afTBA);
-	free(afSLG);
-	free(afOBP);
-	free(aiStolenBase);
-	free(aiCS);
-	free(aiStrikeOut);
-	free(aiWalk);
-	free(adERA);
-	free(adTERA);
-	free(adTRG);
-	free(adIP);
-	free(aiPER);
-	free(aiPHits);
-	free(aiPWalks);
-	free(aiPK);
-	free(aiPWins);
-	free(aiPLoss);
-	free(aiPStarts);
-	free(aiPSaves);
-	free(aiPHR);
 }
 
 void CBaseballDoc::OnPlayersAddEditBatters() 
@@ -4265,7 +4250,6 @@ void CBaseballDoc::OnLeaguesLeagueOptionsHTML()
 	myLeagueOptions.DoModal();
 }
 
-
 void CBaseballDoc::OnFileOpen()
 {
 	// TODO: Add your command handler code here
@@ -4303,7 +4287,6 @@ void CBaseballDoc::OnFileOpen()
 	};
 }
 
-
 int CBaseballDoc::OpenDatabase()
 {
 	CStringA ansiString(m_DBFileName);
@@ -4335,7 +4318,6 @@ int CBaseballDoc::OpenDatabase()
 
 	return 0;
 }
-
 
 int CBaseballDoc::DBSetForeginKeys(bool OnOff)
 {
@@ -4408,7 +4390,6 @@ int CBaseballDoc::DBSetForeginKeys(bool OnOff)
 	return 0;
 }
 
-
 int CBaseballDoc::DBVersion()
 {
 	CHAR buffer[100];
@@ -4436,7 +4417,6 @@ int CBaseballDoc::DBVersion()
 
 	return 0;
 }
-
 
 int CBaseballDoc::GetLeagueID(CStringA strLeagueName)
 {
@@ -4480,7 +4460,6 @@ int CBaseballDoc::GetLeagueID(CStringA strLeagueName)
 	sqlite3_finalize(m_stmt);
 	return myLeagueID;
 }
-
 
 int CBaseballDoc::GetTeamID(CStringA strTeamName, int LeagueID)
 {
