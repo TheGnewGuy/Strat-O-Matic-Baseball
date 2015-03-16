@@ -2139,8 +2139,8 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	/* Create SQL statement */
 	sqlTeam = "SELECT "  \
 		"T.TeamID, " \
-		"sum(P.Wins), " \
-		"sum(P.Loss), " \
+		"sum(P.Wins) AS wins, " \
+		"sum(P.Loss) AS loss, " \
 		"sum(CAST(P.InningsPitched AS FLOAT)) AS sumIP, " \
 		"sum(P.ER) AS sumER, " \
 		"sum(P.Hits)," \
@@ -2152,7 +2152,8 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 		"ON T.TeamID = P.TeamID " \
 		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 " \
 		"GROUP BY T.TeamID " \
-		"ORDER BY ((CAST(sumER AS FLOAT) * 9) / CAST(sumIP AS FLOAT)) ASC";
+		"ORDER BY wins DESC, loss ASC";
+//	"ORDER BY ((CAST(sumER AS FLOAT) * 9) / CAST(sumIP AS FLOAT)) ASC";
 
 	rc = sqlite3_prepare_v2(m_db, sqlTeam, strlen(sqlTeam), &localStmtTeam, 0);
 	if (rc != SQLITE_OK)
@@ -3241,6 +3242,9 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	}
 	sqlite3_finalize(localStmtSelect);
 
+	// Limit on InningsPitched set to greater that 4 innings
+	// Need better limit. A pitcher can have ERA of 0 but there are 
+	// way too many with zero that have not pitched many innings.
 	/* Create SQL statement */
 	sqlSelect = "SELECT "  \
 		"T.TeamNameShort, " \
@@ -3252,7 +3256,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 		"ON T.TeamID = PS.TeamID " \
 		"JOIN PITCHER as P " \
 		"ON PS.PitcherID = P.PitcherID " \
-		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 AND PS.ERA > 0 " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 AND PS.InningsPitched > 4 " \
 		"ORDER BY PS.ERA ASC, PS.InningsPitched DESC LIMIT 10";
 
 	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
@@ -3456,7 +3460,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 		"ON T.TeamID = PS.TeamID " \
 		"JOIN PITCHER as P " \
 		"ON PS.PitcherID = P.PitcherID " \
-		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 AND PS.WHIP > 0 " \
+		"WHERE T.LeagueID = ?1 AND T.ConferenceID = ?2 AND T.DivisionID = ?3 AND PS.InningsPitched > 0 " \
 		"ORDER BY PS.WHIP ASC, PS.ERA DESC LIMIT 10";
 
 	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &localStmtSelect, 0);
@@ -3777,7 +3781,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	}
 	sqlite3_finalize(localStmtSelect);
 
-	strHTMLData = _T("\nStrikeouts                 Wins                       Loss\n");
+	strHTMLData = _T("\nStrikeouts                 Wins                      Loss\n");
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 
 	for (int i = 0; i < strArrayHTMLData1.GetSize(); i++)
@@ -3978,7 +3982,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	}
 	sqlite3_finalize(localStmtSelect);
 
-	strHTMLData = _T("\nStarts                     Saves                      HomeRuns Allowed\n");
+	strHTMLData = _T("\nStarts                     Saves                     HomeRuns Allowed\n");
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 
 	for (int i = 0; i < strArrayHTMLData1.GetSize(); i++)
