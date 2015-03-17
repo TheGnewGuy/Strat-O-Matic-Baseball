@@ -823,7 +823,7 @@ void CBaseballDoc::ExportFile(int teamID)
 
 	// Process Batter file
 	//strTemp = "XB" + strTeamName.Left(20);
-	exportFileName = CStringA(m_dir) + _T("XB") + teamRecord.TeamName + _T(".txt"); // XBTeamName.txt
+	exportFileName = CStringA(m_dir) + _T("XB") + teamRecord.TeamName + _T(".csv"); // XBTeamName.csv
 	//myFileName = strDir+"\\TB"+strTeamName.Right(10);
 	exportBatter.Open(exportFileName,CFile::modeCreate | CFile::modeWrite);
 	sprintf_s(exportData,_T("Team Name,LastName,FirstName,AB,Runs,Hits,RBI,2B,3B,HR,W,K,RE,"));
@@ -1005,7 +1005,7 @@ void CBaseballDoc::ExportFile(int teamID)
 	// Process Pitcher file
 	//strTemp = "XP" + strTeamName.Left(20);
 	//exportFileName = strDir+"\\" + strTemp+".txt"; // dir\XB000001.txt
-	exportFileName = CStringA(m_dir) + _T("XP") + teamRecord.TeamName + _T(".txt"); // XPTeamName.txt
+	exportFileName = CStringA(m_dir) + _T("XP") + teamRecord.TeamName + _T(".csv"); // XPTeamName.csv
 	//myFileName = strDir+"\\TP"+strTeamName.Right(10);
 	exportPitcher.Open(exportFileName,CFile::modeCreate | CFile::modeWrite);
 	sprintf_s(exportData,_T("Team Name,LastName,FirstName,IP,ER,Hits,Walks,Strikeouts,"));
