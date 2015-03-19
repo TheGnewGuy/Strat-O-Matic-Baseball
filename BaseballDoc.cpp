@@ -805,6 +805,9 @@ void CBaseballDoc::ExportFile(int teamID)
 	int CatchArm[10] = {-4,-3,-2,-1,0,1,2,3,4,5};
 	int PHold[16] = {9,8,7,6,5,4,3,2,1,0,-1,-2,-3,-4,-5,-6};
 	m_TeamRecord teamRecord;
+	m_LeagueRecord leagueRecord;
+	m_ConferenceRecord conferenceRecord;
+	m_DivisionRecord divisionRecord;
 	m_BatterStatsRecord batterStatsRecord;
 	m_BatterRecord batterRecord;
 	m_PitcherStatsRecord pitcherStatsRecord;
@@ -820,10 +823,53 @@ void CBaseballDoc::ExportFile(int teamID)
 	int pitcherStatsID = 0;
 
 	teamRecord = GetTeam(teamID);
+	leagueRecord = GetLeague(teamRecord.LeagueID);
+	conferenceRecord = GetConference(teamRecord.ConferenceID);
+	divisionRecord = GetDivision(teamRecord.DivisionID);
+
+	// Division of 1 and or Conference of 1 are pointers to DEFAULT
+	if (teamRecord.DivisionID == 1)
+	{
+		if (teamRecord.ConferenceID == 1)
+		{
+			// Create file name only with League name
+			exportFileName = CStringA(m_dir) + leagueRecord.LeagueName + 
+				_T(" ") + _T("Batter") + 
+				_T(" ") + teamRecord.TeamName + _T(".csv");
+		}
+		else
+		{
+			// Create file name with League name and Conference name
+			exportFileName = CStringA(m_dir) + leagueRecord.LeagueName + 
+				_T(" ") + conferenceRecord.ConferenceName +
+				_T(" ") + _T("Batter") + 
+				_T(" ") + teamRecord.TeamName + _T(".csv");
+		}
+	}
+	else
+	{
+		if (teamRecord.ConferenceID == 1)
+		{
+			// Create file name with League name and Division name
+			exportFileName = CStringA(m_dir) + leagueRecord.LeagueName + 
+				_T(" ") + divisionRecord.DivisionName +
+				_T(" ") + _T("Batter") + 
+				_T(" ") + teamRecord.TeamName + _T(".csv");
+		}
+		else
+		{
+			// Create file name with League name, Conference name, and Division name
+			exportFileName = CStringA(m_dir) + leagueRecord.LeagueName + 
+				_T(" ") + conferenceRecord.ConferenceName +
+				_T(" ") + divisionRecord.DivisionName + 
+				_T(" ") + _T("Batter") + 
+				_T(" ") + teamRecord.TeamName + _T(".csv");
+		}
+	}
 
 	// Process Batter file
 	//strTemp = "XB" + strTeamName.Left(20);
-	exportFileName = CStringA(m_dir) + _T("XB") + teamRecord.TeamName + _T(".csv"); // XBTeamName.csv
+	//exportFileName = CStringA(m_dir) + _T("XB") + teamRecord.TeamName + _T(".csv"); // XBTeamName.csv
 	//myFileName = strDir+"\\TB"+strTeamName.Right(10);
 	exportBatter.Open(exportFileName,CFile::modeCreate | CFile::modeWrite);
 	sprintf_s(exportData,_T("Team Name,LastName,FirstName,AB,Runs,Hits,RBI,2B,3B,HR,W,K,RE,"));
@@ -1002,10 +1048,50 @@ void CBaseballDoc::ExportFile(int teamID)
 	}
 	sqlite3_finalize(localStmt);
 
+	// Division of 1 and or Conference of 1 are pointers to DEFAULT
+	if (teamRecord.DivisionID == 1)
+	{
+		if (teamRecord.ConferenceID == 1)
+		{
+			// Create file name only with League name
+			exportFileName = CStringA(m_dir) + leagueRecord.LeagueName +
+				_T(" ") + _T("Pitcher") + 
+				_T(" ") + teamRecord.TeamName + _T(".csv");
+		}
+		else
+		{
+			// Create file name with League name and Conference name
+			exportFileName = CStringA(m_dir) + leagueRecord.LeagueName + 
+				_T(" ") + conferenceRecord.ConferenceName +
+				_T(" ") + _T("Pitcher") + 
+				_T(" ") + teamRecord.TeamName + _T(".csv");
+		}
+	}
+	else
+	{
+		if (teamRecord.ConferenceID == 1)
+		{
+			// Create file name with League name and Division name
+			exportFileName = CStringA(m_dir) + leagueRecord.LeagueName + 
+				_T(" ") + divisionRecord.DivisionName +
+				_T(" ") + _T("Pitcher") + 
+				_T(" ") + teamRecord.TeamName + _T(".csv");
+		}
+		else
+		{
+			// Create file name with League name, Conference name, and Division name
+			exportFileName = CStringA(m_dir) + leagueRecord.LeagueName + 
+				_T(" ") + conferenceRecord.ConferenceName +
+				_T(" ") + divisionRecord.DivisionName +
+				_T(" ") + _T("Pitcher") + 
+				_T(" ") + teamRecord.TeamName + _T(".csv");
+		}
+	}
+
 	// Process Pitcher file
 	//strTemp = "XP" + strTeamName.Left(20);
 	//exportFileName = strDir+"\\" + strTemp+".txt"; // dir\XB000001.txt
-	exportFileName = CStringA(m_dir) + _T("XP") + teamRecord.TeamName + _T(".csv"); // XPTeamName.csv
+	//exportFileName = CStringA(m_dir) + _T("XP") + teamRecord.TeamName + _T(".csv"); // XPTeamName.csv
 	//myFileName = strDir+"\\TP"+strTeamName.Right(10);
 	exportPitcher.Open(exportFileName,CFile::modeCreate | CFile::modeWrite);
 	sprintf_s(exportData,_T("Team Name,LastName,FirstName,IP,ER,Hits,Walks,Strikeouts,"));
@@ -1253,6 +1339,9 @@ void CBaseballDoc::ExportHTMLFile(int teamID)
 	CString strBGColor;
 	CString strTextColor;
 	m_TeamRecord teamRecord;
+	m_LeagueRecord leagueRecord;
+	m_ConferenceRecord conferenceRecord;
+	m_DivisionRecord divisionRecord;
 	m_BatterStatsRecord batterStatsRecord;
 	m_BatterRecord batterRecord;
 	m_PitcherStatsRecord pitcherStatsRecord;
@@ -1273,7 +1362,6 @@ void CBaseballDoc::ExportHTMLFile(int teamID)
 	strIndex = "index.htm";
 	strBackgroundPicture = "images/background.jpg";
 
-	teamRecord = GetTeam(teamID);
 	sqlite3_stmt *localStmt;
 	char *sqlBatterStats;
 	char *sqlPitcherStats;
@@ -1283,8 +1371,49 @@ void CBaseballDoc::ExportHTMLFile(int teamID)
 	int batterStatsID = 0;
 	int pitcherStatsID = 0;
 
+	teamRecord = GetTeam(teamID);
+	leagueRecord = GetLeague(teamRecord.LeagueID);
+	conferenceRecord = GetConference(teamRecord.ConferenceID);
+	divisionRecord = GetDivision(teamRecord.DivisionID);
+
+	// Division of 1 and or Conference of 1 are pointers to DEFAULT
+	if (teamRecord.DivisionID == 1)
+	{
+		if (teamRecord.ConferenceID == 1)
+		{
+			// Create file name only with League name
+			HTMLFileName = CStringA(m_dir) + leagueRecord.LeagueName +
+				_T(" ") + teamRecord.TeamName + _T(".htm");
+		}
+		else
+		{
+			// Create file name with League name and Conference name
+			HTMLFileName = CStringA(m_dir) + leagueRecord.LeagueName +
+				_T(" ") + conferenceRecord.ConferenceName +
+				_T(" ") + teamRecord.TeamName + _T(".htm");
+		}
+	}
+	else
+	{
+		if (teamRecord.ConferenceID == 1)
+		{
+			// Create file name with League name and Division name
+			HTMLFileName = CStringA(m_dir) + leagueRecord.LeagueName +
+				_T(" ") + divisionRecord.DivisionName +
+				_T(" ") + teamRecord.TeamName + _T(".htm");
+		}
+		else
+		{
+			// Create file name with League name, Conference name, and Division name
+			HTMLFileName = CStringA(m_dir) + leagueRecord.LeagueName +
+				_T(" ") + conferenceRecord.ConferenceName +
+				_T(" ") + divisionRecord.DivisionName +
+				_T(" ") + teamRecord.TeamName + _T(".htm");
+		}
+	}
+
 	// Process Batter file
-	HTMLFileName = CStringA(m_dir) + teamRecord.TeamName + _T(".htm"); // dir\TeamName.htm
+	//HTMLFileName = CStringA(m_dir) + teamRecord.TeamName + _T(".htm"); // dir\TeamName.htm
 
 	HTMLPlayer.Open(HTMLFileName,CFile::modeCreate | CFile::modeWrite);
 	sprintf_s(HTMLData,"<HTML>\n<HEAD>\n<TITLE>%s</TITLE>\n</HEAD>\n",
