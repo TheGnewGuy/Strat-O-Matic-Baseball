@@ -104,6 +104,8 @@ BEGIN_MESSAGE_MAP(CBaseballDoc, CDocument)
 	//}}AFX_MSG_MAP
 	ON_COMMAND(ID_FILE_OPEN, &CBaseballDoc::OnFileOpen)
 	ON_COMMAND(ID_LEAGUES_EDITLEAGUE, &CBaseballDoc::OnLeaguesEditLeague)
+	ON_COMMAND(ID_TEAMS_ADDBASETEAMS, &CBaseballDoc::OnTeamsAddBaseTeams)
+	ON_COMMAND(ID_LEAGUES_ADDBASELEAGUE, &CBaseballDoc::OnLeaguesAddBaseLeague)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -294,6 +296,53 @@ void CBaseballDoc::OnUpdateFormsStatistcsform(CCmdUI* pCmdUI)
 	}
 }
 
+void CBaseballDoc::OnTeamsAddBaseTeams()
+{
+	// TODO: Add your command handler code here
+	AddTeam dlg;
+	CString strTeamName;
+	CString strShortTeamName;
+	CString strBallPark;
+	int leagueID = 0;
+	int conferenceID = 0;
+	int divisionID = 0;
+	m_LeagueRecord leagueRecord;
+	m_ConferenceRecord conferenceRecord;
+	m_DivisionRecord divisionRecord;
+	m_TeamRecord teamRecord;
+
+	// Get League, Conference and Division to populate Team fields.
+	leagueID = GetLeagues(TRUE);
+	leagueRecord = GetLeague(leagueID);
+	conferenceID = GetConferenceID(leagueID);
+	conferenceRecord = GetConference(conferenceID);
+	divisionID = GetDivisionID(leagueID);
+	divisionRecord = GetDivision(divisionID);
+
+
+	dlg.m_TeamName = _T("Team Name");
+	dlg.m_League = leagueRecord.LeagueName;
+	dlg.m_Conference = conferenceRecord.ConferenceName;
+	dlg.m_Division = divisionRecord.DivisionName;
+	dlg.m_Base = TRUE;
+	if (dlg.DoModal() == IDOK)
+	{
+		teamRecord.TeamName = dlg.m_TeamName;
+		teamRecord.TeamNameShort = dlg.m_ShortTeamName;
+		teamRecord.BallparkName = dlg.m_BallPark;
+		teamRecord.HomeWins = dlg.m_HomeWin;
+		teamRecord.HomeLosses = dlg.m_HomeLoss;
+		teamRecord.AwayWins = dlg.m_AwayWin;
+		teamRecord.AwayLosses = dlg.m_AwayLoss;
+		teamRecord.LeagueID = leagueID;
+		teamRecord.ConferenceID = conferenceID;
+		teamRecord.DivisionID = divisionID;
+		teamRecord.TeamYear = dlg.m_Year;
+		teamRecord.BaseTeam = dlg.m_Base;
+		TeamInsert(teamRecord);
+	}
+}
+
 void CBaseballDoc::OnTeamsAddteams() 
 {
 	// TODO: Add your command handler code here
@@ -380,6 +429,11 @@ void CBaseballDoc::OnTeamsAddteams()
 		myFilePitcher.Write(&count, sizeof(count));
 		myFilePitcher.Close();
 	}
+}
+
+void CBaseballDoc::OnLeaguesAddBaseLeague()
+{
+	// TODO: Add your command handler code here
 }
 
 void CBaseballDoc::OnLeaguesAddleague() 
@@ -1770,31 +1824,10 @@ void CBaseballDoc::ExportHTMLFile(int teamID)
 void CBaseballDoc::OnTeamsEditLeagueTeams() 
 {
 	// TODO: Add your command handler code here
-	DlgSelLeague dlgSelLeague;
-	CFileFind myFileFind;
-	CStringArray arrayFileNames;
-	CFile myInFile;
-	CString strLeague;
 	int leagueID = 0;
-	CString strLeagueName;
-	CString strLeagueFile;
-	CString strLeagueDir;
 
-//	strLeague = GetLeagues(TRUE);
 	leagueID = GetLeagues(TRUE);
 
-	//strLeagueName = strLeague.Left(30);
-	//if (strncmp(strLeagueName,"All",3))
-	//{
-	//	strLeagueFile = strLeague.Right(12);
-	//	strLeagueDir = strLeagueFile.Left(8);
-	//}
-	//else
-	//{
-	//	strLeagueDir = "data";
-	//}
-
-//	EditTeams(strLeagueDir);
 	EditTeams(leagueID);
 }
 
@@ -4251,6 +4284,143 @@ int CBaseballDoc::GetLeagues(BOOL baseFlag)
 	return leagueID;
 }
 
+int CBaseballDoc::GetConferenceID(int LeagueID)
+{
+	DlgSelLeague dlgSelConference;
+	int conferenceID = 0;
+	CString strConferenceName;
+	char *sqlLeague;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlLeague = "SELECT "  \
+		"ConferenceName " \
+		" FROM CONFERENCES " \
+		" WHERE LeagueID = ?1 " ;
+
+	rc = sqlite3_prepare_v2(m_db, sqlLeague, strlen(sqlLeague), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for LEAGUES Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		strConferenceName = sqlite3_column_text(m_stmt, 0);
+//		if (strConferenceName != "DEFAULT")
+			dlgSelConference.m_arrayLeagues.Add(strConferenceName);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	if (dlgSelConference.m_arrayLeagues.GetCount() != 0)
+	{
+		if (dlgSelConference.DoModal() == IDOK)
+		{
+			strConferenceName = dlgSelConference.m_arrayLeagues[0];
+		}
+		else
+		{
+			// No Leagues found so display message
+			//AfxMessageBox(_T("Could not find any Conferences. Please create a Conference"));
+			strConferenceName = _T("DEFAULT");
+			return 1;		// 1 is default
+		}
+	}
+	else
+	{
+		// No Leagues found so display message
+		strConferenceName = _T("DEFAULT");
+		return 1;		// 1 is default
+	}
+
+	conferenceID = GetConferenceIDName(strConferenceName, LeagueID);
+
+	return conferenceID;
+}
+
+int CBaseballDoc::GetDivisionID(int LeagueID)
+{
+	DlgSelLeague dlgSelDivision;
+	int divisionID = 0;
+	CString strDivisionName;
+	char *sqlLeague;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlLeague = "SELECT "  \
+		"DivisionName " \
+		" FROM DIVISIONS " \
+		" WHERE LeagueID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlLeague, strlen(sqlLeague), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for LEAGUES Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		strDivisionName = sqlite3_column_text(m_stmt, 0);
+		dlgSelDivision.m_arrayLeagues.Add(strDivisionName);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	if (dlgSelDivision.m_arrayLeagues.GetCount() != 0)
+	{
+		if (dlgSelDivision.DoModal() == IDOK)
+		{
+			strDivisionName = dlgSelDivision.m_arrayLeagues[0];
+		}
+		else
+		{
+			// No Leagues found so display message
+			//AfxMessageBox(_T("Could not find any Divisions. Please create a Division"));
+			strDivisionName = _T("DEFAULT");
+			return 1;		// 1 is default
+		}
+	}
+	else
+	{
+		// No Leagues found so display message
+		strDivisionName = _T("DEFAULT");
+		return 1;		// 1 is default
+	}
+
+	divisionID = GetDivisionIDName(strDivisionName, LeagueID);
+
+	return divisionID;
+}
+
 // Create a list of teams based on teams in a given League.
 // Place team neames in dlgSelTeam.m_arrayTeams
 // return with the chosen team ID
@@ -4815,6 +4985,102 @@ CBaseballDoc::m_ConferenceRecord CBaseballDoc::GetConference(int ConferenceID)
 	sqlite3_finalize(m_stmt);
 
 	return conferenceResult;
+}
+
+int CBaseballDoc::GetConferenceIDName(CString strConferenceName, int LeagueID)
+{
+	int conferenceID;
+	char *sqlConference;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlConference = "SELECT "  \
+		"ConferenceID " \
+		" FROM CONFERENCES " \
+		" WHERE LeagueID = ?1 AND ConferenceName = ?2 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlConference, strlen(sqlConference), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for CONFERENCES Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 2, strConferenceName, strlen(strConferenceName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind strConferenceName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		conferenceID = sqlite3_column_int(m_stmt, 0);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return conferenceID;
+}
+
+int CBaseballDoc::GetDivisionIDName(CString strDivisionName, int LeagueID)
+{
+	int divisionID;
+	char *sqlDivision;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlDivision = "SELECT "  \
+		"DivisionID " \
+		" FROM DIVISIONS " \
+		" WHERE LeagueID = ?1 AND DivisionName = ?2 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlDivision, strlen(sqlDivision), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for DIVISIONS Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 2, strDivisionName, strlen(strDivisionName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind strDivisionName int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		divisionID = sqlite3_column_int(m_stmt, 0);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	return divisionID;
 }
 
 CBaseballDoc::m_DivisionRecord CBaseballDoc::GetDivision(int DivisionID)
@@ -6668,3 +6934,142 @@ int CBaseballDoc::PitcherStatsUpdate(m_PitcherStatsRecord PitcherStatsRecord)
 	return 0;
 }
 
+int CBaseballDoc::TeamInsert(m_TeamRecord TeamRecord)
+{
+	int rc;
+	CHAR buffer[100];
+	char *sqlTeam;
+
+	/* Create SQL statement */
+	sqlTeam = "INSERT INTO TEAM("  \
+		"TeamName," \
+		"TeamNameShort," \
+		"BallparkName," \
+		"HomeWins," \
+		"HomeLosses," \
+		"AwayWins," \
+		"AwayLosses," \
+		"LeagueID," \
+		"ConferenceID," \
+		"DivisionID," \
+		"TeamYear," \
+		"BaseTeam" \
+		")" \
+		"VALUES (" \
+		"?1," \
+		"?2," \
+		"?3," \
+		"?4," \
+		"?5," \
+		"?6," \
+		"?7," \
+		"?8," \
+		"?9," \
+		"?10," \
+		"?11," \
+		"?12" \
+		");";
+	rc = sqlite3_prepare_v2(m_db, sqlTeam, -1, &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+
+		//fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for Team Insert OK: %s\n", sqlite3_errmsg(m_db));
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the SELECT statement
+	rc = sqlite3_bind_text(m_stmt, 1, TeamRecord.TeamName, strlen(TeamRecord.TeamName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind strTeamName: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 2, TeamRecord.TeamNameShort, strlen(TeamRecord.TeamNameShort), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind strTeamNameShort: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 3, TeamRecord.BallparkName, strlen(TeamRecord.BallparkName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind strBallParkName: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 4, TeamRecord.HomeWins);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind HomeWins: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 5, TeamRecord.HomeLosses);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind HomeLosses: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 6, TeamRecord.AwayWins);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind AwayWins: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 7, TeamRecord.AwayLosses);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind AwayLosses: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 8, TeamRecord.LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 9, TeamRecord.ConferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ConferenceID: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 10, TeamRecord.DivisionID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind DivisionID: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 11, TeamRecord.TeamYear);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Year: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 12, TeamRecord.BaseTeam);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Base: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		//printf("%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		sprintf_s(buffer, sizeof(buffer), "Failed to insert item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Step for Team Insert OK: %s\n", sqlite3_errmsg(m_db));
+		//AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+	return 0;
+}

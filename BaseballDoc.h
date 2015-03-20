@@ -319,6 +319,13 @@ public:
 	int BatterStatsUpdate(m_BatterStatsRecord BatterStatsRecord);
 	int PitcherUpdate(m_PitcherRecord PitcherRecord);
 	int PitcherStatsUpdate(m_PitcherStatsRecord PitcherStatsRecord);
+	afx_msg void OnTeamsAddBaseTeams();
+	afx_msg void OnLeaguesAddBaseLeague();
+	int GetConferenceID(int LeagueID);
+	int GetDivisionID(int LeagueID);
+	int GetConferenceIDName(CString strConferenceName, int LeagueID);
+	int GetDivisionIDName(CString strDivisionName, int LeagueID);
+	int TeamInsert(m_TeamRecord TeamRecord);
 };
 
 /////////////////////////////////////////////////////////////////////////////

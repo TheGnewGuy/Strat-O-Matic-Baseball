@@ -22,7 +22,30 @@ AddTeam::AddTeam(CWnd* pParent /*=NULL*/)
 	m_TeamName = _T("");
 	m_ShortTeamName = _T("");
 	m_BallPark = _T("");
+	m_AwayLoss = 0;
+	m_AwayWin = 0;
+	m_HomeLoss = 0;
+	m_HomeWin = 0;
+	m_League = _T("DEFAULT");
+	m_Division = _T("DEFAULT");
+	m_Conference = _T("DEFAULT");
+	m_Year = 1800;
+	m_Base = FALSE;
 	//}}AFX_DATA_INIT
+}
+
+BOOL AddTeam::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	// TODO:  Add extra initialization here
+	if (m_Base)
+		m_BaseControl.SetCheck(TRUE);
+	else
+		m_BaseControl.SetCheck(FALSE);
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 
@@ -36,7 +59,25 @@ void AddTeam::DoDataExchange(CDataExchange* pDX)
 	DDV_MaxChars(pDX, m_ShortTeamName, 3);
 	DDX_Text(pDX, IDC_BALLPARK1, m_BallPark);
 	DDV_MaxChars(pDX, m_BallPark, 30);
+	DDX_Text(pDX, IDC_AWAYLOSS, m_AwayLoss);
+	DDV_MinMaxInt(pDX, m_AwayLoss, 0, 200);
+	DDX_Text(pDX, IDC_YEAR, m_Year);
+	DDV_MinMaxInt(pDX, m_Year, 1800, 2500);
+	DDX_Text(pDX, IDC_AWAYWIN, m_AwayWin);
+	DDV_MinMaxInt(pDX, m_AwayWin, 0, 200);
+	DDX_Text(pDX, IDC_CONFERENCE, m_Conference);
+	DDV_MaxChars(pDX, m_Conference, 100);
+	DDX_Text(pDX, IDC_DIVISION, m_Division);
+	DDV_MaxChars(pDX, m_Division, 200);
+	DDX_Text(pDX, IDC_HOMEWIN, m_HomeWin);
+	DDV_MinMaxInt(pDX, m_HomeWin, 0, 200);
+	DDX_Text(pDX, IDC_League, m_League);
+	DDV_MaxChars(pDX, m_League, 100);
+	DDX_Text(pDX, IDC_HOMELOSS, m_HomeLoss);
+	DDV_MinMaxInt(pDX, m_HomeLoss, 0, 200);
+	//  DDX_Control(pDX, IDC_BASE, m_Base);
 	//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_BASE, m_BaseControl);
 }
 
 
