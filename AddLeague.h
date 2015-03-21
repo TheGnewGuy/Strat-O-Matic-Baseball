@@ -45,9 +45,6 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
-#pragma once
-#pragma once
-
 
 // AddLeagueName dialog
 

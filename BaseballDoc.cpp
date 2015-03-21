@@ -55,6 +55,7 @@
 #include "DlgAddTeams.h"
 #include "DlgEditLeague.h"
 #include "AddTeam.h"
+#include "AddConference.h"
 #include "FileStruct.h"
 #include "registry.h"
 #include <direct.h>
@@ -316,7 +317,7 @@ void CBaseballDoc::OnTeamsAddBaseTeams()
 	leagueRecord = GetLeague(leagueID);
 	conferenceID = GetConferenceID(leagueID);
 	conferenceRecord = GetConference(conferenceID);
-	divisionID = GetDivisionID(leagueID);
+	divisionID = GetDivisionID(leagueID, conferenceID);
 	divisionRecord = GetDivision(divisionID);
 
 
@@ -395,11 +396,28 @@ void CBaseballDoc::OnTeamsAddteams()
 void CBaseballDoc::OnLeaguesAddBaseLeague()
 {
 	// TODO: Add your command handler code here
+	int i_conference = 0;
+	int i_division = 0;
 	AddLeagueName dlg;
+	AddConference dlgConference;
+	DlgAddDivision dlgDivision;
+	CStringArray arrayConference;
+	CStringArray arrayDivision;
 	int leagueID = 0;
+	int conferenceID = 0;
 	m_LeagueRecord leagueRecord;
 	m_ConferenceRecord conferenceRecord;
 	m_DivisionRecord divisionRecord;
+
+	arrayConference.RemoveAll();
+	arrayDivision.RemoveAll();
+
+	dlgConference.m_Conference1.Empty();
+	dlgConference.m_Conference2.Empty();
+	dlgConference.m_Conference3.Empty();
+	dlgConference.m_Conference4.Empty();
+	dlgConference.m_Conference5.Empty();
+	dlgConference.m_Conference6.Empty();
 
 	if (dlg.DoModal() == IDOK)
 	{
@@ -409,11 +427,73 @@ void CBaseballDoc::OnLeaguesAddBaseLeague()
 		leagueRecord.NumberOfConferences = 0;
 		leagueRecord.NumberOfDivisions = 0;
 		leagueRecord.Year = dlg.m_Year;
-		
-		LeagueInsert(leagueRecord);
-		// Need to also check for league year
-		leagueID = GetLeagueID(leagueRecord.LeagueName);
 
+		//Create League with basic information, Fill in additional data with update
+		LeagueInsert(leagueRecord);
+		// Need to also check for league year else might be a duplicate League name
+		// leagueID = GetLeagueID(leagueRecord.LeagueName, leagueRecord.Year);
+		leagueID = GetLeagueID(leagueRecord.LeagueName);
+		leagueRecord.LeagueID = leagueID;
+
+		dlgConference.m_LeagueName = leagueRecord.LeagueName;
+		if (dlgConference.DoModal() == IDOK)
+		{
+			arrayConference.RemoveAll();
+			if (!dlgConference.m_Conference1.IsEmpty()) arrayConference.Add(dlgConference.m_Conference1);
+			if (!dlgConference.m_Conference2.IsEmpty()) arrayConference.Add(dlgConference.m_Conference2);
+			if (!dlgConference.m_Conference3.IsEmpty()) arrayConference.Add(dlgConference.m_Conference3);
+			if (!dlgConference.m_Conference4.IsEmpty()) arrayConference.Add(dlgConference.m_Conference4);
+			if (!dlgConference.m_Conference5.IsEmpty()) arrayConference.Add(dlgConference.m_Conference5);
+			if (!dlgConference.m_Conference6.IsEmpty()) arrayConference.Add(dlgConference.m_Conference6);
+			// Conference dialog forces the entry of one conference.
+			//if (!arrayConference.GetSize()) arrayConference.Add("DEFAULT");
+			leagueRecord.NumberOfConferences = arrayConference.GetSize();
+
+			for (i_conference; i_conference < leagueRecord.NumberOfConferences; i_conference++)
+			{
+				conferenceRecord.ConferenceName = arrayConference[i_conference];
+				conferenceRecord.LeagueID = leagueID;
+				conferenceRecord.BaseConference = TRUE;
+				ConferenceInsert(conferenceRecord);
+				conferenceID = GetConferenceIDName(conferenceRecord.ConferenceName, leagueID);
+
+				dlgDivision.m_Conference0 = arrayConference[i_conference];
+
+				dlgDivision.m_Division1.Empty();
+				dlgDivision.m_Division2.Empty();
+				dlgDivision.m_Division3.Empty();
+				dlgDivision.m_Division4.Empty();
+				dlgDivision.m_Division5.Empty();
+				dlgDivision.m_Division6.Empty();
+
+				if (dlgDivision.DoModal() == IDOK)
+				{
+					arrayDivision.RemoveAll();
+					if (!dlgDivision.m_Division1.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division1);
+					if (!dlgDivision.m_Division2.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division2);
+					if (!dlgDivision.m_Division3.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division3);
+					if (!dlgDivision.m_Division4.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division4);
+					if (!dlgDivision.m_Division5.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division5);
+					if (!dlgDivision.m_Division6.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division6);
+					if (!arrayDivision.GetSize()) arrayDivision.Add("DEFAULT");
+					leagueRecord.NumberOfDivisions = arrayDivision.GetSize();
+
+					i_division = 0;
+					if (arrayDivision[0] != "DEFAULT")
+					{
+						for (i_division; i_division < leagueRecord.NumberOfDivisions; i_division++)
+						{
+							divisionRecord.DivisionName = arrayDivision[i_division];
+							divisionRecord.LeagueID = leagueID;
+							divisionRecord.ConferenceID = conferenceID;
+							divisionRecord.BaseDivisions = TRUE;
+							DivisionInsert(divisionRecord);
+						}
+					}
+				}
+			}
+		}
+		LeagueUpdate(leagueRecord);
 	}
 }
 
@@ -4402,6 +4482,80 @@ int CBaseballDoc::GetDivisionID(int LeagueID)
 	return divisionID;
 }
 
+int CBaseballDoc::GetDivisionID(int LeagueID, int ConferenceID)
+{
+	DlgSelLeague dlgSelDivision;
+	int divisionID = 0;
+	CString strDivisionName;
+	char *sqlLeague;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlLeague = "SELECT "  \
+		"DivisionName " \
+		" FROM DIVISIONS " \
+		" WHERE LeagueID = ?1 AND ConferenceID = ?2";
+
+	rc = sqlite3_prepare_v2(m_db, sqlLeague, strlen(sqlLeague), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for LEAGUES Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, ConferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind ConferenceID: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		strDivisionName = sqlite3_column_text(m_stmt, 0);
+		dlgSelDivision.m_arrayLeagues.Add(strDivisionName);
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	if (dlgSelDivision.m_arrayLeagues.GetCount() != 0)
+	{
+		if (dlgSelDivision.DoModal() == IDOK)
+		{
+			strDivisionName = dlgSelDivision.m_arrayLeagues[0];
+		}
+		else
+		{
+			// No Leagues found so display message
+			//AfxMessageBox(_T("Could not find any Divisions. Please create a Division"));
+			strDivisionName = _T("DEFAULT");
+			return 1;		// 1 is default
+		}
+	}
+	else
+	{
+		// No Leagues found so display message
+		strDivisionName = _T("DEFAULT");
+		return 1;		// 1 is default
+	}
+
+	divisionID = GetDivisionIDName(strDivisionName, LeagueID);
+
+	return divisionID;
+}
+
 // Create a list of teams based on teams in a given League.
 // Place team neames in dlgSelTeam.m_arrayTeams
 // return with the chosen team ID
@@ -7097,7 +7251,7 @@ int CBaseballDoc::LeagueInsert(m_LeagueRecord LeagueRecord)
 	else
 	{
 		sprintf_s(buffer, sizeof(buffer), "Prepare for LEAGUES Insert OK: %s\n", sqlite3_errmsg(m_db));
-		AfxMessageBox(buffer);
+		//AfxMessageBox(buffer);
 	}
 
 	// Bind the data to field '1' which is the first '?' in the INSERT statement
@@ -7133,5 +7287,167 @@ int CBaseballDoc::LeagueInsert(m_LeagueRecord LeagueRecord)
 	}
 
 	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		//printf("%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		sprintf_s(buffer, sizeof(buffer), "Failed to insert item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Execute for League Insert OK.\n");
+		//AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+	return 0;
+}
+
+int CBaseballDoc::ConferenceInsert(m_ConferenceRecord conferenceRecord)
+{
+	int rc;
+	char *sqlConference;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlConference = "INSERT INTO CONFERENCES("  \
+		"ConferenceName," \
+		"LeagueID," \
+		"BaseConference" \
+		")" \
+		"VALUES (" \
+		"?1," \
+		"?2," \
+		"?3" \
+		");";
+
+	rc = sqlite3_prepare_v2(m_db, sqlConference, strlen(sqlConference), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+
+		//fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for Conference Insert OK: %s\n", sqlite3_errmsg(m_db));
+		//AfxMessageBox(buffer);
+	}
+
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, conferenceRecord.ConferenceName, strlen(conferenceRecord.ConferenceName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind txt: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, conferenceRecord.LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 3, conferenceRecord.BaseConference);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		//printf("%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		sprintf_s(buffer, sizeof(buffer), "Failed to insert item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Execute for Conference Insert OK.\n");
+		//AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+	return 0;
+}
+
+int CBaseballDoc::DivisionInsert(m_DivisionRecord divisionRecord)
+{
+	int rc;
+	char *sqlConference;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlConference = "INSERT INTO DIVISIONS("  \
+		"DivisionName," \
+		"LeagueID," \
+		"ConferenceID," \
+		"BaseDivisions" \
+		")" \
+		"VALUES (" \
+		"?1," \
+		"?2," \
+		"?3," \
+		"?4" \
+		");";
+
+	rc = sqlite3_prepare_v2(m_db, sqlConference, strlen(sqlConference), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+
+		//fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for Division Insert OK: %s\n", sqlite3_errmsg(m_db));
+		//AfxMessageBox(buffer);
+	}
+
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, divisionRecord.DivisionName, strlen(divisionRecord.DivisionName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind txt: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, divisionRecord.LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 3, divisionRecord.ConferenceID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 4, divisionRecord.BaseDivisions);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		//printf("%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		sprintf_s(buffer, sizeof(buffer), "Failed to insert item: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Execute for Division Insert OK.\n");
+		//AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
 	return 0;
 }

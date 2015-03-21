@@ -328,6 +328,9 @@ public:
 	int GetDivisionIDName(CString strDivisionName, int LeagueID);
 	int TeamInsert(m_TeamRecord TeamRecord);
 	int LeagueInsert(m_LeagueRecord LeagueRecord);
+	int ConferenceInsert(m_ConferenceRecord conferenceRecord);
+	int DivisionInsert(m_DivisionRecord divisionRecord);
+	int GetDivisionID(int LeagueID, int ConferenceID);
 };
 
 /////////////////////////////////////////////////////////////////////////////

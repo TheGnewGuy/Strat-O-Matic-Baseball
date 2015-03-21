@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AddConference.cpp" />
     <ClCompile Include="AddLeague.cpp" />
     <ClCompile Include="AddTeam.cpp" />
     <ClCompile Include="Baseball.cpp" />
@@ -227,6 +228,7 @@
     <ResourceCompile Include="Baseball.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddConference.h" />
     <ClInclude Include="AddLeague.h" />
     <ClInclude Include="AddTeam.h" />
     <ClInclude Include="Baseball.h" />

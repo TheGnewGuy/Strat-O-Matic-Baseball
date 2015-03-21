@@ -45,6 +45,8 @@
 #define IDD_PITCHERSCHANCE              172
 #define IDD_LEAGUEHTMLOPTIONS           173
 #define IDD_LEAGUENAME                  174
+#define IDD_LEAGUE2                     175
+#define IDD_CONFERENCE                  175
 #define IDC_LEAGUE1                     1000
 #define IDC_CONFERENCE1                 1001
 #define IDC_CONFERENCE2                 1002
@@ -224,7 +226,6 @@
 #define IDC_League                      1186
 #define IDC_CONFERENCE                  1187
 #define IDC_DIVISION                    1188
-#define IDC_EDIT1                       1189
 #define ID_FORMS_SCORESHEETFORM         32771
 #define ID_FORMS_STATISTCSFORM          32772
 #define ID_FORMS_SCORESHEETFORMXTRA     32773
