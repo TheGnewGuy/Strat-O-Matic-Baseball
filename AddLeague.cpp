@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "Baseball.h"
 #include "AddLeague.h"
+#include "afxdialogex.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -68,7 +70,58 @@ void AddLeague::OnOK()
 	{
 		CWnd* pmyCWnd = AfxGetMainWnd();
 		pmyCWnd->MessageBox("You Must Enter a League Name",
-			"Team not Selected!",MB_OK|MB_ICONEXCLAMATION);
+			"Enter a League Name!",MB_OK|MB_ICONEXCLAMATION);
+	}
+	else
+	{
+		CDialog::OnOK();
+	}
+}
+// AddLeague.cpp : implementation file
+//
+
+// AddLeagueName dialog
+
+IMPLEMENT_DYNAMIC(AddLeagueName, CDialog)
+
+AddLeagueName::AddLeagueName(CWnd* pParent /*=NULL*/)
+	: CDialog(AddLeagueName::IDD, pParent)
+	, m_NewLeagueName(_T(""))
+	, m_Year(1800)
+{
+}
+
+AddLeagueName::~AddLeagueName()
+{
+}
+
+void AddLeagueName::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_LEAGUE1, m_NewLeagueName);
+	DDV_MaxChars(pDX, m_NewLeagueName, 30);
+	DDX_Text(pDX, IDC_YEAR, m_Year);
+	DDV_MinMaxInt(pDX, m_Year, 1800, 2200);
+}
+
+
+BEGIN_MESSAGE_MAP(AddLeagueName, CDialog)
+END_MESSAGE_MAP()
+
+
+// AddLeagueName message handlers
+
+
+void AddLeagueName::OnOK()
+{
+	GetDlgItemText(IDC_LEAGUE1, m_NewLeagueName);
+	m_Year = GetDlgItemInt(IDC_YEAR);
+
+	if (m_NewLeagueName.IsEmpty())
+	{
+		CWnd* pmyCWnd = AfxGetMainWnd();
+		pmyCWnd->MessageBox("You Must Enter a League Name",
+			"Enter a League Name!", MB_OK | MB_ICONEXCLAMATION);
 	}
 	else
 	{

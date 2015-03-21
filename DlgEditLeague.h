@@ -12,7 +12,7 @@ public:
 	virtual ~DlgEditLeague();
 
 // Dialog Data
-	enum { IDD = IDD_DLGEDITLEAGUE };
+	enum { IDD = IDD_LEAGUENAME };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

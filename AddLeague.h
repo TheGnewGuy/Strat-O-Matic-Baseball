@@ -1,4 +1,4 @@
-#if !defined(AFX_ADDLEAGUE_H__01BF1281_8A03_11D2_B0EE_444553540000__INCLUDED_)
+#include "afxwin.h"
 #define AFX_ADDLEAGUE_H__01BF1281_8A03_11D2_B0EE_444553540000__INCLUDED_
 
 #if _MSC_VER >= 1000
@@ -45,8 +45,29 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
+#pragma once
+#pragma once
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
-#endif // !defined(AFX_ADDLEAGUE_H__01BF1281_8A03_11D2_B0EE_444553540000__INCLUDED_)
+// AddLeagueName dialog
+
+class AddLeagueName : public CDialog
+{
+	DECLARE_DYNAMIC(AddLeagueName)
+
+public:
+	AddLeagueName(CWnd* pParent = NULL);   // standard constructor
+	virtual ~AddLeagueName();
+
+// Dialog Data
+	enum { IDD = IDD_LEAGUENAME };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+	DECLARE_MESSAGE_MAP()
+	virtual void OnOK();
+public:
+	CString m_NewLeagueName;
+	int m_Year;
+};

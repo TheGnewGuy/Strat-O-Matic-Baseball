@@ -141,6 +141,7 @@ public:
 		int NumberOfConferences;
 		int NumberOfDivisions;
 		int BaseLeague;
+		int Year;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
@@ -326,6 +327,7 @@ public:
 	int GetConferenceIDName(CString strConferenceName, int LeagueID);
 	int GetDivisionIDName(CString strDivisionName, int LeagueID);
 	int TeamInsert(m_TeamRecord TeamRecord);
+	int LeagueInsert(m_LeagueRecord LeagueRecord);
 };
 
 /////////////////////////////////////////////////////////////////////////////

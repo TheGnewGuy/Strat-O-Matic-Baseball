@@ -324,6 +324,7 @@ void CBaseballDoc::OnTeamsAddBaseTeams()
 	dlg.m_League = leagueRecord.LeagueName;
 	dlg.m_Conference = conferenceRecord.ConferenceName;
 	dlg.m_Division = divisionRecord.DivisionName;
+	// Setting base to TRUE sets base team. But this can be overridden
 	dlg.m_Base = TRUE;
 	if (dlg.DoModal() == IDOK)
 	{
@@ -347,93 +348,73 @@ void CBaseballDoc::OnTeamsAddteams()
 {
 	// TODO: Add your command handler code here
 	AddTeam dlg;
-	CFile myFileBatter;
-	CFile myFilePitcher;
-	BYTE count;
 	CString strTeamName;
 	CString strShortTeamName;
 	CString strBallPark;
-	CString filler10("          ");
-	CString strFileNameBatter;
-	CString strFileNamePitcher;
-	CString strFileTitle;
-	CStringArray arrayFileNumber;
-	CString strFileNumber;
-	char strNewFileNumber[10];
-	CFileFind myFileFind;
-	BOOL bWorking;
-	long lFileNumber;
-	int i,sortflag;
-	CString strTemp;
+	int leagueID = 0;
+	int conferenceID = 0;
+	int divisionID = 0;
+	m_LeagueRecord leagueRecord;
+	m_ConferenceRecord conferenceRecord;
+	m_DivisionRecord divisionRecord;
+	m_TeamRecord teamRecord;
 
-	count = 0;
+	// Get League, Conference and Division to populate Team fields.
+	leagueID = GetLeagues(TRUE);
+	leagueRecord = GetLeague(leagueID);
+	conferenceID = GetConferenceID(leagueID);
+	conferenceRecord = GetConference(conferenceID);
+	divisionID = GetDivisionID(leagueID);
+	divisionRecord = GetDivision(divisionID);
 
-	// Find all existing batter files TB000000.dat
-	// Create the next sequential file. If not found
-	// start at 0
-	bWorking = myFileFind.FindFile("data\\TB*.dat",0);
-	if (bWorking)
-	{
-		while (bWorking)
-		{
-			bWorking = myFileFind.FindNextFile();
-			strFileTitle = myFileFind.GetFileTitle();
-			arrayFileNumber.Add(strFileTitle.Right(6));
-		}
-	}
-	else
-	{
-		arrayFileNumber.Add("000000");
-	}
-	myFileFind.Close();
 
-	// Since the FindNextFile does not return the files in any order
-	// we must sort the file names to get highest number
-	sortflag = 1;
-	while (sortflag)
-	{
-		sortflag = 0;
-		for (i=0; i<(arrayFileNumber.GetSize()-1);i++)
-		{
-			if (arrayFileNumber[i].Compare(arrayFileNumber[i+1]) == 1)
-			{
-				strTemp = arrayFileNumber[i];
-				arrayFileNumber[i] = arrayFileNumber[i+1];
-				arrayFileNumber[i+1] = strTemp;
-				sortflag = 1;
-			}
-		}
-	}
-
-	lFileNumber = atol(arrayFileNumber[arrayFileNumber.GetSize()-1]);
-	lFileNumber++;
-	sprintf_s(strNewFileNumber,"%6.6lu",lFileNumber);
-	strFileNumber = strNewFileNumber;
-	strFileNameBatter = "data\\TB"+strFileNumber+".dat";
-	strFileNamePitcher = "data\\TP"+strFileNumber+".dat";
-
+	dlg.m_TeamName = _T("Team Name");
+	dlg.m_League = leagueRecord.LeagueName;
+	dlg.m_Conference = conferenceRecord.ConferenceName;
+	dlg.m_Division = divisionRecord.DivisionName;
+	// Setting base to FALSE sets non base team. But this can be overridden
+	dlg.m_Base = FALSE;
 	if (dlg.DoModal() == IDOK)
 	{
-		// Create a Batter file with zero counter and team name
-		strTeamName = dlg.m_TeamName+filler10+filler10+filler10+filler10;
-		strShortTeamName = dlg.m_BallPark;
-		strBallPark = dlg.m_ShortTeamName;
-		myFileBatter.Open(strFileNameBatter,CFile::modeCreate | CFile::modeWrite);
-		myFileBatter.Write(&count, sizeof(count));
-		myFileBatter.Write(strTeamName, 40);
-		myFileBatter.Write(strShortTeamName, 3);
-		myFileBatter.Write(strBallPark, 30);
-		myFileBatter.Close();
-		// Create Pitcher file only with a zero counter
-		myFilePitcher.Open(strFileNamePitcher,CFile::modeCreate | CFile::modeWrite);
-		myFilePitcher.Write(&count, sizeof(count));
-		myFilePitcher.Close();
+		teamRecord.TeamName = dlg.m_TeamName;
+		teamRecord.TeamNameShort = dlg.m_ShortTeamName;
+		teamRecord.BallparkName = dlg.m_BallPark;
+		teamRecord.HomeWins = dlg.m_HomeWin;
+		teamRecord.HomeLosses = dlg.m_HomeLoss;
+		teamRecord.AwayWins = dlg.m_AwayWin;
+		teamRecord.AwayLosses = dlg.m_AwayLoss;
+		teamRecord.LeagueID = leagueID;
+		teamRecord.ConferenceID = conferenceID;
+		teamRecord.DivisionID = divisionID;
+		teamRecord.TeamYear = dlg.m_Year;
+		teamRecord.BaseTeam = dlg.m_Base;
+		TeamInsert(teamRecord);
 	}
 }
 
 void CBaseballDoc::OnLeaguesAddBaseLeague()
 {
 	// TODO: Add your command handler code here
+	AddLeagueName dlg;
+	int leagueID = 0;
+	m_LeagueRecord leagueRecord;
+	m_ConferenceRecord conferenceRecord;
+	m_DivisionRecord divisionRecord;
+
+	if (dlg.DoModal() == IDOK)
+	{
+		leagueRecord.LeagueName = dlg.m_NewLeagueName;
+		leagueRecord.Year = dlg.m_Year;
+		leagueRecord.BaseLeague = TRUE;
+		leagueRecord.NumberOfConferences = 0;
+		leagueRecord.NumberOfDivisions = 0;
+		leagueRecord.Year = dlg.m_Year;
+		
+		LeagueInsert(leagueRecord);
+		// Need to also check for league year
+		leagueID = GetLeagueID(leagueRecord.LeagueName);
+
+	}
 }
 
 void CBaseballDoc::OnLeaguesAddleague() 
@@ -4895,6 +4876,7 @@ CBaseballDoc::m_LeagueRecord CBaseballDoc::GetLeague(int LeagueID)
 		"NumberOfConferences," \
 		"NumberOfDivisions," \
 		"BaseLeague," \
+		"LeagueYear," \
 		"CreateTime," \
 		"LastUpdateTime" \
 		" FROM LEAGUES " \
@@ -4926,8 +4908,9 @@ CBaseballDoc::m_LeagueRecord CBaseballDoc::GetLeague(int LeagueID)
 		leagueResult.NumberOfConferences = sqlite3_column_int(m_stmt, 2);
 		leagueResult.NumberOfDivisions = sqlite3_column_int(m_stmt, 3);
 		leagueResult.BaseLeague = sqlite3_column_int(m_stmt, 4);
-		leagueResult.CreateTime = sqlite3_column_text(m_stmt, 5);
-		leagueResult.LastUpdateTime = sqlite3_column_text(m_stmt, 6);
+		leagueResult.Year = sqlite3_column_int(m_stmt, 5);
+		leagueResult.CreateTime = sqlite3_column_text(m_stmt, 6);
+		leagueResult.LastUpdateTime = sqlite3_column_text(m_stmt, 7);
 	}
 
 	sqlite3_finalize(m_stmt);
@@ -5706,8 +5689,9 @@ int CBaseballDoc::LeagueUpdate(m_LeagueRecord LeagueRecord)
 		"NumberOfConferences = ?2," \
 		"NumberOfDivisions = ?3," \
 		"BaseLeague = ?4," \
-		"LastUpdateTime = datetime('NOW','localtime')" \
-		" WHERE LeagueID = ?5 ";
+		"LeagueYear = ?5, "
+		"LastUpdateTime = datetime('NOW','localtime') " \
+		"WHERE LeagueID = ?6 ";
 
 	rc = sqlite3_prepare_v2(m_db, sqlLeague, strlen(sqlLeague), &m_stmt, 0);
 	if (rc != SQLITE_OK)
@@ -5745,7 +5729,13 @@ int CBaseballDoc::LeagueUpdate(m_LeagueRecord LeagueRecord)
 		sprintf_s(buffer, sizeof(buffer), "Could not bind BaseLeague int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 5, LeagueRecord.LeagueID);
+	rc = sqlite3_bind_int(m_stmt, 5, LeagueRecord.Year);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind Year int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 6, LeagueRecord.LeagueID);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID int: %s\n", sqlite3_errmsg(m_db));
@@ -7071,5 +7061,77 @@ int CBaseballDoc::TeamInsert(m_TeamRecord TeamRecord)
 	}
 
 	sqlite3_finalize(m_stmt);
+	return 0;
+}
+
+int CBaseballDoc::LeagueInsert(m_LeagueRecord LeagueRecord)
+{
+	char *sqlLeague;
+	int rc;
+	CHAR buffer[100];
+
+	/* Create SQL statement */
+	sqlLeague = "INSERT INTO LEAGUES("  \
+		"LeagueName," \
+		"NumberOfConferences," \
+		"NumberOfDivisions," \
+		"BaseLeague," \
+		"LeagueYear"
+		")" \
+		"VALUES (" \
+		"?1," \
+		"?2," \
+		"?3," \
+		"?4," \
+		"?5"
+		");";
+
+	rc = sqlite3_prepare_v2(m_db, sqlLeague, strlen(sqlLeague), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+
+		//fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for LEAGUES Insert OK: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, LeagueRecord.LeagueName, strlen(LeagueRecord.LeagueName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind txt: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, LeagueRecord.NumberOfConferences);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 3, LeagueRecord.NumberOfDivisions);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 4, LeagueRecord.BaseLeague);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 5, LeagueRecord.Year);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
 	return 0;
 }

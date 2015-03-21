@@ -3,7 +3,7 @@
 // Used by Baseball.rc
 //
 #define IDD_ABOUTBOX                    100
-#define IDD_DLGEDITLEAGUE               103
+#define IDD_ADDLEAGUENAME               104
 #define IDR_MAINFRAME                   128
 #define IDR_BASEBATYPE                  129
 #define IDB_UpArrowPressed              130
@@ -44,6 +44,7 @@
 #define IDD_PITCHERSSTATS               171
 #define IDD_PITCHERSCHANCE              172
 #define IDD_LEAGUEHTMLOPTIONS           173
+#define IDD_LEAGUENAME                  174
 #define IDC_LEAGUE1                     1000
 #define IDC_CONFERENCE1                 1001
 #define IDC_CONFERENCE2                 1002
@@ -219,11 +220,11 @@
 #define IDC_AWAYWIN                     1178
 #define IDC_AWAYLOSS                    1180
 #define IDC_YEAR                        1181
-#define IDC_CHECK2                      1185
 #define IDC_BASE                        1185
 #define IDC_League                      1186
 #define IDC_CONFERENCE                  1187
 #define IDC_DIVISION                    1188
+#define IDC_EDIT1                       1189
 #define ID_FORMS_SCORESHEETFORM         32771
 #define ID_FORMS_STATISTCSFORM          32772
 #define ID_FORMS_SCORESHEETFORMXTRA     32773
@@ -269,7 +270,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        169
 #define _APS_NEXT_COMMAND_VALUE         32823
-#define _APS_NEXT_CONTROL_VALUE         1189
-#define _APS_NEXT_SYMED_VALUE           104
+#define _APS_NEXT_CONTROL_VALUE         1190
+#define _APS_NEXT_SYMED_VALUE           107
 #endif
 #endif
