@@ -17,6 +17,8 @@ static char THIS_FILE[] = __FILE__;
 
 AddTeam::AddTeam(CWnd* pParent /*=NULL*/)
 	: CDialog(AddTeam::IDD, pParent)
+	, m_TotalLosses(0)
+	, m_TotalWins(0)
 {
 	//{{AFX_DATA_INIT(AddTeam)
 	m_TeamName = _T("");
@@ -78,6 +80,8 @@ void AddTeam::DoDataExchange(CDataExchange* pDX)
 	//  DDX_Control(pDX, IDC_BASE, m_Base);
 	//}}AFX_DATA_MAP
 	DDX_Control(pDX, IDC_BASE, m_BaseControl);
+	DDX_Text(pDX, IDC_TOTALLOSSES, m_TotalLosses);
+	DDX_Text(pDX, IDC_TOTALWINS, m_TotalWins);
 }
 
 

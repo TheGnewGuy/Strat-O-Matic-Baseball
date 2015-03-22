@@ -53,6 +53,8 @@ public:
 	virtual BOOL OnInitDialog();
 	CButton m_BaseControl;
 	bool m_Base;
+	int m_TotalLosses;
+	int m_TotalWins;
 };
 
 /////////////////////////////////////////////////////////////////////////////
