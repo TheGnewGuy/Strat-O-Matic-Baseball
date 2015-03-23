@@ -395,7 +395,7 @@ void CBaseballDoc::OnTeamsAddteams()
 
 void CBaseballDoc::OnLeaguesAddBaseLeague()
 {
-	// TODO: Add your command handler code here
+	// The difference between OnLeaguesAddleague and OnLeaguesAddBaseLeague is the base flag
 	int i_conference = 0;
 	int i_division = 0;
 	AddLeagueName dlg;
@@ -499,282 +499,106 @@ void CBaseballDoc::OnLeaguesAddBaseLeague()
 
 void CBaseballDoc::OnLeaguesAddleague() 
 {
-	// TODO: Add your command handler code here
-	BatterStruct structBatter;
-	PitcherStruct structPitcher;
-	int i,j,k,ii;
-	AddLeague dlg;
+	// The difference between OnLeaguesAddleague and OnLeaguesAddBaseLeague is the base flag
+	int i_conference = 0;
+	int i_division = 0;
+	AddLeagueName dlg;
+	AddConference dlgConference;
 	DlgAddDivision dlgDivision;
-	DlgAddTeams dlgTeams;
-	CFile myFile;
-	CString filler10("          ");
 	CStringArray arrayConference;
 	CStringArray arrayDivision;
-	BYTE version;
-	BYTE conferencenumber;
-	CString leaguename;
-	BYTE divisionnumber;
-	CString conferencename;
-	BYTE teamsnumber;
-	CString divisionname;
-	CString teamname;
-	CString strFileName;
-	CString strFileTitle;
-	CStringArray arrayFileNumber;
-	CString strFileNumber;
-	CString strLeagueDir;
-	char strNewFileNumber[10];
-	CFileFind myFileFind;
-	BOOL bWorking;
-	long lFileNumber;
-	int sortflag;
-	CString strTemp;
-	CStringArray arrayFileNames;
-	BYTE count;
-	CFile myInFile;
-	CFile myTempFile;
-	char temp[41];
-	CString strTeamName;
-	short winloss = 0;
-	CFileStatus myFileStatus;
-	int myFileCancel = FALSE;
+	int leagueID = 0;
+	int conferenceID = 0;
+	m_LeagueRecord leagueRecord;
+	m_ConferenceRecord conferenceRecord;
+	m_DivisionRecord divisionRecord;
 
-	version = 1;	// Set version of file
 	arrayConference.RemoveAll();
 	arrayDivision.RemoveAll();
-	dlg.m_Conference1.Empty();
-	dlg.m_Conference2.Empty();
-	dlg.m_Conference3.Empty();
-	dlg.m_Conference4.Empty();
-	dlg.m_Conference5.Empty();
-	dlg.m_Conference6.Empty();
-	dlgDivision.m_Division1.Empty();
-	dlgDivision.m_Division2.Empty();
-	dlgDivision.m_Division3.Empty();
-	dlgDivision.m_Division4.Empty();
-	dlgDivision.m_Division5.Empty();
-	dlgDivision.m_Division6.Empty();
+
+	dlgConference.m_Conference1.Empty();
+	dlgConference.m_Conference2.Empty();
+	dlgConference.m_Conference3.Empty();
+	dlgConference.m_Conference4.Empty();
+	dlgConference.m_Conference5.Empty();
+	dlgConference.m_Conference6.Empty();
 
 	if (dlg.DoModal() == IDOK)
 	{
-		leaguename = dlg.m_NewLeagueName+filler10+filler10+filler10;
-		conferencenumber = 0;
-		arrayConference.RemoveAll();
-		if (!dlg.m_Conference1.IsEmpty()) arrayConference.Add(dlg.m_Conference1+filler10+filler10+filler10);
-		if (!dlg.m_Conference2.IsEmpty()) arrayConference.Add(dlg.m_Conference2+filler10+filler10+filler10);
-		if (!dlg.m_Conference3.IsEmpty()) arrayConference.Add(dlg.m_Conference3+filler10+filler10+filler10);
-		if (!dlg.m_Conference4.IsEmpty()) arrayConference.Add(dlg.m_Conference4+filler10+filler10+filler10);
-		if (!dlg.m_Conference5.IsEmpty()) arrayConference.Add(dlg.m_Conference5+filler10+filler10+filler10);
-		if (!dlg.m_Conference6.IsEmpty()) arrayConference.Add(dlg.m_Conference6+filler10+filler10+filler10);
-		if (!arrayConference.GetSize()) arrayConference.Add("NULL"+filler10+filler10+filler10);
-		conferencenumber = arrayConference.GetSize();
+		leagueRecord.LeagueName = dlg.m_NewLeagueName;
+		leagueRecord.Year = dlg.m_Year;
+		leagueRecord.BaseLeague = FALSE;
+		leagueRecord.NumberOfConferences = 0;
+		leagueRecord.NumberOfDivisions = 0;
+		leagueRecord.Year = dlg.m_Year;
 
-		bWorking = myFileFind.FindFile("data\\L*.dat",0);
-		if (bWorking)
-		{
-			while (bWorking)
-			{
-				bWorking = myFileFind.FindNextFile();
-				strFileTitle = myFileFind.GetFileTitle();
-				arrayFileNumber.Add(strFileTitle.Right(7));
-			}
-		}
-		else
-		{
-			arrayFileNumber.Add("0000000");
-		}
-		myFileFind.Close();
+		//Create League with basic information, Fill in additional data with update
+		LeagueInsert(leagueRecord);
+		// Need to also check for league year else might be a duplicate League name
+		// leagueID = GetLeagueID(leagueRecord.LeagueName, leagueRecord.Year);
+		leagueID = GetLeagueID(leagueRecord.LeagueName);
+		leagueRecord.LeagueID = leagueID;
 
-		// Since the FindNextFile does not return the files in any order
-		// we must sort the file names
-		sortflag = 1;
-		while (sortflag)
+		dlgConference.m_LeagueName = leagueRecord.LeagueName;
+		if (dlgConference.DoModal() == IDOK)
 		{
-			sortflag = 0;
-			for (i=0; i<(arrayFileNumber.GetSize()-1);i++)
+			arrayConference.RemoveAll();
+			if (!dlgConference.m_Conference1.IsEmpty()) arrayConference.Add(dlgConference.m_Conference1);
+			if (!dlgConference.m_Conference2.IsEmpty()) arrayConference.Add(dlgConference.m_Conference2);
+			if (!dlgConference.m_Conference3.IsEmpty()) arrayConference.Add(dlgConference.m_Conference3);
+			if (!dlgConference.m_Conference4.IsEmpty()) arrayConference.Add(dlgConference.m_Conference4);
+			if (!dlgConference.m_Conference5.IsEmpty()) arrayConference.Add(dlgConference.m_Conference5);
+			if (!dlgConference.m_Conference6.IsEmpty()) arrayConference.Add(dlgConference.m_Conference6);
+			// Conference dialog forces the entry of one conference.
+			//if (!arrayConference.GetSize()) arrayConference.Add("DEFAULT");
+			leagueRecord.NumberOfConferences = arrayConference.GetSize();
+
+			for (i_conference; i_conference < leagueRecord.NumberOfConferences; i_conference++)
 			{
-				if (arrayFileNumber[i].Compare(arrayFileNumber[i+1]) == 1)
+				conferenceRecord.ConferenceName = arrayConference[i_conference];
+				conferenceRecord.LeagueID = leagueID;
+				conferenceRecord.BaseConference = FALSE;
+				ConferenceInsert(conferenceRecord);
+				conferenceID = GetConferenceIDName(conferenceRecord.ConferenceName, leagueID);
+
+				dlgDivision.m_Conference0 = arrayConference[i_conference];
+
+				dlgDivision.m_Division1.Empty();
+				dlgDivision.m_Division2.Empty();
+				dlgDivision.m_Division3.Empty();
+				dlgDivision.m_Division4.Empty();
+				dlgDivision.m_Division5.Empty();
+				dlgDivision.m_Division6.Empty();
+
+				if (dlgDivision.DoModal() == IDOK)
 				{
-					strTemp = arrayFileNumber[i];
-					arrayFileNumber[i] = arrayFileNumber[i+1];
-					arrayFileNumber[i+1] = strTemp;
-					sortflag = 1;
-				}
-			}
-		}
+					arrayDivision.RemoveAll();
+					if (!dlgDivision.m_Division1.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division1);
+					if (!dlgDivision.m_Division2.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division2);
+					if (!dlgDivision.m_Division3.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division3);
+					if (!dlgDivision.m_Division4.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division4);
+					if (!dlgDivision.m_Division5.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division5);
+					if (!dlgDivision.m_Division6.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division6);
+					if (!arrayDivision.GetSize()) arrayDivision.Add("DEFAULT");
+					leagueRecord.NumberOfDivisions = arrayDivision.GetSize();
 
-		lFileNumber = atol(arrayFileNumber[arrayFileNumber.GetSize()-1]);
-		lFileNumber++;
-		sprintf_s(strNewFileNumber,"%7.7lu",lFileNumber);
-		strFileNumber = strNewFileNumber;
-		strFileName = "data\\L"+strFileNumber+".dat";
-		strLeagueDir = "L"+ strFileNumber;
-		_mkdir(strLeagueDir); // make a directory for league files
-
-		myFile.Open(strFileName,CFile::modeCreate | CFile::modeWrite);
-		// Write file version number
-		myFile.Write(&version, sizeof(version));
-		myFile.Write(&conferencenumber, sizeof(conferencenumber));
-		myFile.Write(leaguename, 30);
-		for (i=0; i<arrayConference.GetSize(); i++)
-		{
-			conferencename = arrayConference[i];
-			divisionnumber = 0;
-			dlgDivision.m_Division1.Empty();
-			dlgDivision.m_Division2.Empty();
-			dlgDivision.m_Division3.Empty();
-			dlgDivision.m_Division4.Empty();
-			dlgDivision.m_Division5.Empty();
-			dlgDivision.m_Division6.Empty();
-			dlgDivision.m_Conference0 = conferencename.Left(30);
-
-			if (dlgDivision.DoModal() == IDOK)
-			{
-				arrayDivision.RemoveAll();
-				if (!dlgDivision.m_Division1.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division1+filler10+filler10+filler10);
-				if (!dlgDivision.m_Division2.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division2+filler10+filler10+filler10);
-				if (!dlgDivision.m_Division3.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division3+filler10+filler10+filler10);
-				if (!dlgDivision.m_Division4.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division4+filler10+filler10+filler10);
-				if (!dlgDivision.m_Division5.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division5+filler10+filler10+filler10);
-				if (!dlgDivision.m_Division6.IsEmpty()) arrayDivision.Add(dlgDivision.m_Division6+filler10+filler10+filler10);
-				if (!arrayDivision.GetSize()) arrayDivision.Add("NULL"+filler10+filler10+filler10);
-				divisionnumber = arrayDivision.GetSize();
-
-				myFile.Write(&divisionnumber,sizeof(divisionnumber));
-				myFile.Write(conferencename,30);
-				for (j=0; j<arrayDivision.GetSize(); j++)
-				{
-					divisionname = arrayDivision[j];
-					dlgTeams.m_Division0 = divisionname.Left(30);
-					teamsnumber = 0;
-					dlgTeams.m_arrayTeams.RemoveAll();
-					arrayFileNames.RemoveAll();
-
-					count = 0;
-
-					bWorking = myFileFind.FindFile("data\\TB*.dat",0);
-					if (bWorking)
+					i_division = 0;
+					if (arrayDivision[0] != "DEFAULT")
 					{
-						while (bWorking)
+						for (i_division; i_division < leagueRecord.NumberOfDivisions; i_division++)
 						{
-							bWorking = myFileFind.FindNextFile();
-							arrayFileNames.Add(myFileFind.GetFileName());
+							divisionRecord.DivisionName = arrayDivision[i_division];
+							divisionRecord.LeagueID = leagueID;
+							divisionRecord.ConferenceID = conferenceID;
+							divisionRecord.BaseDivisions = FALSE;
+							DivisionInsert(divisionRecord);
 						}
-						myFileFind.Close();
-
-						// Since the FindNextFile does not return the files in any order
-						// we must sort the file names
-						sortflag = 1;
-						while (sortflag)
-						{
-							sortflag = 0;
-							for (ii=0; ii<(arrayFileNames.GetSize()-1);ii++)
-							{
-								if (arrayFileNames[ii].Compare(arrayFileNames[ii+1]) == 1)
-								{
-									strTemp = arrayFileNames[ii];
-									arrayFileNames[ii] = arrayFileNames[ii+1];
-									arrayFileNames[ii+1] = strTemp;
-									sortflag = 1;
-								}
-							}
-						}
-
-						for (ii=0; ii<arrayFileNames.GetSize(); ii++)
-						{
-							myInFile.Open("data\\"+arrayFileNames[ii],CFile::modeRead);
-							myInFile.Read(&count,sizeof(count));
-							myInFile.Read(temp,40);
-							myInFile.Close();
-							temp[40] = NULL;
-							strTeamName = temp;
-							strTeamName = strTeamName+"\t"+arrayFileNames[ii];
-							dlgTeams.m_arrayTeams.Add(strTeamName);
-						}
-						if (dlgTeams.DoModal() == IDOK)
-						{
-							teamsnumber = dlgTeams.m_arrayTeams.GetSize();
-
-							myFile.Write(&teamsnumber,sizeof(teamsnumber));
-							myFile.Write(divisionname,30);
-							for (k=0; k<dlgTeams.m_arrayTeams.GetSize(); k++)
-							{
-								teamname = dlgTeams.m_arrayTeams[k];
-								myFile.Write(teamname.Left(40),40);
-								myFile.Write(teamname.Right(12),8);
-								// Add 3 characters to identify team
-								myFile.Write("   ",3);
-								// Add 20 characters to identify Ballpark
-								myFile.Write("                    ",20);
-								// Home game wins and losses
-								myFile.Write(&winloss,sizeof(winloss));	// Wins
-								myFile.Write(&winloss,sizeof(winloss)); // Loss
-								// Away game wins and losses
-								myFile.Write(&winloss,sizeof(winloss));	// Wins
-								myFile.Write(&winloss,sizeof(winloss)); // Loss
-								// Build team files with zeroed out fields in league dir
-								structBatter.CopyBatterFile("data\\"+teamname.Right(12),strLeagueDir+"\\"+teamname.Right(12));
-								structPitcher.CopyPitcherFile("data\\TP"+teamname.Right(10),strLeagueDir+"\\TP"+teamname.Right(10));
-							}
-						}		// End - dlgTeams.DoModal()
-						else
-						{
-							myFileCancel = TRUE;
-							break;
-						}
-					}		// End - (bWorking)
-					else
-					{
-						// No teams found so display message
-						AfxMessageBox("Could not find any Team files. Please create a team",
-							MB_OK|MB_ICONEXCLAMATION);
-						myFileCancel = TRUE;
-						break;
-					}		// End - (bWorking) else
-				}		//End - for (j=0; j<arrayDivision.GetSize(); j++)
-			}		// End - dlgDivision.DoModal()
-			else
-			{
-				myFileCancel = TRUE;
-				break;
-			}
-			if (myFileCancel)
-				break;
-		}		//End - for (i=0; i<arrayConference.GetSize(); i++)
-
-		if (myFileCancel)
-		{
-			// remove the directory due to cancel being pressed
-			if (_rmdir(strLeagueDir))
-			{
-				// Check to see if error was due to non empty dir
-				if ( errno  == ENOTEMPTY)
-				{
-					bWorking = myFileFind.FindFile(strLeagueDir+"\\*.*",0);
-					if (bWorking)
-					{
-						while (bWorking)
-						{
-							bWorking = myFileFind.FindNextFile();
-							if (myFileFind.IsDots())
-								continue;
-							myTempFile.Remove(myFileFind.GetFilePath());
-						}
-						myFileFind.Close();
-						_rmdir(strLeagueDir);
 					}
 				}
 			}
-			// Delete the leage filename due to cancel
-			myFile.Close();
-			myFile.Remove(strFileName);
 		}
-		else
-		{
-			if (!myFile.GetStatus(myFileStatus))
-				myFile.Close();
-		}
-	}		//end - dlg.DoModal()
+		LeagueUpdate(leagueRecord);
+	}
 }
 
 void CBaseballDoc::OnLeaguesEditLeague()
