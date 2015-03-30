@@ -132,7 +132,7 @@ public:
 		int DivisionID;
 		int TeamYear;
 		int BaseTeam;
-		int ActiveRec;
+		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
@@ -143,7 +143,7 @@ public:
 		int NumberOfDivisions;
 		int BaseLeague;
 		int Year;
-		int ActiveRec;
+		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
@@ -152,7 +152,7 @@ public:
 		CStringA ConferenceName;
 		int LeagueID;
 		int BaseConference;
-		int ActiveRec;
+		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
@@ -162,7 +162,7 @@ public:
 		int LeagueID;
 		int ConferenceID;
 		int BaseDivisions;
-		int ActiveRec;
+		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
@@ -221,7 +221,7 @@ public:
 		double OBChanceBasic;
 		double OBChanceLeft;
 		double OBChanceRight;
-		int ActiveRec;
+		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
@@ -247,7 +247,7 @@ public:
 		double OBP;
 		int BatterID;
 		int TeamID;
-		int ActiveRec;
+		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
@@ -286,7 +286,7 @@ public:
 		int Pitcher;
 		int ER1;
 		int TeamID;
-		int ActiveRec;
+		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
@@ -308,7 +308,7 @@ public:
 		double WHIP;
 		int PitcherID;
 		int TeamID;
-		int ActiveRec;
+		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
@@ -320,7 +320,7 @@ public:
 		CStringA HTMLBGColor;
 		CStringA HTMLLinkColor;
 		CStringA HTMLVLinkColor;
-		int ActiveRec;
+		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	};
