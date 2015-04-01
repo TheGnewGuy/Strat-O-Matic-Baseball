@@ -116,8 +116,6 @@ public:
 	int DBSetForeginKeys(bool OnOff);
 	int DBVersion();
 	afx_msg void OnLeaguesEditLeague();
-	int GetLeagueID(CStringA strLeagueName);
-	int GetTeamID(CStringA strTeamName, int LeagueID);
 	struct m_TeamRecord{
 		int TeamID;
 		CStringA TeamName;
@@ -320,6 +318,7 @@ public:
 		CStringA HTMLBGColor;
 		CStringA HTMLLinkColor;
 		CStringA HTMLVLinkColor;
+		int LeagueID;
 		bool ActiveRec;
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
@@ -342,6 +341,9 @@ public:
 	int PitcherStatsUpdate(m_PitcherStatsRecord PitcherStatsRecord);
 	afx_msg void OnTeamsAddBaseTeams();
 	afx_msg void OnLeaguesAddBaseLeague();
+	int GetLeagueID(CStringA strLeagueName);
+	int GetLeagueID(CStringA strLeagueName, int LeagueYear);
+	int GetTeamID(CStringA strTeamName, int LeagueID);
 	int GetConferenceID(int LeagueID);
 	int GetDivisionID(int LeagueID);
 	int GetConferenceIDName(CString strConferenceName, int LeagueID);
@@ -351,6 +353,7 @@ public:
 	int ConferenceInsert(m_ConferenceRecord conferenceRecord);
 	int DivisionInsert(m_DivisionRecord divisionRecord);
 	int GetDivisionID(int LeagueID, int ConferenceID);
+	int OptionInsertDefault(int LeagueID);
 };
 
 /////////////////////////////////////////////////////////////////////////////

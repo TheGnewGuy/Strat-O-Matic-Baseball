@@ -4723,6 +4723,55 @@ int CBaseballDoc::GetLeagueID(CStringA strLeagueName)
 	return myLeagueID;
 }
 
+int CBaseballDoc::GetLeagueID(CStringA strLeagueName, int LeagueYear)
+{
+	int rc;
+	CHAR buffer[100];
+	char *sqlSelect;
+	int myLeagueID = 0;
+
+	// Select the LeagueId
+	sqlSelect = "SELECT LeagueId from LEAGUES WHERE LeagueName = ?1 AND LeagueYear = ?2";
+
+	rc = sqlite3_prepare_v2(m_db, sqlSelect, strlen(sqlSelect), &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "SELECT LeagueId Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	// Bind the data to field '1' which is the first '?' in the SELECT statement
+	rc = sqlite3_bind_text(m_stmt, 1, strLeagueName, strlen(strLeagueName), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueName: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 2, LeagueYear);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueYear: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc == SQLITE_ROW)
+	{
+		sprintf_s(buffer, sizeof(buffer), "%s  %i\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_int(m_stmt, 0));
+		//AfxMessageBox(buffer);
+		myLeagueID = sqlite3_column_int(m_stmt, 0);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "LeagueID Select returned nothing: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+	return myLeagueID;
+}
+
 int CBaseballDoc::GetTeamID(CStringA strTeamName, int LeagueID)
 {
 	int myTeamId = 0;
@@ -7047,6 +7096,7 @@ int CBaseballDoc::LeagueInsert(m_LeagueRecord LeagueRecord)
 	char *sqlLeague;
 	int rc;
 	CHAR buffer[100];
+	int leagueID = 0;
 
 	/* Create SQL statement */
 	sqlLeague = "INSERT INTO LEAGUES("  \
@@ -7125,6 +7175,11 @@ int CBaseballDoc::LeagueInsert(m_LeagueRecord LeagueRecord)
 	}
 
 	sqlite3_finalize(m_stmt);
+
+	leagueID = GetLeagueID(LeagueRecord.LeagueName, LeagueRecord.Year);
+	// Setup default League Options record
+	OptionInsertDefault(leagueID);
+
 	return 0;
 }
 
@@ -7269,6 +7324,117 @@ int CBaseballDoc::DivisionInsert(m_DivisionRecord divisionRecord)
 	else
 	{
 		sprintf_s(buffer, sizeof(buffer), "Execute for Division Insert OK.\n");
+		//AfxMessageBox(buffer);
+	}
+
+	sqlite3_finalize(m_stmt);
+	return 0;
+}
+
+int CBaseballDoc::OptionInsertDefault(int LeagueID)
+{
+	char *sqlLeague;
+	int rc;
+	CHAR buffer[100];
+	m_LeagueOptionsRecord leagueOptionsRecord;
+
+	leagueOptionsRecord.HTMLBackgroundPicture = _T("images/background.jpg");
+	leagueOptionsRecord.HTMLBGColor = _T("White");
+	leagueOptionsRecord.HTMLIndex = _T("index.html");
+	leagueOptionsRecord.HTMLLinkColor = _T("Blue");
+	leagueOptionsRecord.HTMLTextColor = _T("Black");
+	leagueOptionsRecord.HTMLVLinkColor = _T("Purple");
+	leagueOptionsRecord.LeagueID = LeagueID;
+
+	/* Create SQL statement */
+	sqlLeague = "INSERT INTO LEAGUEOPTIONS("  \
+		"HTMLBackgroundPicture, " \
+		"HTMLIndex, " \
+		"HTMLTextColor, " \
+		"HTMLBGColor, " \
+		"HTMLLinkColor, " \
+		"HTMLVLinkColor, " \
+		"LeagueID " \
+		")" \
+		"VALUES (" \
+		"?1," \
+		"?2," \
+		"?3," \
+		"?4," \
+		"?5," \
+		"?6," \
+		"?7" \
+		");";
+
+	rc = sqlite3_prepare_v2(m_db, sqlLeague, strlen(sqlLeague), &m_stmt, 0);
+	if (rc != SQLITE_OK)
+	{
+
+		//fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for LEAGUEOPTIONS Insert OK: %s\n", sqlite3_errmsg(m_db));
+		//AfxMessageBox(buffer);
+	}
+
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_text(m_stmt, 1, leagueOptionsRecord.HTMLBackgroundPicture, strlen(leagueOptionsRecord.HTMLBackgroundPicture), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind txt: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 2, leagueOptionsRecord.HTMLIndex, strlen(leagueOptionsRecord.HTMLIndex), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind txt: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 3, leagueOptionsRecord.HTMLTextColor, strlen(leagueOptionsRecord.HTMLTextColor), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind txt: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 4, leagueOptionsRecord.HTMLBGColor, strlen(leagueOptionsRecord.HTMLBGColor), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind txt: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 5, leagueOptionsRecord.HTMLLinkColor, strlen(leagueOptionsRecord.HTMLLinkColor), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind txt: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_text(m_stmt, 6, leagueOptionsRecord.HTMLVLinkColor, strlen(leagueOptionsRecord.HTMLVLinkColor), SQLITE_STATIC);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind txt: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 7, leagueOptionsRecord.LeagueID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	rc = sqlite3_step(m_stmt);
+
+	if (rc != SQLITE_DONE)
+	{
+		//printf("%s  %s\n", sqlite3_column_name(m_stmt, 0), sqlite3_column_text(m_stmt, 0));
+		sprintf_s(buffer, sizeof(buffer), "Failed to insert Default Options: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Execute for League Insert OK.\n");
 		//AfxMessageBox(buffer);
 	}
 
