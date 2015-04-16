@@ -121,6 +121,8 @@ public:
 		CStringA TeamName;
 		CStringA TeamNameShort;
 		CStringA BallparkName;
+		int TotalWins;
+		int TotalLosses;
 		int HomeWins;
 		int HomeLosses;
 		int AwayWins;

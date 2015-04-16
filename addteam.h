@@ -143,6 +143,17 @@ public:
 	CString	m_BallPark;
 	CString	m_ShortTeamName;
 	CString	m_TeamName;
+	BOOL m_Base;
+	CString m_Conference;
+	CString m_Division;
+	int m_AwayLoss;
+	int m_AwayWin;
+	int m_HomeLoss;
+	int m_HomeWin;
+	CString m_League;
+	int m_TotalLosses;
+	int m_TotalWins;
+	int m_Year;
 	//}}AFX_DATA
 
 

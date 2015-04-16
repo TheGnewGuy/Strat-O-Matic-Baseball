@@ -236,6 +236,17 @@ void DlgSelLeague::OnOK()
 
 EditTeam::EditTeam(CWnd* pParent /*=NULL*/)
 	: CDialog(EditTeam::IDD, pParent)
+	, m_Base(FALSE)
+	, m_Conference(_T(""))
+	, m_Division(_T(""))
+	, m_AwayLoss(0)
+	, m_AwayWin(0)
+	, m_HomeLoss(0)
+	, m_HomeWin(0)
+	, m_League(_T(""))
+	, m_TotalLosses(0)
+	, m_TotalWins(0)
+	, m_Year(0)
 {
 	//{{AFX_DATA_INIT(EditTeam)
 	m_BallPark = _T("");
@@ -256,6 +267,18 @@ void EditTeam::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_TEAM1, m_TeamName);
 	DDV_MaxChars(pDX, m_TeamName, 40);
 	//}}AFX_DATA_MAP
+	DDX_Check(pDX, IDC_BASE, m_Base);
+	DDX_Text(pDX, IDC_CONFERENCE, m_Conference);
+	DDX_Text(pDX, IDC_DIVISION, m_Division);
+	//  DDX_Text(pDX, IDC_AWAYLOSS, m_AwayLoss);
+	DDX_Text(pDX, IDC_AWAYLOSS, m_AwayLoss);
+	DDX_Text(pDX, IDC_AWAYWIN, m_AwayWin);
+	DDX_Text(pDX, IDC_HOMELOSS, m_HomeLoss);
+	DDX_Text(pDX, IDC_HOMEWIN, m_HomeWin);
+	DDX_Text(pDX, IDC_League, m_League);
+	DDX_Text(pDX, IDC_TOTALLOSSES, m_TotalLosses);
+	DDX_Text(pDX, IDC_TOTALWINS, m_TotalWins);
+	DDX_Text(pDX, IDC_YEAR, m_Year);
 }
 
 

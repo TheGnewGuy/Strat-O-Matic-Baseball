@@ -1725,15 +1725,49 @@ void CBaseballDoc::EditTeams(int leagueID)
 	CString strBallPark;
 	m_TeamRecord teamResult;
 	m_TeamRecord teamUpdate;
+	m_LeagueRecord leagueRecord;
+	m_ConferenceRecord conferenceRecord;
+	m_DivisionRecord divisionRecord;
 
 	teamID = GetTeams(leagueID);
 	teamResult = GetTeam(teamID);
+	leagueRecord = GetLeague(teamResult.LeagueID);
+	conferenceRecord = GetConference(teamResult.ConferenceID);
+	divisionRecord = GetDivision(teamResult.DivisionID);
 
 	strTeamName = teamResult.TeamName;
 
 	dlg.m_TeamName = teamResult.TeamName;
 	dlg.m_ShortTeamName = teamResult.TeamNameShort;
 	dlg.m_BallPark = teamResult.BallparkName;
+	dlg.m_Base = teamResult.BaseTeam;
+	dlg.m_Year = teamResult.TeamYear;
+	dlg.m_AwayLoss = teamResult.AwayLosses;
+	dlg.m_AwayWin = teamResult.AwayWins;
+	dlg.m_HomeLoss = teamResult.HomeLosses;
+	dlg.m_HomeWin = teamResult.HomeWins;
+	dlg.m_TotalLosses = teamResult.TotalLosses;
+	dlg.m_TotalWins = teamResult.TotalWins;
+	dlg.m_Year = teamResult.TeamYear;
+	dlg.m_League = leagueRecord.LeagueName;
+	// If conference is Default, do not display.
+	if (conferenceRecord.ConferenceID == 1)
+	{
+		dlg.m_Conference = "";
+	}
+	else
+	{
+		dlg.m_Conference = conferenceRecord.ConferenceName;
+	}
+	// If division is Default, do not display.
+	if (divisionRecord.DivisionID == 1)
+	{
+		dlg.m_Division = "";
+	}
+	else
+	{
+		dlg.m_Division = divisionRecord.DivisionName;
+	}
 	if (dlg.DoModal() == IDOK)
 	{
 		// Update the Database with team name, Short name, and Ballpark
@@ -1743,15 +1777,17 @@ void CBaseballDoc::EditTeams(int leagueID)
 		teamUpdate.TeamName = dlg.m_TeamName;
 		teamUpdate.TeamNameShort = dlg.m_ShortTeamName;
 		teamUpdate.BallparkName = dlg.m_BallPark;
-		teamUpdate.HomeWins = teamResult.HomeWins;
-		teamUpdate.HomeLosses = teamResult.HomeLosses;
-		teamUpdate.AwayWins = teamResult.AwayWins;
-		teamUpdate.AwayLosses = teamResult.AwayLosses;
+		teamUpdate.HomeWins = dlg.m_HomeWin;
+		teamUpdate.HomeLosses = dlg.m_HomeLoss;
+		teamUpdate.AwayWins = dlg.m_AwayWin;
+		teamUpdate.AwayLosses = dlg.m_AwayLoss;
 		teamUpdate.LeagueID = teamResult.LeagueID;
 		teamUpdate.ConferenceID = teamResult.ConferenceID;
 		teamUpdate.DivisionID = teamResult.DivisionID;
-		teamUpdate.TeamYear = teamResult.TeamYear;
-		teamUpdate.BaseTeam = teamResult.BaseTeam;
+		teamUpdate.TeamYear = dlg.m_Year;
+		teamUpdate.BaseTeam = dlg.m_Base;
+		teamUpdate.TotalLosses = dlg.m_TotalLosses;
+		teamUpdate.TotalWins = dlg.m_TotalWins;
 
 		TeamUpdate(teamUpdate);
 	}
@@ -4832,6 +4868,8 @@ CBaseballDoc::m_TeamRecord CBaseballDoc::GetTeam(int TeamID)
 		"TeamName," \
 		"TeamNameShort," \
 		"BallparkName," \
+		"TotalWins," \
+		"TotalLosses," \
 		"HomeWins," \
 		"HomeLosses," \
 		"AwayWins," \
@@ -4871,17 +4909,19 @@ CBaseballDoc::m_TeamRecord CBaseballDoc::GetTeam(int TeamID)
 		teamResult.TeamName = sqlite3_column_text(m_stmt, 1);
 		teamResult.TeamNameShort = sqlite3_column_text(m_stmt, 2);
 		teamResult.BallparkName = sqlite3_column_text(m_stmt, 3);
-		teamResult.HomeWins = sqlite3_column_int(m_stmt, 4);
-		teamResult.HomeLosses = sqlite3_column_int(m_stmt, 5);
-		teamResult.AwayWins = sqlite3_column_int(m_stmt, 6);
-		teamResult.AwayLosses = sqlite3_column_int(m_stmt, 7);
-		teamResult.LeagueID = sqlite3_column_int(m_stmt, 8);
-		teamResult.ConferenceID = sqlite3_column_int(m_stmt, 9);
-		teamResult.DivisionID = sqlite3_column_int(m_stmt, 10);
-		teamResult.TeamYear = sqlite3_column_int(m_stmt, 11);
-		teamResult.BaseTeam = sqlite3_column_int(m_stmt, 12);
-		teamResult.CreateTime = sqlite3_column_text(m_stmt, 13);
-		teamResult.LastUpdateTime = sqlite3_column_text(m_stmt, 14);
+		teamResult.TotalWins = sqlite3_column_int(m_stmt, 4);
+		teamResult.TotalLosses = sqlite3_column_int(m_stmt, 5);
+		teamResult.HomeWins = sqlite3_column_int(m_stmt, 6);
+		teamResult.HomeLosses = sqlite3_column_int(m_stmt, 7);
+		teamResult.AwayWins = sqlite3_column_int(m_stmt, 8);
+		teamResult.AwayLosses = sqlite3_column_int(m_stmt, 9);
+		teamResult.LeagueID = sqlite3_column_int(m_stmt, 10);
+		teamResult.ConferenceID = sqlite3_column_int(m_stmt, 11);
+		teamResult.DivisionID = sqlite3_column_int(m_stmt, 12);
+		teamResult.TeamYear = sqlite3_column_int(m_stmt, 13);
+		teamResult.BaseTeam = sqlite3_column_int(m_stmt, 14);
+		teamResult.CreateTime = sqlite3_column_text(m_stmt, 15);
+		teamResult.LastUpdateTime = sqlite3_column_text(m_stmt, 16);
 	}
 
 	sqlite3_finalize(m_stmt);
@@ -5587,17 +5627,19 @@ int CBaseballDoc::TeamUpdate(m_TeamRecord TeamRecord)
 		"TeamName = ?1," \
 		"TeamNameShort = ?2," \
 		"BallparkName = ?3," \
-		"HomeWins = ?4," \
-		"HomeLosses = ?5," \
-		"AwayWins = ?6," \
-		"AwayLosses = ?7," \
-		"LeagueID = ?8," \
-		"ConferenceID = ?9," \
-		"DivisionID = ?10," \
-		"TeamYear = ?11," \
-		"BaseTeam = ?12," \
+		"TotalWins = ?4," \
+		"TotalLosses = ?5," \
+		"HomeWins = ?6," \
+		"HomeLosses = ?7," \
+		"AwayWins = ?8," \
+		"AwayLosses = ?9," \
+		"LeagueID = ?10," \
+		"ConferenceID = ?11," \
+		"DivisionID = ?12," \
+		"TeamYear = ?13," \
+		"BaseTeam = ?14," \
 		"LastUpdateTime = datetime('NOW','localtime')" \
-		" WHERE TeamID = ?13 ";
+		" WHERE TeamID = ?15 ";
 
 	rc = sqlite3_prepare_v2(m_db, sqlTeam, strlen(sqlTeam), &m_stmt, 0);
 	if (rc != SQLITE_OK)
@@ -5629,61 +5671,73 @@ int CBaseballDoc::TeamUpdate(m_TeamRecord TeamRecord)
 		sprintf_s(buffer, sizeof(buffer), "Could not bind BallparkName int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 4, TeamRecord.HomeWins);
+	rc = sqlite3_bind_int(m_stmt, 4, TeamRecord.TotalWins);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TotalWins int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 5, TeamRecord.TotalLosses);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TotalLosses int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	rc = sqlite3_bind_int(m_stmt, 6, TeamRecord.HomeWins);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind HomeWins int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 5, TeamRecord.HomeLosses);
+	rc = sqlite3_bind_int(m_stmt, 7, TeamRecord.HomeLosses);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind HomeLosses int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 6, TeamRecord.AwayWins);
+	rc = sqlite3_bind_int(m_stmt, 8, TeamRecord.AwayWins);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind AwayWins int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 7, TeamRecord.AwayLosses);
+	rc = sqlite3_bind_int(m_stmt, 9, TeamRecord.AwayLosses);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind AwayLosses int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 8, TeamRecord.LeagueID);
+	rc = sqlite3_bind_int(m_stmt, 10, TeamRecord.LeagueID);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind LeagueID int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 9, TeamRecord.ConferenceID);
+	rc = sqlite3_bind_int(m_stmt, 11, TeamRecord.ConferenceID);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind ConferenceID int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 10, TeamRecord.DivisionID);
+	rc = sqlite3_bind_int(m_stmt, 12, TeamRecord.DivisionID);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind DivisionID int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 11, TeamRecord.TeamYear);
+	rc = sqlite3_bind_int(m_stmt, 13, TeamRecord.TeamYear);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamYear int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 12, TeamRecord.BaseTeam);
+	rc = sqlite3_bind_int(m_stmt, 14, TeamRecord.BaseTeam);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind BaseTeam int: %s\n", sqlite3_errmsg(m_db));
 		AfxMessageBox(buffer);
 	}
-	rc = sqlite3_bind_int(m_stmt, 13, TeamRecord.TeamID);
+	rc = sqlite3_bind_int(m_stmt, 15, TeamRecord.TeamID);
 	if (rc != SQLITE_OK)
 	{
 		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
