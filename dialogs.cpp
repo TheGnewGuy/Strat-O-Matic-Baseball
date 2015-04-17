@@ -157,7 +157,7 @@ void PropertyPageBatters::OnPlayerAdd()
 {
 	// Notify Main Sheet of button being pressed
 	CBaseballDoc* pDoc = (CBaseballDoc*) m_pDocVoid;
-	pDoc->m_pPropertySheetBatters->PostMessage(WM_APP1); // Update Button Pressed
+	pDoc->m_pPropertySheetBatters->PostMessage(WM_APP4); // Add Button Pressed
 
 	// Enable / Disable Update and Add buttons
 	CWnd* pAddWnd = GetDlgItem(IDPLAYERADD1);
@@ -532,7 +532,7 @@ void PropertyPageBattersStats::OnPlayerAdd()
 {
 	// Notify Main Sheet of button being pressed
 	CBaseballDoc* pDoc = (CBaseballDoc*) m_pDocVoid;
-	pDoc->m_pPropertySheetBatters->PostMessage(WM_APP1); // Update Button Pressed
+	pDoc->m_pPropertySheetBatters->PostMessage(WM_APP4); // Add Button Pressed
 
 	// Enable / Disable Update and Add buttons
 	CWnd* pAddWnd = GetDlgItem(IDPLAYERADD1);
@@ -995,7 +995,7 @@ void PropertyPageBattersChance::OnPlayerAdd()
 {
 	// Notify Main Sheet of button being pressed
 	CBaseballDoc* pDoc = (CBaseballDoc*) m_pDocVoid;
-	pDoc->m_pPropertySheetBatters->PostMessage(WM_APP1); // Update Button Pressed
+	pDoc->m_pPropertySheetBatters->PostMessage(WM_APP4); // Add Button Pressed
 
 	// Enable / Disable Update and Add buttons
 	CWnd* pAddWnd = GetDlgItem(IDPLAYERADD1);
@@ -1252,6 +1252,7 @@ BEGIN_MESSAGE_MAP(PropertySheetBatters, CPropertySheet)
 	ON_MESSAGE(WM_APP1,OnUpdate)
 	ON_MESSAGE(WM_APP2,OnOK)
 	ON_MESSAGE(WM_APP3,OnCancel)
+	ON_MESSAGE(WM_APP4, &PropertySheetBatters::OnAdd)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1601,6 +1602,12 @@ LRESULT PropertySheetBatters::OnUpdate(WPARAM wParam,LPARAM lParam)
 		BuildPlayerNameComboBox(4);
 	}
 	return (LRESULT)0;
+}
+
+// Handler for Button click od WM_APP4
+afx_msg LRESULT PropertySheetBatters::OnAdd(WPARAM wParam, LPARAM lParam)
+{
+	return 0;
 }
 
 LRESULT PropertySheetBatters::OnOK(WPARAM wParam,LPARAM lParam) 
@@ -2212,7 +2219,7 @@ void PropertyPageBattersInfo::OnPlayerAdd()
 {
 	// Notify Main Sheet of button being pressed
 	CBaseballDoc* pDoc = (CBaseballDoc*) m_pDocVoid;
-	pDoc->m_pPropertySheetBatters->PostMessage(WM_APP1); // Update Button Pressed
+	pDoc->m_pPropertySheetBatters->PostMessage(WM_APP4); // Add Button Pressed
 
 	// Enable / Disable Update and Add buttons
 	CWnd* pAddWnd = GetDlgItem(IDPLAYERADD1);
@@ -4593,3 +4600,4 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // PropertySheetLeagueOptions message handlers
+

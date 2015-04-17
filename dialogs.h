@@ -399,7 +399,8 @@ public:
 
 #define WM_APP1 WM_APP + 1	// Update
 #define WM_APP2 WM_APP + 2	// OnOK
-#define WM_APP3 WM_APP + 3	// Onancel
+#define WM_APP3 WM_APP + 3	// OnCancel
+#define WM_APP4 WM_APP + 4	// OnAdd
 
 class PropertySheetBatters : public CPropertySheet
 {
@@ -603,6 +604,9 @@ public:
 		CStringA CreateTime;
 		CStringA LastUpdateTime;
 	} m_pitcherStatsRecord;
+protected:
+//	afx_msg LRESULT WM_APP4(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnAdd(WPARAM wParam, LPARAM lParam);
 };
 
 /////////////////////////////////////////////////////////////////////////////
