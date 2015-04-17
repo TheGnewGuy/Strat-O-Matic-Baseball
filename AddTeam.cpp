@@ -270,7 +270,6 @@ void EditTeam::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_BASE, m_Base);
 	DDX_Text(pDX, IDC_CONFERENCE, m_Conference);
 	DDX_Text(pDX, IDC_DIVISION, m_Division);
-	//  DDX_Text(pDX, IDC_AWAYLOSS, m_AwayLoss);
 	DDX_Text(pDX, IDC_AWAYLOSS, m_AwayLoss);
 	DDX_Text(pDX, IDC_AWAYWIN, m_AwayWin);
 	DDX_Text(pDX, IDC_HOMELOSS, m_HomeLoss);
