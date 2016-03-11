@@ -356,6 +356,10 @@ public:
 	int DivisionInsert(m_DivisionRecord divisionRecord);
 	int GetDivisionID(int LeagueID, int ConferenceID);
 	int OptionInsertDefault(int LeagueID);
+	int BatterAdd(m_BatterRecord BatterRecord);
+	int PitcherAdd(m_PitcherRecord PitcherRecord);
+	int BatterStatsAdd(m_BatterStatsRecord BatterStatsRecord);
+	int PitcherStatsAdd(m_PitcherStatsRecord PitcherStatsRecord);
 };
 
 /////////////////////////////////////////////////////////////////////////////
