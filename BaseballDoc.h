@@ -360,6 +360,8 @@ public:
 	int PitcherAdd(m_PitcherRecord PitcherRecord);
 	int BatterStatsAdd(m_BatterStatsRecord BatterStatsRecord);
 	int PitcherStatsAdd(m_PitcherStatsRecord PitcherStatsRecord);
+	int GetBatter(int teamID, CString FirstName, CString LastName);
+	int GetPitcher(int teamID, CString FirstName, CString LastName);
 };
 
 /////////////////////////////////////////////////////////////////////////////
