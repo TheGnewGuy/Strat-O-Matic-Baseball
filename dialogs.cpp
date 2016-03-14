@@ -34,6 +34,8 @@ PropertyPageBatters::PropertyPageBatters() : CPropertyPage(PropertyPageBatters::
 	CBaseballView *pView = (CBaseballView *) pChild->GetActiveView();
 	m_pDocVoid = pView->GetDocument();
 
+	//OnInitDialog();
+
 	m_bChangedFlag = FALSE;
 }
 
@@ -438,6 +440,8 @@ PropertyPageBattersStats::PropertyPageBattersStats() : CPropertyPage(PropertyPag
 	CBaseballView *pView = (CBaseballView *) pChild->GetActiveView();
 	m_pDocVoid = pView->GetDocument();
 
+	//OnInitDialog();
+
 	m_bChangedFlag = FALSE;
 }
 
@@ -838,6 +842,8 @@ PropertyPageBattersChance::PropertyPageBattersChance() : CPropertyPage(PropertyP
 	// Get the active view attached to the active MDI child window.
 	CBaseballView *pView = (CBaseballView *) pChild->GetActiveView();
 	m_pDocVoid = pView->GetDocument();
+
+	//OnInitDialog();
 
 	m_bChangedFlag = FALSE;
 }
@@ -1609,17 +1615,98 @@ afx_msg LRESULT PropertySheetBatters::OnAdd(WPARAM wParam, LPARAM lParam)
 {
 	BOOL rc_GetDlgItemInt;
 	char cTemp[31];
-	char buf[10];
+//	char buf[10];
 	CBaseballDoc::m_BatterStatsRecord batterStatsRecord;
 	CBaseballDoc::m_BatterRecord batterRecord;
 	CBaseballDoc::m_TeamRecord teamRecord;
 
 	CBaseballDoc* pDoc = (CBaseballDoc*)m_pDocVoid;
 
-	// Read in the player Data so data is present for update
-	//batterStatsRecord = pDoc->GetBatterStats(m_BatterStatsID);
-	//batterRecord = pDoc->GetBatter(batterStatsRecord.BatterID);
+	// Initialize Batter to defaults
+	batterRecord.BatterID = 0;
+	batterRecord.FirstName = "";
+	batterRecord.LastName = "";
+	batterRecord.Pitcher = 0;
+	batterRecord.Catcher = 0;
+	batterRecord.FirstBase = 0;
+	batterRecord.SecondBase = 0;
+	batterRecord.ShortStop = 0;
+	batterRecord.ThirdBase = 0;
+	batterRecord.LeftField = 0;
+	batterRecord.CenterField = 0;
+	batterRecord.RightField = 0;
+	batterRecord.Bunting = 0;
+	batterRecord.HitRun = 0;
+	batterRecord.Running = 0;
+	batterRecord.Stealing = 0;
+	batterRecord.CatchArm = 0;
+	batterRecord.OutArm = 0;
+	batterRecord.PowerRight = 0;
+	batterRecord.PowerLeft = 0;
+	batterRecord.Pass = 0;
+	batterRecord.TRate = 0;
+	batterRecord.ER1 = 0;
+	batterRecord.ER2 = 0;
+	batterRecord.ER3 = 0;
+	batterRecord.ER4 = 0;
+	batterRecord.ER5 = 0;
+	batterRecord.ER6 = 0;
+	batterRecord.ER7 = 0;
+	batterRecord.ER8 = 0;
+	batterRecord.ER9 = 0;
+	batterRecord.BatterHits = 0;
+	batterRecord.TeamID = 0;
+	batterRecord.OBChanceHomeRun = 0;
+	batterRecord.OBChanceTriple = 0;
+	batterRecord.OBChanceDouble = 0;
+	batterRecord.OBChanceSingle = 0;
+	batterRecord.OBChanceWalk = 0;
+	batterRecord.ChanceDoublePlay = 0;
+	batterRecord.OBChanceHomeRunRight = 0;
+	batterRecord.OBChanceTripleRight = 0;
+	batterRecord.OBChanceDoubleRight = 0;
+	batterRecord.OBChanceSingleRight = 0;
+	batterRecord.OBChanceWalkRight = 0;
+	batterRecord.ChanceDoublePlayRight = 0;
+	batterRecord.OBChanceHomeRunLeft = 0;
+	batterRecord.OBChanceDoubleLeft = 0;
+	batterRecord.OBChanceSingleLeft = 0;
+	batterRecord.OBChanceWalkLeft = 0;
+	batterRecord.ChanceDoublePlayLeft = 0;
+	batterRecord.OBChanceBasic = 0;
+	batterRecord.OBChanceLeft = 0;
+	batterRecord.OBChanceRight = 0;
+
+	// Initialize BatterStats to defaults
+	batterStatsRecord.BatterStatsID=0;
+	batterStatsRecord.AB = 0;
+	batterStatsRecord.Runs = 0;
+	batterStatsRecord.Hits = 0;
+	batterStatsRecord.RBI = 0;
+	batterStatsRecord.Doubles = 0;
+	batterStatsRecord.Triples = 0;
+	batterStatsRecord.HomeRuns = 0;
+	batterStatsRecord.Walk = 0;
+	batterStatsRecord.Stirkeout = 0;
+	batterStatsRecord.ReachedOnError = 0;
+	batterStatsRecord.Sacrifice = 0;
+	batterStatsRecord.StolenBase = 0;
+	batterStatsRecord.CS = 0;
+	batterStatsRecord.Games = 0;
+	batterStatsRecord.HBP = 0;
+	batterStatsRecord.AVG = 0;
+	batterStatsRecord.SLG = 0;
+	batterStatsRecord.OBP = 0;
+	batterStatsRecord.BatterID = 0;
+	batterStatsRecord.TeamID = 0;
+
+	// Read in the Team Data, not currently used for anything
 	teamRecord = pDoc->GetTeam(m_TeamID);
+	if (teamRecord.BaseTeam == FALSE)
+	{
+		AfxMessageBox("You are attempting to Add a Player to a non-Base team\nAction not allowed.");
+		return FALSE;
+	}
 
 	if (m_pPage1->m_hWnd != 0)
 	{
@@ -1752,58 +1839,16 @@ afx_msg LRESULT PropertySheetBatters::OnAdd(WPARAM wParam, LPARAM lParam)
 		m_pPage4->m_bChangedFlag = FALSE;
 	}
 
-	// Open file and update player
-	if (m_flagNew == TRUE)
-	{
-		//m_structBatter.AddBatter(m_FileName);
-		batterRecord.TeamID = m_TeamID;
-		batterStatsRecord.TeamID = m_TeamID;
-		pDoc->BatterAdd(batterRecord);
-		// Need to retrieve batter ID that was just created, maybe first and last name with teamID
-		batterStatsRecord.BatterID = pDoc->GetBatter(teamRecord.TeamID, batterRecord.FirstName, batterRecord.LastName);
-		pDoc->BatterStatsAdd(batterStatsRecord);
-		m_flagNew = FALSE;
-	}
-	else
-	{
-		// If this is a base team, then add the batter and batterstats records.
-		if (teamRecord.BaseTeam == 1)
-		{
-			pDoc->BatterAdd(batterRecord);
-			// Need to retrieve batter ID that was just created, maybe first and last name with teamID
-			batterStatsRecord.BatterID = pDoc->GetBatter(teamRecord.TeamID, batterRecord.FirstName, batterRecord.LastName);
-			pDoc->BatterStatsAdd(batterStatsRecord);
-		}
-		else
-		{
-			// We still could be updating the BASE stats record.
-			//pDoc->BatterStatsAdd(batterStatsRecord);
-		}
+	// Add Batter
+	batterRecord.TeamID = m_TeamID;
+	batterStatsRecord.TeamID = m_TeamID;
+	pDoc->BatterAdd(batterRecord);
+	// Need to retrieve batter ID that was just created
+	batterStatsRecord.BatterID = pDoc->GetBatter(teamRecord.TeamID, batterRecord.FirstName, batterRecord.LastName);
+	pDoc->BatterStatsAdd(batterStatsRecord);
+	// Reset New flag to false
+	m_flagNew = FALSE;
 
-		if (m_pPage3->m_hWnd != 0)
-		{
-			if (batterStatsRecord.AB == 0)
-			{
-				m_pPage3->SetDlgItemText(IDC_BATTINGAVERAGE, _T("0"));
-				m_pPage3->SetDlgItemText(IDC_SLG, _T("0"));
-				m_pPage3->SetDlgItemText(IDC_ONBASEPERCENT, _T("0"));
-				m_pPage3->m_bChangedFlag = FALSE;
-			}
-			else
-			{
-				m_fBattingAverage = (float)batterStatsRecord.Hits / batterStatsRecord.AB;
-				sprintf_s(buf, "%1.3f", m_fBattingAverage);
-				m_pPage3->SetDlgItemText(IDC_BATTINGAVERAGE, buf);
-				m_fSLG = (float)((batterStatsRecord.Hits - (batterStatsRecord.Doubles + batterStatsRecord.Triples + batterStatsRecord.HomeRuns)) + (2 * batterStatsRecord.Doubles) + (3 * batterStatsRecord.Triples) + (4 * batterStatsRecord.HomeRuns)) / (batterStatsRecord.AB);
-				sprintf_s(buf, "%1.3f", m_fSLG);
-				m_pPage3->SetDlgItemText(IDC_SLG, buf);
-				m_fOnBasePercentage = (float)(batterStatsRecord.Hits + batterStatsRecord.Walk + batterStatsRecord.ReachedOnError + batterStatsRecord.Sacrifice) / (batterStatsRecord.AB + batterStatsRecord.Walk + batterStatsRecord.ReachedOnError + batterStatsRecord.Sacrifice);
-				sprintf_s(buf, "%1.3f", m_fOnBasePercentage);
-				m_pPage3->SetDlgItemText(IDC_ONBASEPERCENT, buf);
-				m_pPage3->m_bChangedFlag = FALSE;
-			}
-		}
-	}
 	// ReBuild combo table for player display
 	if (m_pPage1->m_hWnd != 0)
 	{
@@ -1821,7 +1866,7 @@ afx_msg LRESULT PropertySheetBatters::OnAdd(WPARAM wParam, LPARAM lParam)
 	{
 		BuildPlayerNameComboBox(4);
 	}
-	return (LRESULT)0;
+	return (LRESULT)TRUE;
 }
 
 LRESULT PropertySheetBatters::OnOK(WPARAM wParam,LPARAM lParam) 
@@ -2833,6 +2878,8 @@ void PropertyPagePitchersInfo::OnInitDialogPublic()
 {
 	
 	SetDlgItemText( IDC_COMBO_PLAYERNAME1, NULL );
+	SetDlgItemText(IDC_FIRSTNAME1, NULL);
+	SetDlgItemText(IDC_LASTNAME1, NULL);
 	SetDlgItemInt( IDC_STARTER1, 0, FALSE );
 	SetDlgItemInt( IDC_RELIEF1, 0, FALSE );
 	SetDlgItemInt( IDC_PITCHER, 0, FALSE );
@@ -2892,7 +2939,7 @@ void PropertyPagePitchersInfo::OnPlayerAdd()
 {
 	// Notify Main Sheet of button being pressed
 	CBaseballDoc* pDoc = (CBaseballDoc*) m_pDocVoid;
-	pDoc->m_pPropertySheetPitchers->PostMessage(WM_APP1); // Update Button Pressed
+	pDoc->m_pPropertySheetPitchers->PostMessage(WM_APP4); // Update Button Pressed
 
 	// Enable / Disable Update and Add buttons
 	CWnd* pAddWnd = GetDlgItem(IDPLAYERADD1);
@@ -3233,7 +3280,7 @@ void PropertyPagePitchersChance::OnPlayerAdd()
 {
 	// Notify Main Sheet of button being pressed
 	CBaseballDoc* pDoc = (CBaseballDoc*) m_pDocVoid;
-	pDoc->m_pPropertySheetPitchers->PostMessage(WM_APP1); // Update Button Pressed
+	pDoc->m_pPropertySheetPitchers->PostMessage(WM_APP4); // Update Button Pressed
 
 	// Enable / Disable Update and Add buttons
 	CWnd* pAddWnd = GetDlgItem(IDPLAYERADD1);
@@ -3623,7 +3670,7 @@ void PropertyPagePitchersStats::OnPlayerAdd()
 {
 	// Notify Main Sheet of button being pressed
 	CBaseballDoc* pDoc = (CBaseballDoc*) m_pDocVoid;
-	pDoc->m_pPropertySheetPitchers->PostMessage(WM_APP1); // Update Button Pressed
+	pDoc->m_pPropertySheetPitchers->PostMessage(WM_APP4); // Update Button Pressed
 
 	// Enable / Disable Update and Add buttons
 	CWnd* pAddWnd = GetDlgItem(IDPLAYERADD1);
@@ -3795,9 +3842,10 @@ BEGIN_MESSAGE_MAP(PropertySheetPitchers, CPropertySheet)
 	//{{AFX_MSG_MAP(PropertySheetPitchers)
 		// NOTE - the ClassWizard will add and remove mapping macros here.
 	//}}AFX_MSG_MAP
-	ON_MESSAGE(WM_APP1,OnUpdate)
+//	ON_MESSAGE(WM_APP1,OnUpdate)
 	ON_MESSAGE(WM_APP2,OnOK)
 	ON_MESSAGE(WM_APP3,OnCancel)
+	ON_MESSAGE(WM_APP4, &PropertySheetPitchers::OnAdd)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -3972,6 +4020,207 @@ void PropertySheetPitchers::OnNew()
 	OnNewInitStruct();
 	m_flagNew = TRUE;
 	m_rgetcursel = -1;
+}
+
+afx_msg LRESULT PropertySheetPitchers::OnAdd(WPARAM wParam, LPARAM lParam)
+{
+	BOOL rc_GetDlgItemInt;
+	char cTemp[31];
+	CString filler10("          ");
+//	char buf[10];
+	//double fIP;
+//	double fTRG;
+//	double fERA;
+	CBaseballDoc::m_PitcherStatsRecord pitcherStatsRecord;
+	CBaseballDoc::m_PitcherRecord pitcherRecord;
+	CBaseballDoc::m_TeamRecord teamRecord;
+
+	CBaseballDoc* pDoc = (CBaseballDoc*)m_pDocVoid;
+
+	// Initialize PitcherStats to defaults
+	pitcherRecord.PitcherID = 0;
+	pitcherRecord.FirstName = "";
+	pitcherRecord.LastName = "";
+	pitcherRecord.OBChanceHomeRun = 0;
+	pitcherRecord.OBChanceTriple = 0;
+	pitcherRecord.OBChanceDouble = 0;
+	pitcherRecord.OBChanceSingle = 0;
+	pitcherRecord.OBChanceWalk = 0;
+	pitcherRecord.ChanceDoublePlay = 0;
+	pitcherRecord.OBChanceHomeRunRight = 0;
+	pitcherRecord.OBChanceTripleRight = 0;
+	pitcherRecord.OBChanceDoubleRight = 0;
+	pitcherRecord.OBChanceSingleRight = 0;
+	pitcherRecord.OBChanceWalkRight = 0;
+	pitcherRecord.ChanceDoublePlayRight = 0;
+	pitcherRecord.OBChanceHomeRunLeft = 0;
+	pitcherRecord.OBChanceTripleLeft = 0;
+	pitcherRecord.OBChanceDoubleLeft = 0;
+	pitcherRecord.OBChanceSingleLeft = 0;
+	pitcherRecord.OBChanceWalkLeft = 0;
+	pitcherRecord.ChanceDoublePlayLeft = 0;
+	pitcherRecord.OBChanceBasic = 0;
+	pitcherRecord.OBChanceLeft = 0;
+	pitcherRecord.OBChanceRight = 0;
+	pitcherRecord.Starter = 0;
+	pitcherRecord.Relief = 0;
+	pitcherRecord.Throws = 0;
+	pitcherRecord.Bunting = 0;
+	pitcherRecord.Hold = 0;
+	pitcherRecord.WP = 0;
+	pitcherRecord.Balk = 0;
+	pitcherRecord.Pitcher = 0;
+	pitcherRecord.ER1 = 0;
+	pitcherRecord.TeamID = 0;
+
+	// Initialize Pitcher to defaults
+	pitcherStatsRecord.PitcherStatsID = 0;
+	pitcherStatsRecord.Wins = 0;
+	pitcherStatsRecord.Loss = 0;
+	pitcherStatsRecord.Saves = 0;
+	pitcherStatsRecord.InningsPitched = 0;
+	pitcherStatsRecord.ER = 0;
+	pitcherStatsRecord.Hits = 0;
+	pitcherStatsRecord.Walks = 0;
+	pitcherStatsRecord.Strikeouts = 0;
+	pitcherStatsRecord.HomeRuns = 0;
+	pitcherStatsRecord.Games = 0;
+	pitcherStatsRecord.CompleteGames = 0;
+	pitcherStatsRecord.Starts = 0;
+	pitcherStatsRecord.ERA = 0;
+	pitcherStatsRecord.WHIP = 0;
+	pitcherStatsRecord.PitcherID = 0;
+	pitcherStatsRecord.TeamID = 0;
+
+	// Read in the Team Data. Not currently used for anything
+	teamRecord = pDoc->GetTeam(m_TeamID);
+
+
+	if (m_pPage1->m_hWnd != 0)
+	{
+		m_pPage1->GetDlgItemText(IDC_COMBO_PLAYERNAME1, cTemp, 30);
+		m_structPitcher.m_PitcherName = cTemp;
+		m_pPage1->GetDlgItemText(IDC_FIRSTNAME1, cTemp, 30);
+		pitcherRecord.FirstName = cTemp;
+		m_pPage1->GetDlgItemText(IDC_LASTNAME1, cTemp, 30);
+		pitcherRecord.LastName = cTemp;
+		pitcherRecord.Pitcher = m_pPage1->GetDlgItemInt(IDC_PITCHER, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.Starter = m_pPage1->GetDlgItemInt(IDC_STARTER1, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.Relief = m_pPage1->GetDlgItemInt(IDC_RELIEF1, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.WP = m_pPage1->GetDlgItemInt(IDC_WP, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.ER1 = m_pPage1->GetDlgItemInt(IDC_ERP, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.Balk = m_pPage1->GetDlgItemInt(IDC_BALK, &rc_GetDlgItemInt, FALSE);
+		pitcherRecord.Throws = m_pPage1->m_comboThrows.GetCurSel();
+		pitcherRecord.Hold = m_pPage1->m_comboHold.GetCurSel();
+		pitcherRecord.Bunting = m_pPage1->m_comboBunting.GetCurSel();
+		m_pPage1->m_bChangedFlag = FALSE;
+	}
+	if (m_pPage2->m_hWnd != 0)
+	{
+		m_pPage2->GetDlgItemText(IDC_COMBO_PLAYERNAME1, cTemp, 30);
+		m_structPitcher.m_PitcherName = cTemp;
+		m_pPage2->GetDlgItemText(IDC_CHANCEBASIC, cTemp, 6);
+		pitcherRecord.OBChanceBasic = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCELEFT, cTemp, 6);
+		pitcherRecord.OBChanceLeft = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCERIGHT, cTemp, 6);
+		pitcherRecord.OBChanceRight = (float)_ttof(cTemp);
+
+		m_pPage2->GetDlgItemText(IDC_CHANCEHR, cTemp, 6);
+		pitcherRecord.OBChanceHomeRun = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCEDOUBLE, cTemp, 6);
+		pitcherRecord.OBChanceDouble = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCESINGLE, cTemp, 6);
+		pitcherRecord.OBChanceSingle = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCETRIPLE, cTemp, 6);
+		pitcherRecord.OBChanceTriple = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCEWALK, cTemp, 6);
+		pitcherRecord.OBChanceWalk = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCEDOUBLEPLAY, cTemp, 6);
+		pitcherRecord.ChanceDoublePlay = (float)_ttof(cTemp);
+
+		m_pPage2->GetDlgItemText(IDC_CHANCEHRL, cTemp, 6);
+		pitcherRecord.OBChanceHomeRunLeft = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCEDOUBLEL, cTemp, 6);
+		pitcherRecord.OBChanceDoubleLeft = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCESINGLEL, cTemp, 6);
+		pitcherRecord.OBChanceSingleLeft = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCETRIPLEL, cTemp, 6);
+		pitcherRecord.OBChanceTripleLeft = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCEWALKL, cTemp, 6);
+		pitcherRecord.OBChanceWalkLeft = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCEDOUBLEPLAYL, cTemp, 6);
+		pitcherRecord.ChanceDoublePlayLeft = (float)_ttof(cTemp);
+
+		m_pPage2->GetDlgItemText(IDC_CHANCEHRR, cTemp, 6);
+		pitcherRecord.OBChanceHomeRunRight = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCEDOUBLER, cTemp, 6);
+		pitcherRecord.OBChanceDoubleRight = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCESINGLER, cTemp, 6);
+		pitcherRecord.OBChanceSingleRight = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCETRIPLER, cTemp, 6);
+		pitcherRecord.OBChanceTripleRight = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCEWALKR, cTemp, 6);
+		pitcherRecord.OBChanceWalkRight = (float)_ttof(cTemp);
+		m_pPage2->GetDlgItemText(IDC_CHANCEDOUBLEPLAYR, cTemp, 6);
+		pitcherRecord.ChanceDoublePlayRight = (float)_ttof(cTemp);
+
+		m_pPage2->m_bChangedFlag = FALSE;
+	}
+	if (m_pPage3->m_hWnd != 0)
+	{
+		m_pPage3->GetDlgItemText(IDC_COMBO_PLAYERNAME1, cTemp, 30);
+		m_structPitcher.m_PitcherName = cTemp;
+		m_pPage3->GetDlgItemText(IDC_IP1, cTemp, 7);
+		pitcherStatsRecord.InningsPitched = (float)_ttof(cTemp);
+		pitcherStatsRecord.Starts = m_pPage3->GetDlgItemInt(IDC_STARTS1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Wins = m_pPage3->GetDlgItemInt(IDC_WINS1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Walks = m_pPage3->GetDlgItemInt(IDC_WALK1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Strikeouts = m_pPage3->GetDlgItemInt(IDC_STRIKEOUT1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Saves = m_pPage3->GetDlgItemInt(IDC_SAVES1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Loss = m_pPage3->GetDlgItemInt(IDC_LOSS1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.HomeRuns = m_pPage3->GetDlgItemInt(IDC_HR1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Hits = m_pPage3->GetDlgItemInt(IDC_HITS1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.ER = m_pPage3->GetDlgItemInt(IDC_ER1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.Games = m_pPage3->GetDlgItemInt(IDC_GAMES1, &rc_GetDlgItemInt, FALSE);
+		pitcherStatsRecord.CompleteGames = m_pPage3->GetDlgItemInt(IDC_COMPLETEGAMES1, &rc_GetDlgItemInt, FALSE);
+		if (pitcherStatsRecord.InningsPitched == 0)
+		{
+			pitcherStatsRecord.ERA = 0.0f;
+			pitcherStatsRecord.WHIP = 0.0f;
+		}
+		else
+		{
+			pitcherStatsRecord.ERA = (float)(pitcherStatsRecord.ER * 9) / pitcherStatsRecord.InningsPitched;
+			pitcherStatsRecord.WHIP = (float)((pitcherStatsRecord.Hits + pitcherStatsRecord.Walks) * 9) / pitcherStatsRecord.InningsPitched;
+		}
+		m_pPage3->m_bChangedFlag = FALSE;
+	}
+
+	// Add Pitcher
+	pitcherRecord.TeamID = m_TeamID;
+	pitcherStatsRecord.TeamID = m_TeamID;
+	pDoc->PitcherAdd(pitcherRecord);
+	// Need to retrieve Pitcher ID that was just created
+	pitcherStatsRecord.PitcherID = pDoc->GetPitcher(teamRecord.TeamID, pitcherRecord.FirstName, pitcherRecord.LastName);
+	pDoc->PitcherStatsAdd(pitcherStatsRecord);
+	// Reset New flag to false
+	m_flagNew = FALSE;
+
+	// ReBuild combo table for player display
+	if (m_pPage1->m_hWnd != 0)
+	{
+		BuildPlayerNameComboBox(1);
+	}
+	if (m_pPage2->m_hWnd != 0)
+	{
+		BuildPlayerNameComboBox(2);
+	}
+	if (m_pPage3->m_hWnd != 0)
+	{
+		BuildPlayerNameComboBox(3);
+	}
+	return (LRESULT)0;
 }
 
 void PropertySheetPitchers::OnNewInitStruct()
@@ -4816,4 +5065,3 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // PropertySheetLeagueOptions message handlers
-

@@ -22,7 +22,6 @@ public:
 	void OnInitDialogPublic();
 	BOOL m_bChangedFlag;
 	void* m_pDocVoid;
-	CString m_FileName;
 	void BuildPlayerNameComboBox();
 //	PropertySheetBatters* m_pmyBattersSheet;
 	PropertyPageBatters();
@@ -922,6 +921,9 @@ public:
 	void *m_pDocVoid;
 	int m_TeamID;
 	int m_PitcherStatsID;
+protected:
+//	afx_msg LRESULT WM_APP4(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnAdd(WPARAM wParam, LPARAM lParam);
 };
 
 /////////////////////////////////////////////////////////////////////////////
