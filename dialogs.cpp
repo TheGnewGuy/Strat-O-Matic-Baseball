@@ -1615,7 +1615,6 @@ afx_msg LRESULT PropertySheetBatters::OnAdd(WPARAM wParam, LPARAM lParam)
 {
 	BOOL rc_GetDlgItemInt;
 	char cTemp[31];
-//	char buf[10];
 	CBaseballDoc::m_BatterStatsRecord batterStatsRecord;
 	CBaseballDoc::m_BatterRecord batterRecord;
 	CBaseballDoc::m_TeamRecord teamRecord;
@@ -1702,11 +1701,6 @@ afx_msg LRESULT PropertySheetBatters::OnAdd(WPARAM wParam, LPARAM lParam)
 
 	// Read in the Team Data, not currently used for anything
 	teamRecord = pDoc->GetTeam(m_TeamID);
-	if (teamRecord.BaseTeam == FALSE)
-	{
-		AfxMessageBox("You are attempting to Add a Player to a non-Base team\nAction not allowed.");
-		return FALSE;
-	}
 
 	if (m_pPage1->m_hWnd != 0)
 	{
@@ -1839,13 +1833,22 @@ afx_msg LRESULT PropertySheetBatters::OnAdd(WPARAM wParam, LPARAM lParam)
 		m_pPage4->m_bChangedFlag = FALSE;
 	}
 
-	// Add Batter
-	batterRecord.TeamID = m_TeamID;
-	batterStatsRecord.TeamID = m_TeamID;
-	pDoc->BatterAdd(batterRecord);
-	// Need to retrieve batter ID that was just created
-	batterStatsRecord.BatterID = pDoc->GetBatter(teamRecord.TeamID, batterRecord.FirstName, batterRecord.LastName);
-	pDoc->BatterStatsAdd(batterStatsRecord);
+	// Add Batter to Base teams
+	if (teamRecord.BaseTeam == TRUE)
+	{
+		batterRecord.TeamID = m_TeamID;
+		batterStatsRecord.TeamID = m_TeamID;
+		pDoc->BatterAdd(batterRecord);
+		// Need to retrieve batter ID that was just created
+		batterStatsRecord.BatterID = pDoc->GetBatter(teamRecord.TeamID, batterRecord.FirstName, batterRecord.LastName);
+		pDoc->BatterStatsAdd(batterStatsRecord);
+	}
+	else
+	{
+		// Display message stating that you can only add to Base teams.
+		AfxMessageBox("Batters can only be added to Base teams!\nBatter not added.");
+	}
+
 	// Reset New flag to false
 	m_flagNew = FALSE;
 
@@ -4026,11 +4029,6 @@ afx_msg LRESULT PropertySheetPitchers::OnAdd(WPARAM wParam, LPARAM lParam)
 {
 	BOOL rc_GetDlgItemInt;
 	char cTemp[31];
-	CString filler10("          ");
-//	char buf[10];
-	//double fIP;
-//	double fTRG;
-//	double fERA;
 	CBaseballDoc::m_PitcherStatsRecord pitcherStatsRecord;
 	CBaseballDoc::m_PitcherRecord pitcherRecord;
 	CBaseballDoc::m_TeamRecord teamRecord;
@@ -4197,14 +4195,22 @@ afx_msg LRESULT PropertySheetPitchers::OnAdd(WPARAM wParam, LPARAM lParam)
 		m_pPage3->m_bChangedFlag = FALSE;
 	}
 
-	// Add Pitcher
-	pitcherRecord.TeamID = m_TeamID;
-	pitcherStatsRecord.TeamID = m_TeamID;
-	pDoc->PitcherAdd(pitcherRecord);
-	// Need to retrieve Pitcher ID that was just created
-	pitcherStatsRecord.PitcherID = pDoc->GetPitcher(teamRecord.TeamID, pitcherRecord.FirstName, pitcherRecord.LastName);
-	pDoc->PitcherStatsAdd(pitcherStatsRecord);
-	// Reset New flag to false
+	// Add Pitcher if base team
+	if (teamRecord.BaseTeam == TRUE)
+	{
+		pitcherRecord.TeamID = m_TeamID;
+		pitcherStatsRecord.TeamID = m_TeamID;
+		pDoc->PitcherAdd(pitcherRecord);
+		// Need to retrieve Pitcher ID that was just created
+		pitcherStatsRecord.PitcherID = pDoc->GetPitcher(teamRecord.TeamID, pitcherRecord.FirstName, pitcherRecord.LastName);
+		pDoc->PitcherStatsAdd(pitcherStatsRecord);
+		// Reset New flag to false
+	}
+	else
+	{
+		// Display message stating that you can only add to Base teams.
+		AfxMessageBox("Pitchers can only be added to Base teams!\nPitcher not added.");
+	}
 	m_flagNew = FALSE;
 
 	// ReBuild combo table for player display
