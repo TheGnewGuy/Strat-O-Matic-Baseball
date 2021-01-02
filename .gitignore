@@ -14,11 +14,30 @@ Thumbs.db
 *.ilk
 *.log
 [Bb]in
-[Dd]ebug*/
 *.sbr
-obj/
-[Rr]elease*/
 _ReSharper*/
 Baseball.opensdf
 Baseball.sdf
 *.ipch
+
+# Build results
+[Dd]ebug*/
+[[Rr]elease*/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio cache/options directory
+.vs/
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
