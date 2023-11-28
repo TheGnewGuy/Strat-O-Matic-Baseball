@@ -15,17 +15,19 @@
     <SccLocalPath />
     <Keyword>MFCProj</Keyword>
     <ProjectGuid>{C14B680B-9DE8-D875-6925-0439E6351BDC}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Static</UseOfMfc>
-    <PlatformToolset>v100</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -43,15 +45,17 @@
     <OutDir>.\Release\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(SolutionDir)$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>.\Debug\</OutDir>
     <IntDir>.\Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(SolutionDir)$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -86,18 +90,16 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Release\Baseball.exe</OutputFile>
+      <AdditionalDependencies>SqLiteDLL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
       <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
-      <MinimalRebuild>true</MinimalRebuild>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Debug\Baseball.pch</PrecompiledHeaderOutputFile>
@@ -105,6 +107,7 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ObjectFileName>.\Debug\</ObjectFileName>
       <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -127,9 +130,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Debug\Baseball.exe</OutputFile>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalDependencies>SqLiteDLL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AddConference.cpp" />
     <ClCompile Include="AddLeague.cpp" />
     <ClCompile Include="AddTeam.cpp" />
     <ClCompile Include="Baseball.cpp" />
@@ -139,6 +145,7 @@
     <ClCompile Include="dialogs.cpp" />
     <ClCompile Include="DlgAddDivision.cpp" />
     <ClCompile Include="DlgAddTeams.cpp" />
+    <ClCompile Include="DlgEditLeague.cpp" />
     <ClCompile Include="FileStruct.cpp" />
     <ClCompile Include="FormA.cpp" />
     <ClCompile Include="FormB.cpp" />
@@ -221,6 +228,7 @@
     <ResourceCompile Include="Baseball.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddConference.h" />
     <ClInclude Include="AddLeague.h" />
     <ClInclude Include="AddTeam.h" />
     <ClInclude Include="Baseball.h" />
@@ -230,6 +238,7 @@
     <ClInclude Include="dialogs.h" />
     <ClInclude Include="DlgAddDivision.h" />
     <ClInclude Include="DlgAddTeams.h" />
+    <ClInclude Include="DlgEditLeague.h" />
     <ClInclude Include="FileStruct.h" />
     <ClInclude Include="FormA.h" />
     <ClInclude Include="FormB.h" />
@@ -237,7 +246,11 @@
     <ClInclude Include="Registry.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Splash.h" />
+    <ClInclude Include="sqlite3.h" />
     <ClInclude Include="StdAfx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\toolbar1.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

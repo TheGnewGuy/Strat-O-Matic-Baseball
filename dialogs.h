@@ -22,7 +22,6 @@ public:
 	void OnInitDialogPublic();
 	BOOL m_bChangedFlag;
 	void* m_pDocVoid;
-	CString m_FileName;
 	void BuildPlayerNameComboBox();
 //	PropertySheetBatters* m_pmyBattersSheet;
 	PropertyPageBatters();
@@ -390,13 +389,17 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
+public:
+	afx_msg void OnEditChangeFirstname();
+	afx_msg void OnEditChangeLastname();
 };
 /////////////////////////////////////////////////////////////////////////////
 // PropertySheetBatters
 
 #define WM_APP1 WM_APP + 1	// Update
 #define WM_APP2 WM_APP + 2	// OnOK
-#define WM_APP3 WM_APP + 3	// Onancel
+#define WM_APP3 WM_APP + 3	// OnCancel
+#define WM_APP4 WM_APP + 4	// OnAdd
 
 class PropertySheetBatters : public CPropertySheet
 {
@@ -454,6 +457,155 @@ protected:
 	afx_msg LRESULT OnOK(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT OnCancel(WPARAM wParam,LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+public:
+	int m_TeamID;
+	int m_BatterStatsID;
+	void *m_pDocVoid;
+	struct m_BatterRecord{
+		int BatterID;
+		CStringA FirstName;
+		CStringA LastName;
+		int Pitcher;
+		int Catcher;
+		int FirstBase;
+		int SecondBase;
+		int ShortStop;
+		int ThirdBase;
+		int LeftField;
+		int CenterField;
+		int RightField;
+		int Bunting;
+		int HitRun;
+		int Running;
+		int Stealing;
+		int CatchArm;
+		int OutArm;
+		int PowerRight;
+		int PowerLeft;
+		int Pass;
+		int TRate;
+		int ER1;
+		int ER2;
+		int ER3;
+		int ER4;
+		int ER5;
+		int ER6;
+		int ER7;
+		int ER8;
+		int ER9;
+		int BatterHits;
+		int TeamID;
+		double OBChanceHomeRun;
+		double OBChanceTriple;
+		double OBChanceDouble;
+		double OBChanceSingle;
+		double OBChanceWalk;
+		double ChanceDoublePlay;
+		double OBChanceHomeRunRight;
+		double OBChanceTripleRight;
+		double OBChanceDoubleRight;
+		double OBChanceSingleRight;
+		double OBChanceWalkRight;
+		double ChanceDoublePlayRight;
+		double OBChanceHomeRunLeft;
+		double OBChanceTripleLeft;
+		double OBChanceDoubleLeft;
+		double OBChanceSingleLeft;
+		double OBChanceWalkLeft;
+		double ChanceDoublePlayLeft;
+		double OBChanceBasic;
+		double OBChanceLeft;
+		double OBChanceRight;
+		CStringA CreateTime;
+		CStringA LastUpdateTime;
+	} m_batterRecord;
+	struct m_BatterStatsRecord{
+		int BatterStatsID;
+		int AB;
+		int Runs;
+		int Hits;
+		int RBI;
+		int Doubles;
+		int Triples;
+		int HomeRuns;
+		int Walk;
+		int Stirkeout;
+		int ReachedOnError;
+		int Sacrifice;
+		int StolenBase;
+		int CS;
+		int Games;
+		int HBP;
+		double AVG;
+		double SLG;
+		double OBP;
+		int BatterID;
+		int TeamID;
+		CStringA CreateTime;
+		CStringA LastUpdateTime;
+	} m_batterStatsRecord;
+	struct m_PitcherRecord{
+		int PitcherID;
+		CStringA FirstName;
+		CStringA LastName;
+		double OBChanceHomeRun;
+		double OBChanceTriple;
+		double OBChanceDouble;
+		double OBChanceSingle;
+		double OBChanceWalk;
+		double ChanceDoublePlay;
+		double OBChanceHomeRunRight;
+		double OBChanceTripleRight;
+		double OBChanceDoubleRight;
+		double OBChanceSingleRight;
+		double OBChanceWalkRight;
+		double ChanceDoublePlayRight;
+		double OBChanceHomeRunLeft;
+		double OBChanceTripleLeft;
+		double OBChanceDoubleLeft;
+		double OBChanceSingleLeft;
+		double OBChanceWalkLeft;
+		double ChanceDoublePlayLeft;
+		double OBChanceBasic;
+		double OBChanceLeft;
+		double OBChanceRight;
+		int Starter;
+		int Relief;
+		int Throws;
+		int Bunting;
+		int Hold;
+		int WP;
+		int Balk;
+		int Pitcher;
+		int ER1;
+		int TeamID;
+		CStringA CreateTime;
+		CStringA LastUpdateTime;
+	} m_pitcherRecord;
+	struct m_PitcherStatsRecord{
+		int PitcherStatsID;
+		int Wins;
+		int Loss;
+		int Saves;
+		double InningsPitched;
+		int ER;
+		int Hits;
+		int Walks;
+		int Strikeouts;
+		int HomeRuns;
+		int Games;
+		int CompleteGames;
+		int Starts;
+		double ERA;
+		double WHIP;
+		int PitcherID;
+		int TeamID;
+		CStringA CreateTime;
+		CStringA LastUpdateTime;
+	} m_pitcherStatsRecord;
+protected:
+//	afx_msg LRESULT WM_APP4(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnAdd(WPARAM wParam, LPARAM lParam);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -528,6 +680,9 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
+public:
+	afx_msg void OnChangeFirstName();
+	afx_msg void OnChangeLastName();
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -762,6 +917,13 @@ protected:
 		// NOTE - the ClassWizard will add and remove member functions here.
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	void *m_pDocVoid;
+	int m_TeamID;
+	int m_PitcherStatsID;
+protected:
+//	afx_msg LRESULT WM_APP4(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnAdd(WPARAM wParam, LPARAM lParam);
 };
 
 /////////////////////////////////////////////////////////////////////////////

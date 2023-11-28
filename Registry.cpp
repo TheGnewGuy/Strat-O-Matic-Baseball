@@ -39,12 +39,12 @@ int Registry::GetRegistryOptions()
 
 int Registry::OpenRegistryOptions()
 {
-	CString BackgroundPicture = "images/background.jpg";
-	CString Index = "index.htm";
-	CString TextColor = "Black";
-	CString BGColor = "White";
-	CString LinkColor = "Blue";
-	CString VLinkColor = "Purple";
+	CString BackgroundPicture = _T("images/background.jpg");
+	CString Index = _T("index.htm");
+	CString TextColor = _T("Black");
+	CString BGColor = _T("White");
+	CString LinkColor = _T("Blue");
+	CString VLinkColor = _T("Purple");
 
 	char lpszSubKeyOptions[MAX_PATH];
 	unsigned long regRC;
@@ -54,9 +54,9 @@ int Registry::OpenRegistryOptions()
 
 	RegCreateKeyEx(
 		HKEY_CURRENT_USER,
-		lpszSubKeyOptions,
+		CA2T(lpszSubKeyOptions),
 		0,
-		"",
+		_T(""),
 		REG_OPTION_NON_VOLATILE,
 		KEY_ALL_ACCESS,
 		0,

@@ -9,12 +9,12 @@
       <UniqueIdentifier>{be7f2cc8-4ab6-4c24-bc33-89bbeb9a9b4d}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{be9bfcdf-94c3-439f-b087-68faec086cfb}</UniqueIdentifier>
-      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
-    </Filter>
     <Filter Include="Help Files">
       <UniqueIdentifier>{873a836d-5fe6-4198-8b72-182d4caaea2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Help Files\Resource Files">
+      <UniqueIdentifier>{be9bfcdf-94c3-439f-b087-68faec086cfb}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +64,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgEditLeague.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AddConference.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -124,76 +130,85 @@
     <ClInclude Include="StdAfx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sqlite3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgEditLeague.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AddConference.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\Baseball.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\Baseball.rc2">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\BaseballDoc.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\Baseballs.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\bitmap1.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\bmp00001.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\bmp00002.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\DownArrow.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\DownArrowP.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\Field.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\field1.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\FieldGray.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\FieldGrayComplete.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\FieldGreen.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\Fieldstrikenadballs.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\ScoreBoard.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\Splash.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\StopGame.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\StopGameRed.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\StopGameYellow.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\Toolbar.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\UpArrow.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="res\UpArrowP.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Help Files\Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="hlp\AfxCore.rtf">
       <Filter>Help Files</Filter>
@@ -275,5 +290,10 @@
     </CustomBuild>
     <CustomBuild Include="Baseball.reg" />
     <CustomBuild Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\toolbar1.bmp">
+      <Filter>Help Files\Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -95,25 +95,28 @@ public:
 	CString m_OBChanceSingleLeft;
 	CString m_OBChanceWalkLeft;
 	CString m_ChanceDoublePlayLeft;
-	int CopyBatterFile(CString inFileName, CString outFileName);
-	BYTE GetCountBatter(CString BatterFileName);
+	//int CopyBatterFile(CString inFileName, CString outFileName);
+	//BYTE GetCountBatter(CString BatterFileName);
+	int GetCountBatter(int TeamID);
 	BYTE m_bBatterHits;
 	CString m_OBChanceRight;
 	CString m_OBChanceLeft;
 	CString m_OBChanceBasic;
 	BYTE m_bFiller1;
-	int GetBatter(CString BatterFileName, LONG SeekPosition);
-	int AddBatter(CString BatterFileName);
-	int UpdateBatter(CString BatterFileName, LONG SeekPosition);
+	//int GetBatter(CString BatterFileName, LONG SeekPosition);
+	//int AddBatter(CString BatterFileName);
+	//int UpdateBatter(CString BatterFileName, LONG SeekPosition);
 	virtual ~BatterStruct();
 
 	// Generated message map functions
 protected:
 private:
-	int BatterRead(CFile* myFile);
-	int BatterWrite(CFile* myFile);
+	//int BatterRead(CFile* myFile);
+	//int BatterWrite(CFile* myFile);
 protected:
 	// Generated message map functions
+public:
+	void *m_pDocVoid;
 };
 
 /////////////////////////////////////////////////////////////////////////////

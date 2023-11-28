@@ -48,10 +48,11 @@ void FormB::OnDraw(CDC * pDC, CBaseballDoc * pDoc)
 	CFont* origFont;
 	CFont myFont;
 	LOGFONT lf;
-	char szFontName[LF_FACESIZE] = "Times New Roman";
+	//char  szFontName[LF_FACESIZE] = _T("Times New Roman");
 	
 	memset(&lf, 0, sizeof(LOGFONT));
-	lstrcpy(lf.lfFaceName, szFontName);
+//	lstrcpy((LPWSTR)&lf.lfFaceName, _T("Times New Roman"));
+	lstrcpy(lf.lfFaceName, _T("Times New Roman"));
 	lf.lfHeight = -100;
 	VERIFY(myFont.CreateFontIndirect(&lf));
 	origFont = pDC->SelectObject(&myFont);
@@ -71,21 +72,21 @@ void FormB::OnDraw(CDC * pDC, CBaseballDoc * pDoc)
 		pDC->MoveTo(j,-yStart);
 		pDC->LineTo(j,-i);
 	}
-	pDC->TextOut(xStart+1500+100,-(yStart+55),"AB",2);
-	pDC->TextOut(xStart+1500+150+(1*xInc),-(yStart+55),"R",1);
-	pDC->TextOut(xStart+1500+150+(2*xInc),-(yStart+55),"H",1);
-	pDC->TextOut(xStart+1500+90+(3*xInc),-(yStart+55),"RBI",3);
-	pDC->TextOut(xStart+1500+125+(4*xInc),-(yStart+55),"2B",2);
-	pDC->TextOut(xStart+1500+125+(5*xInc),-(yStart+55),"3B",2);
-	pDC->TextOut(xStart+1500+125+(6*xInc),-(yStart+55),"HR",2);
-	pDC->TextOut(xStart+1500+150+(7*xInc),-(yStart+55),"W",1);
-	pDC->TextOut(xStart+1500+150+(8*xInc),-(yStart+55),"K",1);
-	pDC->TextOut(xStart+1500+125+(9*xInc),-(yStart+55),"RE",2);
-	pDC->TextOut(xStart+1500+125+(10*xInc),-(yStart+55),"SB",2);
-	pDC->TextOut(xStart+1500+125+(11*xInc),-(yStart+55),"SF",2);
-	pDC->TextOut(xStart+1500+90+(12*xInc),-(yStart+55),"AVG",3);
-	pDC->TextOut(xStart+1500+90+(13*xInc),-(yStart+55),"SLG",3);
-	pDC->TextOut(xStart+1500+90+(14*xInc),-(yStart+55),"OB%",3);
+	pDC->TextOut(xStart + 1500 + 100, -(yStart + 55), _T("AB"), 2);
+	pDC->TextOut(xStart + 1500 + 150 + (1 * xInc), -(yStart + 55), _T("R"), 1);
+	pDC->TextOut(xStart + 1500 + 150 + (2 * xInc), -(yStart + 55), _T("H"), 1);
+	pDC->TextOut(xStart + 1500 + 90 + (3 * xInc), -(yStart + 55), _T("RBI"), 3);
+	pDC->TextOut(xStart + 1500 + 125 + (4 * xInc), -(yStart + 55), _T("2B"), 2);
+	pDC->TextOut(xStart + 1500 + 125 + (5 * xInc), -(yStart + 55), _T("3B"), 2);
+	pDC->TextOut(xStart + 1500 + 125 + (6 * xInc), -(yStart + 55), _T("HR"), 2);
+	pDC->TextOut(xStart + 1500 + 150 + (7 * xInc), -(yStart + 55), _T("W"), 1);
+	pDC->TextOut(xStart + 1500 + 150 + (8 * xInc), -(yStart + 55), _T("K"), 1);
+	pDC->TextOut(xStart + 1500 + 125 + (9 * xInc), -(yStart + 55), _T("RE"), 2);
+	pDC->TextOut(xStart + 1500 + 125 + (10 * xInc), -(yStart + 55), _T("SB"), 2);
+	pDC->TextOut(xStart + 1500 + 125 + (11 * xInc), -(yStart + 55), _T("SF"), 2);
+	pDC->TextOut(xStart + 1500 + 90 + (12 * xInc), -(yStart + 55), _T("AVG"), 3);
+	pDC->TextOut(xStart + 1500 + 90 + (13 * xInc), -(yStart + 55), _T("SLG"), 3);
+	pDC->TextOut(xStart + 1500 + 90 + (14 * xInc), -(yStart + 55), _T("OB%"), 3);
 
 	pDC->MoveTo(xStart,-yStart);
 	pDC->LineTo(xEnd,-yStart);

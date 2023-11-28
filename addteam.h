@@ -1,3 +1,4 @@
+#include "afxwin.h"
 #if !defined(AFX_ADDTEAM_H__06762502_8C3F_11D2_B0EE_444553540000__INCLUDED_)
 #define AFX_ADDTEAM_H__06762502_8C3F_11D2_B0EE_444553540000__INCLUDED_
 
@@ -40,6 +41,20 @@ protected:
 		// NOTE: the ClassWizard will add member functions here
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	int m_AwayLoss;
+	int m_AwayWin;
+	CString m_League;
+	CString m_Conference;
+	CString m_Division;
+	int m_HomeWin;
+	int m_HomeLoss;
+	int m_Year;
+	virtual BOOL OnInitDialog();
+	CButton m_BaseControl;
+	bool m_Base;
+	int m_TotalLosses;
+	int m_TotalWins;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -128,6 +143,17 @@ public:
 	CString	m_BallPark;
 	CString	m_ShortTeamName;
 	CString	m_TeamName;
+	BOOL m_Base;
+	CString m_Conference;
+	CString m_Division;
+	int m_AwayLoss;
+	int m_AwayWin;
+	int m_HomeLoss;
+	int m_HomeWin;
+	CString m_League;
+	int m_TotalLosses;
+	int m_TotalWins;
+	int m_Year;
 	//}}AFX_DATA
 
 
