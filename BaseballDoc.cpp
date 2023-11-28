@@ -45,6 +45,7 @@
 //			the number of batters or pitchers is less than m_StatCount,
 //			an error will occure due to indexes being out of range.
 //      6.  Batter/Pitcher Add routines			
+//		7.	Import from CSV files. Batters and Pitchers
 //
 
 #include "stdafx.h"
