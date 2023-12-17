@@ -3845,7 +3845,7 @@ BEGIN_MESSAGE_MAP(PropertySheetPitchers, CPropertySheet)
 	//{{AFX_MSG_MAP(PropertySheetPitchers)
 		// NOTE - the ClassWizard will add and remove mapping macros here.
 	//}}AFX_MSG_MAP
-//	ON_MESSAGE(WM_APP1,OnUpdate)
+	ON_MESSAGE(WM_APP1,OnUpdate)
 	ON_MESSAGE(WM_APP2,OnOK)
 	ON_MESSAGE(WM_APP3,OnCancel)
 	ON_MESSAGE(WM_APP4, &PropertySheetPitchers::OnAdd)

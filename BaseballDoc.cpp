@@ -34,6 +34,9 @@
 //      Version 1.0.0.11 and Copyright to 2014
 //  01/22/14 Changed the XBteam.txt and XPteam.txt to trim trailing spaces from team name
 //      resulting in "XP1997 Baltland       .txt" being changed to "XP1997 Baltland.txt"
+//  12/15/23 The update pitchers routine was not being called. Turned out that the
+//      ON_MESSAGE(WM_APP1,OnUpdate) line was commented out in 
+//      BEGIN_MESSAGE_MAP(PropertySheetPitchers, CPropertySheet)
 //
 //	New Features to add:
 //		1.	Deletion of players and pitchers
