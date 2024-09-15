@@ -4,6 +4,8 @@
 //
 #define IDD_ABOUTBOX                    100
 #define IDD_ADDLEAGUENAME               104
+#define IDD_DlgCopyPlayer               107
+#define IDD_DlgCopyPlayer1              109
 #define IDR_MAINFRAME                   128
 #define IDR_BASEBATYPE                  129
 #define IDB_UpArrowPressed              130
@@ -46,6 +48,7 @@
 #define IDD_LEAGUEHTMLOPTIONS           173
 #define IDD_LEAGUENAME                  174
 #define IDD_CONFERENCE                  175
+#define IDD_SELPLAYER1                  176
 #define IDC_LEAGUE1                     1000
 #define IDC_CONFERENCE1                 1001
 #define IDC_CONFERENCE2                 1002
@@ -228,6 +231,7 @@
 #define IDC_TOTALWINS                   1190
 #define IDC_EDIT2                       1191
 #define IDC_TOTALLOSSES                 1191
+#define IDC_SELPLAYERLISTBOX1           1192
 #define ID_FORMS_SCORESHEETFORM         32771
 #define ID_FORMS_STATISTCSFORM          32772
 #define ID_FORMS_SCORESHEETFORMXTRA     32773
@@ -265,15 +269,17 @@
 #define ID_TEAMS_ADDBASSTEAMS           32820
 #define ID_TEAMS_ADDBASETEAMS           32821
 #define ID_LEAGUES_ADDBASELEAGUE        32822
+#define ID_PLAYERS_COPYBATTERS          32823
+#define ID_PLAYERS_COPYPITCHERS         32824
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        169
-#define _APS_NEXT_COMMAND_VALUE         32823
-#define _APS_NEXT_CONTROL_VALUE         1192
-#define _APS_NEXT_SYMED_VALUE           107
+#define _APS_NEXT_RESOURCE_VALUE        174
+#define _APS_NEXT_COMMAND_VALUE         32825
+#define _APS_NEXT_CONTROL_VALUE         1193
+#define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

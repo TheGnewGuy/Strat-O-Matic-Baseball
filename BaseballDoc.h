@@ -362,6 +362,8 @@ public:
 	int PitcherStatsAdd(m_PitcherStatsRecord PitcherStatsRecord);
 	int GetBatter(int teamID, CString FirstName, CString LastName);
 	int GetPitcher(int teamID, CString FirstName, CString LastName);
+	afx_msg void OnPlayersCopyBatters();
+	afx_msg void OnPlayersCopyPitchers();
 };
 
 /////////////////////////////////////////////////////////////////////////////

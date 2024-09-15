@@ -21,7 +21,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -145,6 +145,7 @@
     <ClCompile Include="dialogs.cpp" />
     <ClCompile Include="DlgAddDivision.cpp" />
     <ClCompile Include="DlgAddTeams.cpp" />
+    <ClCompile Include="DlgCopyPlayer.cpp" />
     <ClCompile Include="DlgEditLeague.cpp" />
     <ClCompile Include="FileStruct.cpp" />
     <ClCompile Include="FormA.cpp" />
@@ -238,6 +239,7 @@
     <ClInclude Include="dialogs.h" />
     <ClInclude Include="DlgAddDivision.h" />
     <ClInclude Include="DlgAddTeams.h" />
+    <ClInclude Include="DlgCopyPlayer.h" />
     <ClInclude Include="DlgEditLeague.h" />
     <ClInclude Include="FileStruct.h" />
     <ClInclude Include="FormA.h" />

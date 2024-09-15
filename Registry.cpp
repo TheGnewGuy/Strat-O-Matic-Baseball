@@ -50,7 +50,7 @@ int Registry::OpenRegistryOptions()
 	unsigned long regRC;
 	LPDWORD regRCDisp = &regRC;
 
-	sprintf_s(lpszSubKeyOptions,SUBKEY_OPTIONS_FORMAT_STRING,m_strLeagueDir);
+	sprintf_s(lpszSubKeyOptions,SUBKEY_OPTIONS_FORMAT_STRING,m_strLeagueDir.GetString());
 
 	RegCreateKeyEx(
 		HKEY_CURRENT_USER,

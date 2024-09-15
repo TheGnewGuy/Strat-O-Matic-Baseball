@@ -37,7 +37,25 @@
 //  12/15/23 The update pitchers routine was not being called. Turned out that the
 //      ON_MESSAGE(WM_APP1,OnUpdate) line was commented out in 
 //      BEGIN_MESSAGE_MAP(PropertySheetPitchers, CPropertySheet)
-//
+//  12/25/23 Cleaned up a number of warnings about sprintf wanting char * but passing CString
+//      Added .GetString() to all of the warnings
+//      Setup OnPlayersCopyBatter routine and Dialog to go along with it
+//      Setup OnPlayersCopyPitcher routine and Dialog to go along with it
+//      CopyBatter and Pitcher are the same other than pitcher and batter
+//   01/16/24 Somewhere along the line the values stored in the DB for CatchArm and OutArm
+//      got mixed between the actual value and the cursor position from the dialog.
+//      All other fields are storing the cursor position from the dialog so 
+//      as a result the DB needs to be corrected by changing all Batter records
+//      to a 6 for OutArm and 4 for CatchArm. Currently, none of the records 
+//      are using this field with valid data.
+//   01/17/24 Set Version to 1.0.0.12
+//   06/03/24 Changed PropertyPagePitchersInfo::OnInitDialog() Range for relief from 4 to 5
+//   06/95/24 CHanged Dialogs PropertySheetPitchers OnAdd and OnUpdate for the 
+//      WHIP calculation to not multiply times 9. Also, had to manually update the
+//      DB WHIP field to correc the error in all 600 plus records of PITCHERSTAT table.
+//      It seems that the dialog field TRG was changed to WHIP at some random time in the past.
+//   06/95/24 Set Version to 1.0.0.13
+// 
 //	New Features to add:
 //		1.	Deletion of players and pitchers
 //		2.	Building of teams from existing players in Base.
@@ -49,6 +67,8 @@
 //			an error will occure due to indexes being out of range.
 //      6.  Batter/Pitcher Add routines			
 //		7.	Import from CSV files. Batters and Pitchers
+//      8.  Need to change TRG fields to WHIP so everything matches up correctly
+//
 //
 
 #include "stdafx.h"
@@ -58,6 +78,7 @@
 #include "DlgAddDivision.h"
 #include "DlgAddTeams.h"
 #include "DlgEditLeague.h"
+#include "DlgCopyPlayer.h"
 #include "AddTeam.h"
 #include "AddConference.h"
 #include "FileStruct.h"
@@ -111,6 +132,8 @@ BEGIN_MESSAGE_MAP(CBaseballDoc, CDocument)
 	ON_COMMAND(ID_LEAGUES_EDITLEAGUE, &CBaseballDoc::OnLeaguesEditLeague)
 	ON_COMMAND(ID_TEAMS_ADDBASETEAMS, &CBaseballDoc::OnTeamsAddBaseTeams)
 	ON_COMMAND(ID_LEAGUES_ADDBASELEAGUE, &CBaseballDoc::OnLeaguesAddBaseLeague)
+	ON_COMMAND(ID_PLAYERS_COPYBATTERS, &CBaseballDoc::OnPlayersCopyBatters)
+	ON_COMMAND(ID_PLAYERS_COPYPITCHERS, &CBaseballDoc::OnPlayersCopyPitchers)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -886,9 +909,9 @@ void CBaseballDoc::ExportFile(int teamID)
 
 		// Process batters
 		sprintf_s(exportData, "%s,%s,%s,",
-			teamRecord.TeamName,
-			batterRecord.LastName,
-			batterRecord.FirstName);
+			teamRecord.TeamName.GetString(),
+			batterRecord.LastName.GetString(),
+			batterRecord.FirstName.GetString());
 		strexportData = exportData;
 		exportBatter.Write(strexportData, strexportData.GetLength());
 		sprintf_s(exportData, "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,",
@@ -909,7 +932,9 @@ void CBaseballDoc::ExportFile(int teamID)
 			batterStatsRecord.StolenBase,
 			batterStatsRecord.CS,
 			Bunting[batterRecord.Bunting],
-			Stealing[batterRecord.Stealing],
+			Stealing[batterRecord.Stealing].GetString(),
+			// The value for Running in the DB is actually the cursor position from the dialog
+			// not the actual value
 			Running[batterRecord.Running],
 			HitRun[batterRecord.HitRun],
 			BatterHits[batterRecord.BatterHits],
@@ -985,6 +1010,8 @@ void CBaseballDoc::ExportFile(int teamID)
 			Pass[batterRecord.Pass],
 			Power[batterRecord.PowerLeft],
 			Power[batterRecord.PowerRight],
+			// The cursor position from the dialog for CatchArm and OutArm is saved in the DB, 
+			// not the actual value!
 			OutArm[batterRecord.OutArm],
 			CatchArm[batterRecord.CatchArm]);
 		strexportData = exportData;
@@ -1111,9 +1138,9 @@ void CBaseballDoc::ExportFile(int teamID)
 
 		// Process pitchers
 		sprintf_s(exportData,"%s,%s,%s,",
-			teamRecord.TeamName,
-			pitcherRecord.LastName,
-			pitcherRecord.FirstName);
+			teamRecord.TeamName.GetString(),
+			pitcherRecord.LastName.GetString(),
+			pitcherRecord.FirstName.GetString());
 		strexportData = exportData;
 		exportPitcher.Write(strexportData,strexportData.GetLength());
 		sprintf_s(exportData,"%3.2f,%i,%i,%i,%i,%i,%i,%i,%i,",
@@ -1123,6 +1150,8 @@ void CBaseballDoc::ExportFile(int teamID)
 			pitcherStatsRecord.Walks,
 			pitcherStatsRecord.Strikeouts,
 			pitcherStatsRecord.HomeRuns,
+			// The value for Hold in the DB is actually the cursor position from the dialog
+			// Not the actual value
 			PHold[pitcherRecord.Hold],
 			pitcherStatsRecord.Wins,
 			pitcherStatsRecord.Loss);
@@ -1364,17 +1393,18 @@ void CBaseballDoc::ExportHTMLFile(int teamID)
 
 	HTMLPlayer.Open(HTMLFileName,CFile::modeCreate | CFile::modeWrite);
 	sprintf_s(HTMLData,"<HTML>\n<HEAD>\n<TITLE>%s</TITLE>\n</HEAD>\n",
-		teamRecord.TeamName);
+		teamRecord.TeamName.GetString());
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 	sprintf_s(HTMLData,"<BODY TEXT=%s LINK=%s VLINK=%s BGCOLOR=%s BACKGROUND=\"%s\">\n",
-		strTextColor,strLinkColor,strVLinkColor,strBGColor,strBackgroundPicture);
+		strTextColor.GetString(), strLinkColor.GetString(), strVLinkColor.GetString(), 
+		strBGColor.GetString(), strBackgroundPicture.GetString());
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData, "<H2>%s</H2>\n", teamRecord.TeamName);
+	sprintf_s(HTMLData, "<H2>%s</H2>\n", teamRecord.TeamName.GetString());
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
-	sprintf_s(HTMLData,"<A href=\"%s\">Back</A><BR><BR>\n",strIndex);
+	sprintf_s(HTMLData,"<A href=\"%s\">Back</A><BR><BR>\n",strIndex.GetString());
 	strHTMLData = HTMLData;
 	HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 	sprintf_s(HTMLData,"<TABLE BORDER>\n<TR>\n");
@@ -1475,7 +1505,7 @@ void CBaseballDoc::ExportHTMLFile(int teamID)
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%s, %s</TD>",
-			batterRecord.LastName, batterRecord.FirstName);
+			batterRecord.LastName.GetString(), batterRecord.FirstName.GetString());
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData, "<TD>%i</TD>",
@@ -1637,7 +1667,7 @@ void CBaseballDoc::ExportHTMLFile(int teamID)
 
 		// Process pitchers
 		sprintf_s(HTMLData,"<TR><TD>%s, %s</TD>",
-			pitcherRecord.LastName, pitcherRecord.FirstName);
+			pitcherRecord.LastName.GetString(), pitcherRecord.FirstName.GetString());
 		strHTMLData = HTMLData;
 		HTMLPlayer.Write(strHTMLData,strHTMLData.GetLength());
 		sprintf_s(HTMLData,"<TD>%1.2f</TD>",
@@ -2067,7 +2097,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	sprintf_s(HTMLData, "<HEAD>\n");
 	strHTMLData = HTMLData;
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
-	sprintf_s(HTMLData, "<TITLE>%s</TITLE>\n", leagueRecord.LeagueName);
+	sprintf_s(HTMLData, "<TITLE>%s</TITLE>\n", leagueRecord.LeagueName.GetString());
 	strHTMLData = HTMLData;
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 	sprintf_s(HTMLData, "</HEAD>\n");
@@ -2075,24 +2105,25 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 
 	sprintf_s(HTMLData, "<BODY TEXT=%s LINK=%s VLINK=%s BGCOLOR=%s BACKGROUND=\"%s\">\n",
-		strTextColor, strLinkColor, strVLinkColor, strBGColor, strBackgroundPicture);
+		strTextColor.GetString(), strLinkColor.GetString(), strVLinkColor.GetString(), 
+		strBGColor.GetString(), strBackgroundPicture.GetString());
 	strHTMLData = HTMLData;
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
-	sprintf_s(HTMLData, "<A href=\"%s\">Back</A><BR><BR>\n", strIndex);
+	sprintf_s(HTMLData, "<A href=\"%s\">Back</A><BR><BR>\n", strIndex.GetString());
 	strHTMLData = HTMLData;
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
-	sprintf_s(HTMLData, "<H2>League: %s</H2>\n", leagueRecord.LeagueName);
+	sprintf_s(HTMLData, "<H2>League: %s</H2>\n", leagueRecord.LeagueName.GetString());
 	strHTMLData = HTMLData;
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 	if (conferenceID != 1)
 	{
-		sprintf_s(HTMLData, "Conference: <B>%s</B><BR>\n", conferenceRecord.ConferenceName);
+		sprintf_s(HTMLData, "Conference: <B>%s</B><BR>\n", conferenceRecord.ConferenceName.GetString());
 		strHTMLData = HTMLData;
 		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 	}
 	if (divisionID != 1)
 	{
-		sprintf_s(HTMLData, "Division: <B>%s</B><BR>\n", divisionRecord.DivisionName);
+		sprintf_s(HTMLData, "Division: <B>%s</B><BR>\n", divisionRecord.DivisionName.GetString());
 		strHTMLData = HTMLData;
 		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 	}
@@ -2197,7 +2228,8 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 		teamRecord = GetTeam(teamID);
 
 		sprintf_s(HTMLData, "%s %-15.15s %1.3f %1.3f %1.3f %5i %4i %5i %4i %4i %4i %3i %4i %4i\n",
-			teamRecord.TeamNameShort, teamRecord.TeamName, fBA, fSLG, fOBP, sumAB, sumRuns, sumHits, sumRBI,
+			teamRecord.TeamNameShort.GetString(), teamRecord.TeamName.GetString(), 
+			fBA, fSLG, fOBP, sumAB, sumRuns, sumHits, sumRBI,
 			sumDouble, sumTriple, sumHomeRun, sumStollen, sumCS);
 		strHTMLData = HTMLData;
 		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
@@ -2300,12 +2332,13 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 		totalStrikeouts += sumStrikeouts;
 
 		fERA = ((float)sumER * 9) / sumInningsPitched;
-		fWHIP = (float)((sumPHits + sumWalks) * 9) / sumInningsPitched;
+		fWHIP = (float)(sumPHits + sumWalks) / sumInningsPitched;
 
 		teamRecord = GetTeam(teamID);
 
 		sprintf_s(HTMLData, "%s %-15.15s %5.2f  %4.1f   %3i   %3i  %6.1f %5i %4i %3i  %4i %4i\n",
-			teamRecord.TeamNameShort, teamRecord.TeamName, fERA, fWHIP, sumWins, sumLoss, sumInningsPitched, sumPHits,
+			teamRecord.TeamNameShort.GetString(), teamRecord.TeamName.GetString(), 
+			fERA, fWHIP, sumWins, sumLoss, sumInningsPitched, sumPHits,
 			sumER, sumPHomeRun, sumWalks, sumStrikeouts);
 		strHTMLData = HTMLData;
 		HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
@@ -2320,7 +2353,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 	HTMLFile.Write(strHTMLData, strHTMLData.GetLength());
 
 	fERA = ((float)totalER * 9) / totalInningsPitched;
-	fWHIP = (float)((totalHits + totalWalks) * 9) / totalInningsPitched;
+	fWHIP = (float)(totalHits + totalWalks) / totalInningsPitched;
 	sprintf_s(HTMLData, "LEAGUE TOTALS       %5.2f  %4.1f   %3i   %3i  %6.1f %5i %4i %3i  %4i %4i\n\n",
 		fERA, fWHIP, totalWins, totalLoss, totalInningsPitched, totalHits, totalER, totalHomeRun, totalWalks, totalStrikeouts);
 	strHTMLData = HTMLData;
@@ -2382,7 +2415,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, atBats);
+			teamNameShort.GetString(), playerName.GetString(), atBats);
 		strArrayHTMLData1.Add(HTMLData);
 
 		// Get next player
@@ -2446,7 +2479,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, runs);
+			teamNameShort.GetString(), playerName.GetString(), runs);
 		strArrayHTMLData2.Add(HTMLData);
 
 		// Get next player
@@ -2510,7 +2543,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
-			teamNameShort, playerName, hits);
+			teamNameShort.GetString(), playerName.GetString(), hits);
 		strArrayHTMLData3.Add(HTMLData);
 
 		// Get next player
@@ -2583,7 +2616,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, rbi);
+			teamNameShort.GetString(), playerName.GetString(), rbi);
 		strArrayHTMLData1.Add(HTMLData);
 
 		// Get next player
@@ -2647,7 +2680,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %1.3f  ",
-			teamNameShort, playerName, avg);
+			teamNameShort.GetString(), playerName.GetString(), avg);
 		strArrayHTMLData2.Add(HTMLData);
 
 		// Get next player
@@ -2711,7 +2744,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %1.3f\n",
-			teamNameShort, playerName, slg);
+			teamNameShort.GetString(), playerName.GetString(), slg);
 		strArrayHTMLData3.Add(HTMLData);
 
 		// Get next player
@@ -2784,7 +2817,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %1.3f ",
-			teamNameShort, playerName, obp);
+			teamNameShort.GetString(), playerName.GetString(), obp);
 		strArrayHTMLData1.Add(HTMLData);
 
 		// Get next player
@@ -2848,7 +2881,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, doubles);
+			teamNameShort.GetString(), playerName.GetString(), doubles);
 		strArrayHTMLData2.Add(HTMLData);
 
 		// Get next player
@@ -2912,7 +2945,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
-			teamNameShort, playerName, triples);
+			teamNameShort.GetString(), playerName.GetString(), triples);
 		strArrayHTMLData3.Add(HTMLData);
 
 		// Get next player
@@ -2986,7 +3019,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, homeRuns);
+			teamNameShort.GetString(), playerName.GetString(), homeRuns);
 		strArrayHTMLData1.Add(HTMLData);
 
 		// Get next player
@@ -3050,7 +3083,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, stolenBase);
+			teamNameShort.GetString(), playerName.GetString(), stolenBase);
 		strArrayHTMLData2.Add(HTMLData);
 
 		// Get next player
@@ -3114,7 +3147,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
-			teamNameShort, playerName, cs);
+			teamNameShort.GetString(), playerName.GetString(), cs);
 		strArrayHTMLData3.Add(HTMLData);
 
 		// Get next player
@@ -3188,7 +3221,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, strikeouts);
+			teamNameShort.GetString(), playerName.GetString(), strikeouts);
 		strArrayHTMLData1.Add(HTMLData);
 
 		// Get next player
@@ -3252,7 +3285,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
-			teamNameShort, playerName, walks);
+			teamNameShort.GetString(), playerName.GetString(), walks);
 		strArrayHTMLData2.Add(HTMLData);
 
 		// Get next player
@@ -3325,7 +3358,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, er);
+			teamNameShort.GetString(), playerName.GetString(), er);
 		strArrayHTMLData1.Add(HTMLData);
 
 		// Get next player
@@ -3392,7 +3425,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %5.2f ",
-			teamNameShort, playerName, era);
+			teamNameShort.GetString(), playerName.GetString(), era);
 		strArrayHTMLData2.Add(HTMLData);
 
 		// Get next player
@@ -3459,7 +3492,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %6.1f\n",
-			teamNameShort, playerName, ip);
+			teamNameShort.GetString(), playerName.GetString(), ip);
 		strArrayHTMLData3.Add(HTMLData);
 
 		// Get next player
@@ -3532,7 +3565,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, hits);
+			teamNameShort.GetString(), playerName.GetString(), hits);
 		strArrayHTMLData1.Add(HTMLData);
 
 		// Get next player
@@ -3596,7 +3629,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %5.2f ",
-			teamNameShort, playerName, whip);
+			teamNameShort.GetString(), playerName.GetString(), whip);
 		strArrayHTMLData2.Add(HTMLData);
 
 		// Get next player
@@ -3663,7 +3696,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
-			teamNameShort, playerName, walks);
+			teamNameShort.GetString(), playerName.GetString(), walks);
 		strArrayHTMLData3.Add(HTMLData);
 
 		// Get next player
@@ -3736,7 +3769,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, strikeouts);
+			teamNameShort.GetString(), playerName.GetString(), strikeouts);
 		strArrayHTMLData1.Add(HTMLData);
 
 		// Get next player
@@ -3800,7 +3833,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i ",
-			teamNameShort, playerName, wins);
+			teamNameShort.GetString(), playerName.GetString(), wins);
 		strArrayHTMLData2.Add(HTMLData);
 
 		// Get next player
@@ -3864,7 +3897,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
-			teamNameShort, playerName, loss);
+			teamNameShort.GetString(), playerName.GetString(), loss);
 		strArrayHTMLData3.Add(HTMLData);
 
 		// Get next player
@@ -3937,7 +3970,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i  ",
-			teamNameShort, playerName, starts);
+			teamNameShort.GetString(), playerName.GetString(), starts);
 		strArrayHTMLData1.Add(HTMLData);
 
 		// Get next player
@@ -4001,7 +4034,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i ",
-			teamNameShort, playerName, saves);
+			teamNameShort.GetString(), playerName.GetString(), saves);
 		strArrayHTMLData2.Add(HTMLData);
 
 		// Get next player
@@ -4065,7 +4098,7 @@ void CBaseballDoc::BuildPlayerArray(int leagueID, int conferenceID, int division
 
 		playerName = firstName + _T(" ") + lastName;
 		sprintf_s(HTMLData, "%s %-16.16s %4i\n",
-			teamNameShort, playerName, homeRuns);
+			teamNameShort.GetString(), playerName.GetString(), homeRuns);
 		strArrayHTMLData3.Add(HTMLData);
 
 		// Get next player
@@ -4140,6 +4173,7 @@ void CBaseballDoc::OnPlayersAddEditBatters()
 
 	// Remove the APPLY button from the display
 	myBattersSheet.m_psh.dwFlags |= PSH_NOAPPLYNOW;
+
 	myBattersSheet.DoModal();
 }
 
@@ -4612,13 +4646,13 @@ int CBaseballDoc::OpenDatabase()
 	}
 	else
 	{
-		sprintf_s(buffer, sizeof(buffer), "Database opened: %s\n", ansiString);
+		sprintf_s(buffer, sizeof(buffer), "Database opened: %s\n", ansiString.GetString());
 		//AfxMessageBox(buffer);
 
 		// Display version of Database
 		//DBVersion();
 
-		// Enable Foregin Keyss support in sqlite
+		// Enable Foregin Keys support in sqlite
 		DBSetForeginKeys(true);
 	}
 
@@ -7884,7 +7918,7 @@ int CBaseballDoc::PitcherUpdate(m_PitcherRecord PitcherRecord)
 		"ER1 = ?32," \
 		"TeamID = ?33," \
 		"LastUpdateTime = datetime('NOW','localtime')" \
-		" WHERE BatterID = ?34 ";
+		" WHERE PitcherID = ?34 ";
 
 	rc = sqlite3_prepare_v2(m_db, sqlPitcher, strlen(sqlPitcher), &m_stmt, 0);
 	if (rc != SQLITE_OK)
@@ -8944,4 +8978,392 @@ int CBaseballDoc::OptionInsertDefault(int LeagueID)
 
 	sqlite3_finalize(m_stmt);
 	return 0;
+}
+
+
+void CBaseballDoc::OnPlayersCopyBatters()
+{
+	// TODO: Get batter. Create new batterstat record that points to the team and the base batter record.
+	//       Team assignments come from the stat record.
+	//       Batter base team will not point to the same team as the stats.
+	//       So: select the base team that has the batter
+	//
+
+	DlgCopyPlayer dlg;
+
+	int i;
+	int leagueID;
+	int teamID = 0;
+	int conferenceID = 0;
+	int divisionID = 0;
+	CString TeamName;
+	char* sqlBatterStats;
+	char* sqlRecCount;
+	int rc;
+	CHAR buffer[100];
+	int batterID;
+	int batterStatsID;
+	CString strFirstName;
+	CString strLastName;
+	CStringArray arrayFirstName;
+	CStringArray arrayLastName;
+	int myIndex = 0;
+	CString myDlgSelection;
+	CString myArraySearch;
+	int arraySize;
+	m_BatterStatsRecord myBatterstatsRecord;
+	int myRecCount = 0;
+	int myBatterID;
+	CString myStrFirst;
+	CString myStrLast;
+
+	// Only get base teams
+	leagueID = GetLeagues(TRUE);
+
+	teamID = GetTeams(leagueID);
+	m_TeamRecord teamRecord = GetTeam(teamID);
+
+	TeamName = teamRecord.TeamName;
+
+	// Create SQL statement to retrieve count of records
+	sqlRecCount = "SELECT "  \
+		"count() " \
+		" FROM BATTERSTATS " \
+		" AS count" \
+		" WHERE TeamID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlRecCount, strlen(sqlRecCount), &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch sqlRecCount data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS count Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+	
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, teamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	// Need to loop through, there should be only one record with count
+	i = 0;
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		myRecCount = sqlite3_column_int(m_stmt, 0);
+	}
+
+	// Define batterIDArray on the heap. Size varies based on number of records returned
+	int* batterIDArray = new int[myRecCount] { 0 };
+
+	// Create SQL statement for BatterStats retrival
+	sqlBatterStats = "SELECT "  \
+		"BatterStatsID," \
+		"B.BatterID," \
+		"FirstName," \
+		"LastName " \
+		" FROM BATTERSTATS AS S " \
+		" JOIN BATTER AS B " \
+		" ON S.BatterID=B.BatterID " \
+		" WHERE S.TeamID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlBatterStats, strlen(sqlBatterStats), &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for BATTERSTATS JOIN Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, teamID);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	// Need to loop through each batter and extract their names and
+	//     insert the names in the Dialog comboBox
+	i = 0;
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		batterStatsID = sqlite3_column_int(m_stmt, 0);
+		batterID = sqlite3_column_int(m_stmt, 1);
+		strFirstName = sqlite3_column_text(m_stmt, 2);
+		strLastName = sqlite3_column_text(m_stmt, 3);
+		dlg.m_arrayPlayers.Add(strFirstName + _T(" ") + strLastName);
+		
+		batterIDArray[i] = batterID;
+		arrayFirstName.Add(strFirstName);
+		arrayLastName.Add(strLastName);
+		i++;
+	}
+
+	sqlite3_finalize(m_stmt);
+	
+	if (dlg.DoModal() == IDOK)
+	{
+
+		myDlgSelection = dlg.m_selection;
+
+		arraySize = dlg.m_arrayPlayers.GetSize();
+		for (i=0; i < arraySize; i++ )
+		{
+			myArraySearch = dlg.m_arrayPlayers.GetAt(i).GetString();
+			if (myArraySearch == myDlgSelection)
+				myIndex = i;
+		}
+
+		myArraySearch = dlg.m_arrayPlayers.GetAt(myIndex).GetString();
+		CString myStrFirst = arrayFirstName.GetAt(myIndex).GetString();
+		CString myStrLast = arrayLastName.GetAt(myIndex).GetString();
+		myBatterID = batterIDArray[myIndex];
+
+		// Only get non base teams
+		leagueID = GetLeagues(FALSE);
+
+		teamID = GetTeams(leagueID);
+
+		// BatterStatsID is the index and is created during INSERT
+		//myBatterstatsRecord.BatterStatsID = 0;
+		myBatterstatsRecord.AB = 0;
+		myBatterstatsRecord.Runs = 0;
+		myBatterstatsRecord.Hits = 0;
+		myBatterstatsRecord.RBI = 0;
+		myBatterstatsRecord.Doubles = 0;
+		myBatterstatsRecord.Triples = 0;
+		myBatterstatsRecord.HomeRuns = 0;
+		myBatterstatsRecord.Walk = 0;
+		myBatterstatsRecord.Stirkeout = 0;
+		myBatterstatsRecord.ReachedOnError = 0;
+		myBatterstatsRecord.Sacrifice = 0;
+		myBatterstatsRecord.StolenBase = 0;
+		myBatterstatsRecord.CS = 0;
+		myBatterstatsRecord.Games = 0;
+		myBatterstatsRecord.HBP = 0;
+		myBatterstatsRecord.AVG = 0;
+		myBatterstatsRecord.SLG = 0;
+		myBatterstatsRecord.OBP = 0;
+		myBatterstatsRecord.BatterID = myBatterID;
+		myBatterstatsRecord.TeamID = teamID;
+		// Active record defaults to TRUE and in not included in the INSERT
+		//myBatterstatsRecord.ActiveRec = 1;
+		// Times are dynamically created
+		//CStringA CreateTime;
+		//CStringA LastUpdateTime;
+
+		BatterStatsAdd(myBatterstatsRecord);
+	}
+
+	// Free up Heap declaration
+	delete[] batterIDArray;
+	// Reset Name arrays
+	arrayFirstName.RemoveAll();
+	arrayLastName.RemoveAll();
+}
+
+
+void CBaseballDoc::OnPlayersCopyPitchers()
+{
+	// TODO: Get pitcher. Create new pitcherstat record that points to the team and the base batter record.
+	//       Team assignments come from the stat record.
+	//       Batter base team will not point to the same team as the stats.
+	//       So: select the base team that has the batter
+	//
+
+	DlgCopyPlayer dlg;
+
+	int i;
+	int leagueID;
+	int teamID = 0;
+	int conferenceID = 0;
+	int divisionID = 0;
+	CString TeamName;
+	char* sqlPitcherStats;
+	char* sqlRecCount;
+	int rc;
+	CHAR buffer[100];
+	int pitcherID;
+	int pitcherStatsID;
+	CString strFirstName;
+	CString strLastName;
+	CStringArray arrayFirstName;
+	CStringArray arrayLastName;
+	int myIndex = 0;
+	CString myDlgSelection;
+	CString myArraySearch;
+	int arraySize;
+	m_PitcherStatsRecord myPitcherstatsRecord;
+	int myRecCount = 0;
+	int myPitcherID;
+	CString myStrFirst;
+	CString myStrLast;
+
+	// Only get base teams
+	leagueID = GetLeagues(TRUE);
+
+	teamID = GetTeams(leagueID);
+	m_TeamRecord teamRecord = GetTeam(teamID);
+
+	TeamName = teamRecord.TeamName;
+
+	// Create SQL statement to retrieve count of records
+	sqlRecCount = "SELECT "  \
+		"count() " \
+		" FROM PITCHERSTATS " \
+		" AS count" \
+		" WHERE TeamID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlRecCount, strlen(sqlRecCount), &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch sqlRecCount data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS count Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, teamID);
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	// Need to loop through, there should be only one record with count
+	i = 0;
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		myRecCount = sqlite3_column_int(m_stmt, 0);
+	}
+
+	// Define pitcherIDArray on the heap. Size varies based on number of records returned
+	int* pitcherIDArray = new int[myRecCount] { 0 };
+
+	// Create SQL statement for BatterStats retrival
+	sqlPitcherStats = "SELECT "  \
+		"PitcherStatsID," \
+		"P.PitcherID," \
+		"FirstName," \
+		"LastName " \
+		" FROM PITCHERSTATS AS S " \
+		" JOIN PITCHER AS P " \
+		" ON S.PitcherID=P.PitcherID " \
+		" WHERE S.TeamID = ?1 ";
+
+	rc = sqlite3_prepare_v2(m_db, sqlPitcherStats, strlen(sqlPitcherStats), &m_stmt, 0);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Failed to fetch data: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+	else
+	{
+		sprintf_s(buffer, sizeof(buffer), "Prepare for PITCHERSTATS JOIN Select OK:\n");
+		//AfxMessageBox(buffer);
+	}
+
+	// Bind the data to field '1' which is the first '?' in the INSERT statement
+	rc = sqlite3_bind_int(m_stmt, 1, teamID);
+
+	if (rc != SQLITE_OK)
+	{
+		sprintf_s(buffer, sizeof(buffer), "Could not bind TeamID int: %s\n", sqlite3_errmsg(m_db));
+		AfxMessageBox(buffer);
+	}
+
+	// Need to loop through each pitcher and extract their names and
+	//     insert the names in the Dialog comboBox
+	i = 0;
+	while (sqlite3_step(m_stmt) == SQLITE_ROW)
+	{
+		pitcherStatsID = sqlite3_column_int(m_stmt, 0);
+		pitcherID = sqlite3_column_int(m_stmt, 1);
+		strFirstName = sqlite3_column_text(m_stmt, 2);
+		strLastName = sqlite3_column_text(m_stmt, 3);
+		dlg.m_arrayPlayers.Add(strFirstName + _T(" ") + strLastName);
+
+		pitcherIDArray[i] = pitcherID;
+		arrayFirstName.Add(strFirstName);
+		arrayLastName.Add(strLastName);
+		i++;
+	}
+
+	sqlite3_finalize(m_stmt);
+
+	if (dlg.DoModal() == IDOK)
+	{
+
+		myDlgSelection = dlg.m_selection;
+
+		arraySize = dlg.m_arrayPlayers.GetSize();
+		for (i = 0; i < arraySize; i++)
+		{
+			myArraySearch = dlg.m_arrayPlayers.GetAt(i).GetString();
+			if (myArraySearch == myDlgSelection)
+				myIndex = i;
+		}
+
+		myArraySearch = dlg.m_arrayPlayers.GetAt(myIndex).GetString();
+		myStrFirst = arrayFirstName.GetAt(myIndex).GetString();
+		myStrLast = arrayLastName.GetAt(myIndex).GetString();
+		myPitcherID = pitcherIDArray[myIndex];
+
+		// Only get non base teams
+		leagueID = GetLeagues(FALSE);
+
+		teamID = GetTeams(leagueID);
+
+		// PitcherStatsID is the index and is created during INSERT
+		//myPitcherstatsRecord.PitcherStatsID = 0;
+		myPitcherstatsRecord.Wins = 0;
+		myPitcherstatsRecord.Loss = 0;
+		myPitcherstatsRecord.Saves = 0;
+		myPitcherstatsRecord.InningsPitched = 0;
+		myPitcherstatsRecord.ER = 0;
+		myPitcherstatsRecord.Hits = 0;
+		myPitcherstatsRecord.Walks = 0;
+		myPitcherstatsRecord.Strikeouts = 0;
+		myPitcherstatsRecord.HomeRuns = 0;
+		myPitcherstatsRecord.Games = 0;
+		myPitcherstatsRecord.CompleteGames = 0;
+		myPitcherstatsRecord.Starts = 0;
+		myPitcherstatsRecord.ERA = 0;
+		myPitcherstatsRecord.WHIP = 0;
+		myPitcherstatsRecord.PitcherID = myPitcherID;
+		myPitcherstatsRecord.TeamID = teamID;
+		// Active record defaults to TRUE and in not included in the INSERT
+		//myPitcherstatsRecord.ActiveRec = 1;
+		// Times are dynamically created
+		//CStringA CreateTime;
+		//CStringA LastUpdateTime;
+
+		PitcherStatsAdd(myPitcherstatsRecord);
+	}
+
+	// Free up Heap declaration
+	delete[] pitcherIDArray;
+	// Reset Name arrays
+	arrayFirstName.RemoveAll();
+	arrayLastName.RemoveAll();
 }

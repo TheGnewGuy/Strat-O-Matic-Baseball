@@ -1259,6 +1259,7 @@ BEGIN_MESSAGE_MAP(PropertySheetBatters, CPropertySheet)
 	ON_MESSAGE(WM_APP2,OnOK)
 	ON_MESSAGE(WM_APP3,OnCancel)
 	ON_MESSAGE(WM_APP4, &PropertySheetBatters::OnAdd)
+//	ON_COMMAND(AFX_IDC_FONTSIZES, &PropertySheetBatters::OnAfxIdcFontsizes)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1288,6 +1289,27 @@ BOOL PropertySheetBatters::OnInitDialog()
 	CWnd* pHelpWnd = GetDlgItem(IDHELP);
 	ASSERT (pHelpWnd);
 	pHelpWnd->ShowWindow(SW_HIDE);
+
+	//// Change font size
+	////CFont* pFont = GetFont();
+	//// Initializes a CFont object with the specified characteristics.
+	////CFont myfont; // located in dialogs.h
+	//VERIFY(myfont.CreateFont(
+	//	12,                       // nHeight
+	//	0,                        // nWidth
+	//	0,                        // nEscapement
+	//	0,                        // nOrientation
+	//	FW_NORMAL,                // nWeight
+	//	FALSE,                    // bItalic
+	//	FALSE,                    // bUnderline
+	//	0,                        // cStrikeOut
+	//	ANSI_CHARSET,             // nCharSet
+	//	OUT_DEFAULT_PRECIS,       // nOutPrecision
+	//	CLIP_DEFAULT_PRECIS,      // nClipPrecision
+	//	DEFAULT_QUALITY,          // nQuality
+	//	DEFAULT_PITCH | FF_SWISS, // nPitchAndFamily
+	//	_T("Arial")));            // lpszFacename
+	//SetFont(&myfont, 1);
 
 	// Resize the window to remove the buttons
 	GetWindowRect(&rcWnd);
@@ -1529,11 +1551,16 @@ LRESULT PropertySheetBatters::OnUpdate(WPARAM wParam,LPARAM lParam)
 		m_structBatter.m_PlayerName = cTemp;
 		batterRecord.Bunting = m_pPage4->m_comboBunting.GetCurSel();
 		batterRecord.Stealing = m_pPage4->m_comboStealing.GetCurSel();
-		batterRecord.Running = m_pPage4->m_comboRunning.GetCurSel();
+		// Running returns the cursor position from the DB
+//		batterRecord.Running = m_pPage4->m_comboRunning.GetCurSel();	// 5 to 19
+		batterRecord.Running = m_pPage4->GetDlgItemInt(IDC_COMBO_RUNNING, &rc_GetDlgItemInt, FALSE);	// 5 to 19
 		batterRecord.HitRun = m_pPage4->m_comboHitRun.GetCurSel();
 		batterRecord.BatterHits = m_pPage4->m_comboBatterHits.GetCurSel();
-		batterRecord.CatchArm = m_pPage4->m_comboCatcherArm.GetCurSel();
-		batterRecord.OutArm = m_pPage4->m_comboOutArm.GetCurSel();
+		// CatchArm and OutArm are returning the cursor position 
+//		batterRecord.CatchArm = m_pPage4->m_comboCatcherArm.GetCurSel();
+		batterRecord.CatchArm = m_pPage4->GetDlgItemInt(IDC_COMBO_CATCHERARM, &rc_GetDlgItemInt, TRUE);
+//		batterRecord.OutArm = m_pPage4->m_comboOutArm.GetCurSel();
+		batterRecord.OutArm = m_pPage4->GetDlgItemInt(IDC_COMBO_OUTARM, &rc_GetDlgItemInt, TRUE);
 		batterRecord.Pass = m_pPage4->m_comboPassBall.GetCurSel();
 		batterRecord.PowerLeft = m_pPage4->m_comboPowerLeft.GetCurSel();
 		batterRecord.PowerRight = m_pPage4->m_comboPowerRight.GetCurSel();
@@ -1816,11 +1843,15 @@ afx_msg LRESULT PropertySheetBatters::OnAdd(WPARAM wParam, LPARAM lParam)
 		m_structBatter.m_PlayerName = cTemp;
 		batterRecord.Bunting = m_pPage4->m_comboBunting.GetCurSel();
 		batterRecord.Stealing = m_pPage4->m_comboStealing.GetCurSel();
-		batterRecord.Running = m_pPage4->m_comboRunning.GetCurSel();
+//		batterStatsRecord.Games = m_pPage3->GetDlgItemInt(IDC_GAMES2, &rc_GetDlgItemInt, FALSE);
+//		batterRecord.Running = m_pPage4->m_comboRunning.GetCurSel();
+		batterRecord.Running = m_pPage4->GetDlgItemInt(IDC_COMBO_RUNNING, &rc_GetDlgItemInt, FALSE);
 		batterRecord.HitRun = m_pPage4->m_comboHitRun.GetCurSel();
 		batterRecord.BatterHits = m_pPage4->m_comboBatterHits.GetCurSel();
-		batterRecord.CatchArm = m_pPage4->m_comboCatcherArm.GetCurSel();
-		batterRecord.OutArm = m_pPage4->m_comboOutArm.GetCurSel();
+//		batterRecord.CatchArm = m_pPage4->m_comboCatcherArm.GetCurSel();
+//		batterRecord.OutArm = m_pPage4->m_comboOutArm.GetCurSel();
+		batterRecord.CatchArm = m_pPage4->GetDlgItemInt(IDC_COMBO_CATCHERARM, &rc_GetDlgItemInt, TRUE);
+		batterRecord.OutArm = m_pPage4->GetDlgItemInt(IDC_COMBO_OUTARM, &rc_GetDlgItemInt, TRUE);
 		batterRecord.Pass = m_pPage4->m_comboPassBall.GetCurSel();
 		batterRecord.PowerLeft = m_pPage4->m_comboPowerLeft.GetCurSel();
 		batterRecord.PowerRight = m_pPage4->m_comboPowerRight.GetCurSel();
@@ -2276,11 +2307,13 @@ void PropertySheetBatters::OnCloseupComboPlayerName(int iPage)
 			m_pPage4->SetDlgItemText(IDC_COMBO_PLAYERNAME1, batterRecord.FirstName + _T(" ") + batterRecord.LastName);
 			m_pPage4->m_comboBunting.SetCurSel(batterRecord.Bunting);
 			m_pPage4->m_comboStealing.SetCurSel(batterRecord.Stealing);
-			m_pPage4->m_comboRunning.SetCurSel(batterRecord.Running);
+			// The value in the DB for Running is actually to cursor position in the dialog
+			m_pPage4->m_comboRunning.SetCurSel(batterRecord.Running-5);		// 5 to 19
 			m_pPage4->m_comboHitRun.SetCurSel(batterRecord.HitRun);
 			m_pPage4->m_comboBatterHits.SetCurSel(batterRecord.BatterHits);
-			m_pPage4->m_comboCatcherArm.SetCurSel(batterRecord.CatchArm);
-			m_pPage4->m_comboOutArm.SetCurSel(batterRecord.OutArm);
+			// CatchArm and OutArm are returning the cursor position 
+			m_pPage4->m_comboCatcherArm.SetCurSel(batterRecord.CatchArm+4);	// -4 to 5 
+			m_pPage4->m_comboOutArm.SetCurSel(batterRecord.OutArm+6);			// -6 to 5 
 			m_pPage4->m_comboPassBall.SetCurSel(batterRecord.Pass);
 			m_pPage4->m_comboPowerLeft.SetCurSel(batterRecord.PowerLeft);
 			m_pPage4->m_comboPowerRight.SetCurSel(batterRecord.PowerRight);
@@ -2828,7 +2861,7 @@ BOOL PropertyPagePitchersInfo::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 	
 	// TODO: Add extra initialization here
-	m_spinRelief.SetRange(0, 4);
+	m_spinRelief.SetRange(0, 5);
 	m_spinRelief.SetBuddy( &m_ceditRelief );
 	m_spinStarter.SetRange(0, 9);
 	m_spinStarter.SetBuddy( &m_ceditStarter );
@@ -4190,7 +4223,8 @@ afx_msg LRESULT PropertySheetPitchers::OnAdd(WPARAM wParam, LPARAM lParam)
 		else
 		{
 			pitcherStatsRecord.ERA = (float)(pitcherStatsRecord.ER * 9) / pitcherStatsRecord.InningsPitched;
-			pitcherStatsRecord.WHIP = (float)((pitcherStatsRecord.Hits + pitcherStatsRecord.Walks) * 9) / pitcherStatsRecord.InningsPitched;
+			// WHIP should not had * 9
+			pitcherStatsRecord.WHIP = (float)(pitcherStatsRecord.Hits + pitcherStatsRecord.Walks) / pitcherStatsRecord.InningsPitched;
 		}
 		m_pPage3->m_bChangedFlag = FALSE;
 	}
@@ -4694,7 +4728,8 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 		else
 		{
 			pitcherStatsRecord.ERA = (float)(pitcherStatsRecord.ER * 9) / pitcherStatsRecord.InningsPitched;
-			pitcherStatsRecord.WHIP = (float)((pitcherStatsRecord.Hits + pitcherStatsRecord.Walks) * 9) / pitcherStatsRecord.InningsPitched;
+			// WHIP should not had * 9
+			pitcherStatsRecord.WHIP = (float)(pitcherStatsRecord.Hits + pitcherStatsRecord.Walks) / pitcherStatsRecord.InningsPitched;
 		}
 		m_pPage3->m_bChangedFlag = FALSE;
 	}
@@ -4733,7 +4768,7 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 				fERA = (double)(pitcherStatsRecord.ER * 9) / pitcherStatsRecord.InningsPitched;
 				sprintf_s(buf, "%1.2f", fERA);
 				m_pPage3->SetDlgItemText(IDC_ERA1, buf);
-				fTRG = (double)((pitcherStatsRecord.Hits + pitcherStatsRecord.Walks) * 9) / pitcherStatsRecord.InningsPitched;
+				fTRG = (double)(pitcherStatsRecord.Hits + pitcherStatsRecord.Walks) / pitcherStatsRecord.InningsPitched;
 				sprintf_s(buf, "%1.2f", fTRG);
 				m_pPage3->SetDlgItemText(IDC_TRG1, buf);
 				m_pPage3->m_bChangedFlag = FALSE;

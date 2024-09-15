@@ -415,6 +415,9 @@ public:
 	LONG m_lSeekPlayerFile;
 	BatterStruct m_structBatter;
 	CString m_FileName;
+// Not working
+	CFont myfont;
+
 
 // Operations
 public:
@@ -606,6 +609,8 @@ public:
 protected:
 //	afx_msg LRESULT WM_APP4(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnAdd(WPARAM wParam, LPARAM lParam);
+public:
+//	afx_msg void OnAfxIdcFontsizes();
 };
 
 /////////////////////////////////////////////////////////////////////////////
