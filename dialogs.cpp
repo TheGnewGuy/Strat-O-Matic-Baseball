@@ -4142,7 +4142,8 @@ afx_msg LRESULT PropertySheetPitchers::OnAdd(WPARAM wParam, LPARAM lParam)
 		pitcherRecord.ER1 = m_pPage1->GetDlgItemInt(IDC_ERP, &rc_GetDlgItemInt, FALSE);
 		pitcherRecord.Balk = m_pPage1->GetDlgItemInt(IDC_BALK, &rc_GetDlgItemInt, FALSE);
 		pitcherRecord.Throws = m_pPage1->m_comboThrows.GetCurSel();
-		pitcherRecord.Hold = m_pPage1->m_comboHold.GetCurSel();
+//		pitcherRecord.Hold = m_pPage1->m_comboHold.GetCurSel();
+		pitcherRecord.Hold = m_pPage1->GetDlgItemInt(IDC_COMBO_HOLD1, &rc_GetDlgItemInt, TRUE);
 		pitcherRecord.Bunting = m_pPage1->m_comboBunting.GetCurSel();
 		m_pPage1->m_bChangedFlag = FALSE;
 	}
@@ -4495,7 +4496,9 @@ void PropertySheetPitchers::OnCloseupComboPlayerName(int iPage)
 			m_pPage1->SetDlgItemInt(IDC_ERP, pitcherRecord.ER1, FALSE);
 			m_pPage1->SetDlgItemInt(IDC_BALK, pitcherRecord.Balk, FALSE);
 			m_pPage1->m_comboThrows.SetCurSel(pitcherRecord.Throws);
-			m_pPage1->m_comboHold.SetCurSel(pitcherRecord.Hold);
+//			m_pPage1->m_comboHold.SetCurSel(pitcherRecord.Hold);
+//			m_pPage1->SetDlgItemInt(IDC_COMBO_HOLD1, pitcherRecord.Hold, TRUE);
+			m_pPage1->m_comboHold.SetCurSel(pitcherRecord.Hold+6);
 			m_pPage1->m_comboBunting.SetCurSel(pitcherRecord.Bunting);
 			m_pPage1->m_bChangedFlag = FALSE;
 		}
@@ -4647,7 +4650,8 @@ LRESULT PropertySheetPitchers::OnUpdate(WPARAM wParam, LPARAM lParam)
 		pitcherRecord.ER1 = m_pPage1->GetDlgItemInt(IDC_ERP, &rc_GetDlgItemInt, FALSE);
 		pitcherRecord.Balk = m_pPage1->GetDlgItemInt(IDC_BALK, &rc_GetDlgItemInt, FALSE);
 		pitcherRecord.Throws = m_pPage1->m_comboThrows.GetCurSel();
-		pitcherRecord.Hold = m_pPage1->m_comboHold.GetCurSel();
+//		pitcherRecord.Hold = m_pPage1->m_comboHold.GetCurSel();
+		pitcherRecord.Hold = m_pPage1->GetDlgItemInt(IDC_COMBO_HOLD1, &rc_GetDlgItemInt, TRUE);
 		pitcherRecord.Bunting = m_pPage1->m_comboBunting.GetCurSel();
 		m_pPage1->m_bChangedFlag	= FALSE;
 	}
